@@ -1,11 +1,10 @@
-// Configuração do Client e Fonte de Dados
+// generator client e datasource (Padrão Prisma 7)
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // --- ENUMS ---
@@ -32,78 +31,78 @@ enum PostStatus {
 
 model Role {
   id    String @id @default(uuid())
-  nome  String @unique // Admin Sistema, Admin Postador, Usuário Comum, RH
+  nome  String @unique
   users User[]
 }
 
 model JobTitle {
-  id           String             @id @default(uuid())
-  nome_cargo   String
-  departamento String
-  users        User[]
-  // Relacionamentos para o histórico de promoções
-  promocoes_de PromotionHistory[] @relation("CargoAnterior")
+  id             String             @id @default(uuid())
+  nome_cargo     String
+  departamento   String
+  users          User[]
+  promocoes_de   PromotionHistory[] @relation("CargoAnterior")
   promocoes_para PromotionHistory[] @relation("NovoCargo")
 }
 
 model User {
-  id                        String             @id @default(uuid())
-  cpf                       String             @unique
-  nome_completo             String
-  email_recuperacao         String?
-  telefone                  String?
-  senha_hash                String
-  foto_url                  String?
-  data_nascimento           DateTime
-  data_admissao             DateTime
-  primeiro_acesso           Boolean            @default(true)
-  status                    UserStatus         @default(PENDENTE)
-  data_exclusao_programada  DateTime?
+  id                       String             @id @default(uuid())
+  cpf                      String             @unique
+  nome_completo            String
+  email_recuperacao        String?
+  telefone                 String?
+  senha_hash               String
+  foto_url                 String?
+  data_nascimento          DateTime
+  data_admissao            DateTime
+  primeiro_acesso          Boolean            @default(true)
+  status                   UserStatus         @default(PENDENTE)
+  data_exclusao_programada DateTime?
   
-  // Relacionamentos
-  role_id                   String
-  role                      Role               @relation(fields: [role_id], references: [id])
-  cargo_id                  String
-  cargo                     JobTitle           @relation(fields: [cargo_id], references: [id])
+  role_id                  String
+  role                     Role               @relation(fields: [role_id], references: [id])
+  cargo_id                 String
+  cargo                    JobTitle           @relation(fields: [cargo_id], references: [id])
   
-  posts                     Post[]
-  visualizacoes             PostView[]
-  curtidas                  Like[]
-  comentarios               Comment[]
-  reacoes                   Reaction[]
-  historico_promocoes       PromotionHistory[]
+  posts                    Post[]
+  visualizacoes            PostView[]
+  curtidas                 Like[]
+  comentarios              Comment[]
+  reacoes                  Reaction[]
+  historico_promocoes      PromotionHistory[]
 
-  createdAt                 DateTime           @default(now())
-  updatedAt                 DateTime           @updatedAt
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
 }
 
-
 model Post {
-  id                        String      @id @default(uuid())
-  tipo                      PostType    @default(MANUAL)
-  mensagem                  String      @db.Text
-  midia_url                 String?
-  data_publicacao           DateTime    @default(now())
-  status                    PostStatus  @default(PUBLICADO)
-  configuracao_recorrencia  Json?       // Armazena regras de repetição
-  visualizacoes_count       Int         @default(0)
+  id                       String      @id @default(uuid())
+  tipo                     PostType    @default(MANUAL)
+  mensagem                 String      @db.Text
+  midia_url                String?
+  data_publicacao          DateTime    @default(now())
+  status                   PostStatus  @default(PUBLICADO)
+  configuracao_recorrencia Json?       
+  visualizacoes_count      Int         @default(0)
 
-  // Relacionamentos
-  autor_id                  String
-  autor                     User        @relation(fields: [autor_id], references: [id])
+  autor_id                 String
+  autor                    User        @relation(fields: [autor_id], references: [id])
   
-  visualizacoes_detalhe     PostView[]
-  curtidas                  Like[]
-  comentarios               Comment[]
-  reacoes                   Reaction[]
+  visualizacoes_detalhe    PostView[]
+  curtidas_rel             Like[]
+  comentarios_rel          Comment[]
+  reacoes_rel              Reaction[]
 
-  createdAt                 DateTime    @default(now())
+  // RELACIONAMENTOS ADICIONADOS PARA OS CONTADORES
+  count_views              countviews?
+  count_likes              countLikes?
+  count_comments           countComments?
+
+  createdAt                DateTime    @default(now())
 }
 
 model PostView {
   id         String   @id @default(uuid())
   data_hora  DateTime @default(now())
-  
   post_id    String
   post       Post     @relation(fields: [post_id], references: [id])
   usuario_id String
@@ -119,14 +118,13 @@ model Like {
   usuario_id String
   usuario    User   @relation(fields: [usuario_id], references: [id])
 
-  @@unique([post_id, usuario_id]) // Evita curtidas duplicadas
+  @@unique([post_id, usuario_id]) 
 }
 
 model Comment {
   id         String   @id @default(uuid())
-  texto      String   @db.VarChar(100) // Limite de caracteres
+  texto      String   @db.VarChar(100) 
   data_hora  DateTime @default(now())
-  
   post_id    String
   post       Post     @relation(fields: [post_id], references: [id])
   usuario_id String
@@ -136,47 +134,42 @@ model Comment {
 model Reaction {
   id            String @id @default(uuid())
   emoji_unicode String
-  
   post_id       String
   post          Post   @relation(fields: [post_id], references: [id])
   usuario_id    String
   usuario       User   @relation(fields: [usuario_id], references: [id])
 }
 
-
-
 model PromotionHistory {
-  id                      String   @id @default(uuid())
-  data_promocao           DateTime @default(now())
-  post_automatico_gerado  Boolean  @default(false)
-
-  usuario_id              String
-  usuario                 User     @relation(fields: [usuario_id], references: [id])
-  
-  cargo_anterior_id       String
-  cargo_anterior          JobTitle @relation("CargoAnterior", fields: [cargo_anterior_id], references: [id])
-  
-  novo_cargo_id           String
-  novo_cargo              JobTitle @relation("NovoCargo", fields: [novo_cargo_id], references: [id])
+  id                     String   @id @default(uuid())
+  data_promocao          DateTime @default(now())
+  post_automatico_gerado Boolean  @default(false)
+  usuario_id             String
+  usuario                User     @relation(fields: [usuario_id], references: [id])
+  cargo_anterior_id      String
+  cargo_anterior         JobTitle @relation("CargoAnterior", fields: [cargo_anterior_id], references: [id])
+  novo_cargo_id          String
+  novo_cargo             JobTitle @relation("NovoCargo", fields: [novo_cargo_id], references: [id])
 }
 
-model countLikesPerPost {
-  post_id    String
-  total      Int
-
-  @@map("count_likes_per_post") // Mapeia para uma view ou tabela agregada
+// MODELOS DE CONTADORES AJUSTADOS PARA RELAÇÃO 1:1
+model countviews {
+  id      String @id @default(uuid())
+  post_id String @unique
+  post    Post   @relation(fields: [post_id], references: [id])
+  count   Int    @default(0)
 }
 
-model coutnCommentsPerPost {
-  post_id    String
-  total      Int
-
-  @@map("count_comments_per_post") // Mapeia para uma view ou tabela agregada
+model countLikes {
+  id      String @id @default(uuid())
+  post_id String @unique
+  post    Post   @relation(fields: [post_id], references: [id])
+  count   Int    @default(0)
 }
 
-model countViewsPerPost {
-  post_id    String
-  total      Int
-
-  @@map("count_views_per_post") // Mapeia para uma view ou tabela agregada
+model countComments {
+  id      String @id @default(uuid())
+  post_id String @unique
+  post    Post   @relation(fields: [post_id], references: [id])
+  count   Int    @default(0)
 }
