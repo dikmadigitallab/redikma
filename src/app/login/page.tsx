@@ -61,7 +61,6 @@ export default function LoginTelefone() {
     setMessage("")
 
     setTimeout(() => {
-      // mock simples
       if (email === "admin@dikma.com" && password === "123456") {
         route.push("/feed")
         setMessage("Login realizado com sucesso")
@@ -74,8 +73,8 @@ export default function LoginTelefone() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#E5E7EB] px-4">
-      <div className="w-full max-w-sm sm:max-w-md bg-white/70 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 space-y-6">
+    <main className="min-h-[100dvh] flex items-start justify-center bg-[#E5E7EB] px-4 pt-10 pb-20 overflow-y-auto">
+      <div className="w-full max-w-sm sm:max-w-md bg-white/70 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 space-y-6 mt-6 sm:mt-0">
 
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
