@@ -1,8 +1,11 @@
 "use client"
 
 import { ArrowRight } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function LandingPage() {
+
+  const route = useRouter()
   return (
     <main className="min-h-screen bg-[#E5E7EB] text-gray-800">
 
@@ -31,8 +34,8 @@ export default function LandingPage() {
 
       {/* Features */}
       <section className="px-6 py-16 max-w-6xl mx-auto grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        
-        {[ 
+
+        {[
           {
             title: "Compartilhe momentos",
             desc: "Publique fotos, vídeos e atualizações com facilidade."
@@ -67,7 +70,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-20 text-center">
+      <section className="px-6 py-20 text-center flex flex-col items-center">
         <h2 className="text-2xl sm:text-4xl font-bold">
           Pronto para começar?
         </h2>
@@ -76,9 +79,22 @@ export default function LandingPage() {
           Crie sua conta e comece agora mesmo.
         </p>
 
-        <button className="mt-6 px-8 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-teal-500 text-white font-medium">
-          Criar conta
-        </button>
+        {/* Botões alinhados e proporcionais */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 w-full max-w-md">
+
+          <button className="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-teal-500 text-white font-medium shadow-md hover:shadow-lg transition">
+            Criar conta
+          </button>
+
+          <button
+            onClick={() => route.push('/login')}
+            className="w-full py-3 rounded-xl border border-gray-300 text-gray-700 font-medium 
+                 hover:bg-gray-100 transition"
+          >
+            Entrar
+          </button>
+
+        </div>
       </section>
 
       {/* Footer */}
