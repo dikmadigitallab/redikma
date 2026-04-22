@@ -36,8 +36,7 @@ export async function POST(req: Request) {
 
 export async function GET() {
   const cookieStore = await cookies() // 👈 AQUI
-  console.log(cookieStore)
-
+ 
   const session = cookieStore.get("session")?.value
 
   if (!session) {

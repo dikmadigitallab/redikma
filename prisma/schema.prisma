@@ -19,35 +19,66 @@ enum post {
   TEMPODECASA
 }
 
-model User {
-  id          String     @id @default(uuid())
-  nome        String
-  username    String     @unique
-  cpf         String     @unique
-  cargo       String
-  role        Roles      @default(COMMON)
-  foto        String?
-  postagens   Postagem[] // 1 usuário → várias postagens
-  aniversario DateTime
-  admissao    DateTime
+
+
+model autoPost {
+  id        String @id @default(uuid())
+  label     String
+  author    String?
+  type      post
+  mensagem  String
+  imagem    String?
+  video     String?
 }
 
 model Postagem {
-  id       String  @id @default(uuid())
-  label    String
-  authorId String
-  duratio  String
-  author   User    @relation(fields: [authorId], references: [id])
-  image    String?
-  video    String?
+  id          String       @id @default(uuid())
+  label       String
+  authorId    String
+  duration    String?
+  publicado   Boolean      @default(false)
+  image       String?
+  video       String?
+  author      User         @relation(fields: [authorId], references: [id])
+  postador    String
+  comentarios Comentario[]
+  likes       Like[]
+  createdAt   DateTime     @default(now())
 }
 
-model autoPost {
-  id       String  @id @default(uuid())
-  label    String
-  author   String?
-  type     post // puxa do enum post
-  mensagem String
-  imagem   String?
-  video    String?
+model Like {
+  id        String    @id @default(uuid())
+  postId    String
+  post      Postagem  @relation(fields: [postId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+
+  @@unique([postId, userId])
+}
+
+model Comentario {
+  id        String    @id @default(uuid())
+  texto     String
+  aprovado  Boolean   @default(true)
+  postId    String
+  post      Postagem  @relation(fields: [postId], references: [id])
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  createdAt DateTime  @default(now())
+}
+
+model User {
+  id          String       @id @default(uuid())
+  nome        String
+  username    String       @unique
+  cpf         String       @unique
+  cargo       String
+  role        Roles        @default(COMMON)
+  foto        String?
+  postagens   Postagem[]
+  comentarios Comentario[]
+  likes       Like[]
+  aniversario DateTime
+  admissao    DateTime
 }

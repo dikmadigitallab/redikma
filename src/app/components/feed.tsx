@@ -2,12 +2,40 @@
 
 import { Search } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+
+type Post = {
+  id: string
+  label: string
+  image?: string | null
+  createdAt: string
+  authorId: string, 
+  postador:string
+}
 
 export function FeedNoticias() {
   const router = useRouter()
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const res = await fetch("/api/posts")
+        const data = await res.json()
+        setPosts(data)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadPosts()
+  }, [])
 
   return (
-    <section className="w-full  xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
+    <section className="w-full xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
 
       {/* Header mobile */}
       <div className="flex items-center justify-between gap-3 lg:hidden">
@@ -23,7 +51,10 @@ export function FeedNoticias() {
           </div>
         </div>
 
-        <img src="https://i.pravatar.cc/100" className="w-10 h-10 rounded-full" />
+        <img
+          src="https://i.pravatar.cc/100"
+          className="w-10 h-10 rounded-full"
+        />
       </div>
 
       {/* Criar post */}
@@ -41,49 +72,64 @@ export function FeedNoticias() {
         </button>
       </div>
 
-      {/* Post */}
-      <div className="bg-white rounded-2xl shadow-sm border p-4 space-y-3">
+      {/* Loading */}
+      {loading && (
+        <p className="text-sm text-gray-500">Carregando posts...</p>
+      )}
 
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="https://i.pravatar.cc/100?img=5" className="w-10 h-10 rounded-full"/>
-            <div>
-              <p className="text-sm font-semibold text-gray-800">Beatriz</p>
-              <p className="text-xs text-gray-400">2 h</p>
+      {/* Posts dinâmicos */}
+      {posts.map((post) => (
+        <div
+          key={post.id}
+          className="bg-white rounded-2xl shadow-sm border p-4 space-y-3"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img
+                src={`https://i.pravatar.cc/100?u=${post.authorId}`}
+                className="w-10 h-10 rounded-full"
+              />
+
+              <div>
+                <p className="text-sm font-semibold text-gray-800">
+                  {post.postador}
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  {new Date(post.createdAt).toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
-          <span className="text-gray-400 cursor-pointer">•••</span>
+
+          <p className="text-sm text-gray-700">{post.label}</p>
+
+          {post.image && (
+            <img
+              src={post.image}
+              className="w-full max-h-[500px] object-cover rounded-xl"
+            />
+          )}
+
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>0 reações</span>
+            <span>0 comentários</span>
+            <span>0 compartilhamentos</span>
+          </div>
+
+          <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
+            <img
+              src="https://i.pravatar.cc/100?img=1"
+              className="w-7 h-7 rounded-full"
+            />
+
+            <input
+              placeholder="Escreva um comentário..."
+              className="bg-transparent outline-none text-sm w-full text-gray-700"
+            />
+          </div>
         </div>
-
-        {/* Conteúdo */}
-        <p className="text-sm text-gray-700">
-          Hoje tivemos um ótimo resultado no time! 🚀
-        </p>
-
-        <img
-          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
-          className="w-full max-h-[500px] object-cover rounded-xl"
-        />
-
-        {/* Métricas */}
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>875 reações</span>
-          <span>34 comentários</span>
-          <span>8 compartilhamentos</span>
-        </div>
-
-        {/* Comentário */}
-        <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
-          <img src="https://i.pravatar.cc/100?img=1" className="w-7 h-7 rounded-full"/>
-          <input
-            placeholder="Escreva um comentário..."
-            className="bg-transparent outline-none text-sm w-full text-gray-700"
-          />
-        </div>
-
-      </div>
-
+      ))}
     </section>
   )
 }
