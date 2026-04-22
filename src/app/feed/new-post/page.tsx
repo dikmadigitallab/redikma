@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Image as ImageIcon } from "lucide-react"
+import { ArrowLeft, Image as ImageIcon, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
@@ -11,6 +11,7 @@ export default function CreatePostPage() {
 
   const [text, setText] = useState("")
   const [image, setImage] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
 
   const [isRecurring, setIsRecurring] = useState(false)
   const [isFixed, setIsFixed] = useState(false)
@@ -18,25 +19,49 @@ export default function CreatePostPage() {
 
   const [error, setError] = useState("")
 
-  function handleSubmit() {
+  function handleImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setImage(file)
+    setPreview(URL.createObjectURL(file))
+  }
+
+  function removeImage() {
+    setImage(null)
+    setPreview(null)
+  }
+
+  async function handleSubmit() {
     if (!text && !image) {
       setError("Adicione texto ou imagem para postar")
       return
     }
 
-    setError("")
+    let imageBase64: string | null = null
 
-    const payload = {
+    if (image) {
+      imageBase64 = await new Promise((resolve) => {
+        const reader = new FileReader()
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.readAsDataURL(image)
+      })
+    }
+
+    const newPost = {
+      id: crypto.randomUUID(),
       text,
-      image,
+      image: imageBase64,
+      createdAt: Date.now(),
       isRecurring,
       isFixed,
       duration: isFixed ? null : duration,
     }
 
-    console.log(payload)
+    const existing = JSON.parse(localStorage.getItem("posts") || "[]")
+    localStorage.setItem("posts", JSON.stringify([newPost, ...existing]))
 
-    router.back()
+    router.push("/feed")
   }
 
   return (
@@ -44,7 +69,7 @@ export default function CreatePostPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-white shadow-sm">
-        <button onClick={() => router.back()} className="text-gray-600">
+        <button onClick={() => router.back()}>
           <ArrowLeft />
         </button>
 
@@ -61,44 +86,63 @@ export default function CreatePostPage() {
       {/* Conteúdo */}
       <div className="flex-1 p-4 space-y-5">
 
-        {/* Caixa de texto */}
+        {/* Texto */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
           <textarea
             placeholder="O que você quer compartilhar?"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full h-32 resize-none outline-none text-gray-700 placeholder-gray-400"
+            className="w-full h-32 resize-none outline-none text-gray-700"
           />
         </div>
 
-        {/* Upload */}
-        <label className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-400 to-teal-400 flex items-center justify-center text-white">
-            <ImageIcon size={18} />
-          </div>
+        {/* Upload + preview */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm space-y-3">
 
-          <div>
-            <p className="text-sm font-medium text-gray-700">
-              Adicionar imagem
-            </p>
-            <p className="text-xs text-gray-400">
-              PNG, JPG ou JPEG
-            </p>
-          </div>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-400 to-teal-400 flex items-center justify-center text-white">
+              <ImageIcon size={18} />
+            </div>
 
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => setImage(e.target.files?.[0] || null)}
-          />
-        </label>
+            <div>
+              <p className="text-sm font-medium text-gray-700">
+                Adicionar imagem
+              </p>
+              <p className="text-xs text-gray-400">
+                Opcional
+              </p>
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImage}
+            />
+          </label>
+
+          {preview && (
+            <div className="relative">
+              <img
+                src={preview}
+                className="w-full max-h-72 object-cover rounded-xl"
+              />
+
+              <button
+                onClick={removeImage}
+                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Configurações */}
         <div className="bg-white rounded-2xl p-4 shadow-sm space-y-4">
 
           <p className="text-sm font-semibold text-gray-700">
-            Configurações da postagem
+            Configurações
           </p>
 
           <label className="flex justify-between items-center">
@@ -138,6 +182,7 @@ export default function CreatePostPage() {
               </select>
             </div>
           )}
+
         </div>
 
         {/* Erro */}
