@@ -13,44 +13,39 @@ enum Roles {
   COMMON
 }
 
-
-enum post{
+enum post {
   ANIVERSARIO
   PROMOÇÃO
   TEMPODECASA
-
 }
 
 model User {
-  id          String       @id @default(uuid())
-  nome        String
-  username    String       @unique
-  cpf         String       @unique
+  id          String     @id @default(uuid())
+  username    String     @unique
+  cpf         String     @unique
   cargo       String
-  role        Roles        @default(COMMON)
-  foto        String
-  postagens   Postagem[]   // 1 usuário → várias postagens
+  role        Roles      @default(COMMON)
+  foto        String?
+  postagens   Postagem[] // 1 usuário → várias postagens
   aniversario DateTime
   admissao    DateTime
 }
 
 model Postagem {
-  id          String   @id @default(uuid())
-  label       String
-  authorId    String
-  author      User     @relation(fields: [authorId], references: [id])
-  image       String?  
-  video       String?
+  id       String  @id @default(uuid())
+  label    String
+  authorId String
+  author   User    @relation(fields: [authorId], references: [id])
+  image    String?
+  video    String?
 }
 
-
 model autoPost {
-id          String   @id @default(uuid())
-label       String
-author      String?
-type        post // puxa do enum post
-mensagem    String
-imagem      String?
-video       String?
-
+  id       String  @id @default(uuid())
+  label    String
+  author   String?
+  type     post // puxa do enum post
+  mensagem String
+  imagem   String?
+  video    String?
 }
