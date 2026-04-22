@@ -7,7 +7,7 @@ export function FeedNoticias() {
   const router = useRouter()
 
   return (
-    <section className="w-full max-w-3xl xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
+    <section className="w-full  xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
 
       {/* Header mobile */}
       <div className="flex items-center justify-between gap-3 lg:hidden">

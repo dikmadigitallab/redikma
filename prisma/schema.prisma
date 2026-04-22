@@ -21,6 +21,7 @@ enum post {
 
 model User {
   id          String     @id @default(uuid())
+  nome        String
   username    String     @unique
   cpf         String     @unique
   cargo       String
@@ -35,6 +36,7 @@ model Postagem {
   id       String  @id @default(uuid())
   label    String
   authorId String
+  duratio  String
   author   User    @relation(fields: [authorId], references: [id])
   image    String?
   video    String?

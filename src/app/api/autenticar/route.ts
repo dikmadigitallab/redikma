@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@//lib/prisma"
+import { cookies } from "next/headers"
 
 function limparCPF(cpf: string) {
   return cpf.replace(/\D/g, "")
@@ -27,4 +28,35 @@ export async function POST(req: Request) {
   })
 
   return response
+}
+
+
+
+
+
+export async function GET() {
+  const cookieStore = await cookies() // 👈 AQUI
+  console.log(cookieStore)
+
+  const session = cookieStore.get("session")?.value
+
+  if (!session) {
+    return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session },
+    select: {
+      id: true,
+      nome: true,
+      username: true, 
+      foto: true,
+    },
+  })
+
+  if (!user) {
+    return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+  }
+
+  return NextResponse.json(user)
 }

@@ -2,6 +2,9 @@
 
 import { Home, Search, Video, User, LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { UserCard } from "./cardUser"
+
+
 
 export function Sidebar() {
   const router = useRouter()
@@ -18,13 +21,7 @@ export function Sidebar() {
     <aside className="hidden lg:flex flex-col gap-6 bg-white rounded-2xl p-5 shadow-sm border">
       
       {/* Usuário */}
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
-        <div>
-          <p className="text-sm font-semibold text-gray-800">Seu nome</p>
-          <p className="text-xs text-gray-500">@usuario</p>
-        </div>
-      </div>
+      <UserCard/>
 
       {/* Menu */}
       <nav className="flex flex-col gap-4 text-gray-600">
