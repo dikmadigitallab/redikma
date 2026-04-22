@@ -28,7 +28,6 @@ CREATE TABLE "JobTitle" (
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "cpf" TEXT NOT NULL,
-    "nome_completo" TEXT NOT NULL,
     "email_recuperacao" TEXT,
     "telefone" TEXT,
     "senha_hash" TEXT NOT NULL,
@@ -42,6 +41,7 @@ CREATE TABLE "User" (
     "cargo_id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "nome" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -163,10 +163,10 @@ CREATE UNIQUE INDEX "countLikes_post_id_key" ON "countLikes"("post_id");
 CREATE UNIQUE INDEX "countComments_post_id_key" ON "countComments"("post_id");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_cargo_id_fkey" FOREIGN KEY ("cargo_id") REFERENCES "JobTitle"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_cargo_id_fkey" FOREIGN KEY ("cargo_id") REFERENCES "JobTitle"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Post" ADD CONSTRAINT "Post_autor_id_fkey" FOREIGN KEY ("autor_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -196,13 +196,13 @@ ALTER TABLE "Reaction" ADD CONSTRAINT "Reaction_post_id_fkey" FOREIGN KEY ("post
 ALTER TABLE "Reaction" ADD CONSTRAINT "Reaction_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PromotionHistory" ADD CONSTRAINT "PromotionHistory_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "PromotionHistory" ADD CONSTRAINT "PromotionHistory_cargo_anterior_id_fkey" FOREIGN KEY ("cargo_anterior_id") REFERENCES "JobTitle"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PromotionHistory" ADD CONSTRAINT "PromotionHistory_novo_cargo_id_fkey" FOREIGN KEY ("novo_cargo_id") REFERENCES "JobTitle"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PromotionHistory" ADD CONSTRAINT "PromotionHistory_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "countviews" ADD CONSTRAINT "countviews_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "Post"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

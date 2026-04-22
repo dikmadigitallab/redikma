@@ -4,20 +4,21 @@ import { useState } from "react"
 import { Phone, ShieldCheck, Mail, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export default function LoginTelefone() {
-  const [mode, setMode] = useState<"phone" | "email">("phone")
+export default function Login() {
+  const router = useRouter()
 
+  const [mode, setMode] = useState<"phone" | "cpf">("phone")
   const [step, setStep] = useState<"phone" | "code" | "success">("phone")
+
   const [phone, setPhone] = useState("")
   const [code, setCode] = useState("")
   const [generatedCode, setGeneratedCode] = useState("")
 
-  const [email, setEmail] = useState("")
+  const [cpf, setCpf] = useState("")
   const [password, setPassword] = useState("")
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
-  const route = useRouter()
 
   function generateCode() {
     return Math.floor(100000 + Math.random() * 900000).toString()
@@ -46,36 +47,44 @@ export default function LoginTelefone() {
     setTimeout(() => {
       if (code === generatedCode) {
         setStep("success")
-        route.push("/feed")
         setMessage("Login realizado com sucesso")
+        router.push("/feed")
       } else {
         setMessage("Código inválido")
-        route.push("/error")
+        router.push("/error")
       }
       setLoading(false)
     }, 1200)
   }
 
-  function loginEmail() {
+  function loginCpf() {
     setLoading(true)
     setMessage("")
 
     setTimeout(() => {
-      if (email === "admin@dikma.com" && password === "123456") {
-        route.push("/feed")
-        setMessage("Login realizado com sucesso")
-      } else {
-        setMessage("Email ou senha inválidos")
-        route.push("/error")
+      if (!cpf) {
+        setMessage("Informe o CPF")
+        setLoading(false)
+        return
       }
+
+      if (password === "123456") {
+        setMessage("Login realizado com sucesso")
+        router.push("/feed")
+      } else {
+        setMessage("Senha inválida")
+        router.push("/error")
+      }
+
       setLoading(false)
     }, 1200)
   }
 
   return (
-    <main className="min-h-[100dvh] flex items-start justify-center bg-[#E5E7EB] px-4 pt-10 pb-20 overflow-y-auto">
-      <div className="w-full max-w-sm sm:max-w-md bg-white/70 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 space-y-6 mt-6 sm:mt-0">
+    <main className="min-h-[100dvh] flex items-start justify-center bg-[#E5E7EB] px-4 pt-10 pb-20">
+      <div className="w-full max-w-sm sm:max-w-md bg-white/70 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 space-y-6">
 
+        {/* HEADER */}
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
 
@@ -88,6 +97,7 @@ export default function LoginTelefone() {
           </p>
         </div>
 
+        {/* TOGGLE */}
         <div className="flex bg-gray-100 rounded-xl p-1">
           <button
             onClick={() => {
@@ -96,7 +106,9 @@ export default function LoginTelefone() {
               setMessage("")
             }}
             className={`w-1/2 py-2 text-sm rounded-lg ${
-              mode === "phone" ? "bg-white shadow text-gray-700" : "text-gray-400"
+              mode === "phone"
+                ? "bg-white shadow text-gray-700"
+                : "text-gray-400"
             }`}
           >
             Telefone
@@ -104,17 +116,20 @@ export default function LoginTelefone() {
 
           <button
             onClick={() => {
-              setMode("email")
+              setMode("cpf")
               setMessage("")
             }}
             className={`w-1/2 py-2 text-sm rounded-lg ${
-              mode === "email" ? "bg-white shadow text-gray-700" : "text-gray-400"
+              mode === "cpf"
+                ? "bg-white shadow text-gray-700"
+                : "text-gray-400"
             }`}
           >
-            Email
+            CPF
           </button>
         </div>
 
+        {/* TELEFONE */}
         {mode === "phone" && step === "phone" && (
           <div className="space-y-4">
             <div className="flex items-center bg-white rounded-xl px-4 py-3 shadow-sm">
@@ -124,14 +139,14 @@ export default function LoginTelefone() {
                 placeholder="Telefone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
+                className="w-full bg-transparent outline-none ml-3 text-sm"
               />
             </div>
 
             <button
               onClick={sendCode}
               disabled={loading || phone.length < 10}
-              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 shadow-md disabled:opacity-50"
+              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 disabled:opacity-50"
             >
               {loading ? "Enviando..." : "Enviar código"}
             </button>
@@ -147,14 +162,14 @@ export default function LoginTelefone() {
                 placeholder="Código"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
+                className="w-full bg-transparent outline-none ml-3 text-sm"
               />
             </div>
 
             <button
               onClick={verifyCode}
               disabled={loading || code.length !== 6}
-              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 shadow-md disabled:opacity-50"
+              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 disabled:opacity-50"
             >
               {loading ? "Verificando..." : "Confirmar código"}
             </button>
@@ -168,16 +183,17 @@ export default function LoginTelefone() {
           </div>
         )}
 
-        {mode === "email" && (
+        {/* CPF */}
+        {mode === "cpf" && (
           <div className="space-y-4">
             <div className="flex items-center bg-white rounded-xl px-4 py-3 shadow-sm">
               <Mail size={18} className="text-gray-400" />
               <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
+                type="text"
+                placeholder="CPF"
+                value={cpf}
+                onChange={(e) => setCpf(e.target.value)}
+                className="w-full bg-transparent outline-none ml-3 text-sm"
               />
             </div>
 
@@ -188,35 +204,38 @@ export default function LoginTelefone() {
                 placeholder="Senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
+                className="w-full bg-transparent outline-none ml-3 text-sm"
               />
             </div>
 
             <button
-              onClick={loginEmail}
-              disabled={loading || !email || !password}
-              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 shadow-md disabled:opacity-50"
+              onClick={loginCpf}
+              disabled={loading || !cpf || !password}
+              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 disabled:opacity-50"
             >
               {loading ? "Entrando..." : "Entrar"}
             </button>
 
             <p className="text-xs text-gray-400 text-center">
-              Mock: admin@dikma.com / 123456
+              Mock: qualquer CPF + senha 123456
             </p>
           </div>
         )}
 
+        {/* DEBUG MOCK */}
         {generatedCode && mode === "phone" && step === "code" && (
           <p className="text-xs text-gray-400 text-center">
             Código mock: {generatedCode}
           </p>
         )}
 
+        {/* MESSAGE */}
         {message && (
           <p className="text-center text-sm text-gray-500">
             {message}
           </p>
         )}
+
       </div>
     </main>
   )
