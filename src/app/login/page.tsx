@@ -56,7 +56,7 @@ async function handleLogin() {
   }
 }
   return (
-    <main className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--background)' }}>
+    <main className="min-h-screen flex items-center justify-center px-4 md:px-6" style={{ backgroundColor: 'var(--background)' }}>
 
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-10" />
       <div className="absolute inset-0 backdrop-blur-sm" />
@@ -65,38 +65,38 @@ async function handleLogin() {
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="relative w-full max-w-md rounded-2xl shadow-lg p-8 space-y-6"
+        className="relative w-full max-w-sm md:max-w-md rounded-lg md:rounded-2xl shadow-lg p-6 md:p-8 space-y-5 md:space-y-6"
         style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
       >
 
         {/* Logo */}
-        <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
-          <span className="font-semibold text-lg" style={{ color: 'var(--black)' }}>Dikma</span>
+        <div className="flex items-center gap-2 md:gap-3 pb-3 md:pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="w-8 md:w-10 h-8 md:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-lg" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
+          <span className="font-semibold text-base md:text-lg" style={{ color: 'var(--black)' }}>Dikma</span>
         </div>
 
         {/* Título */}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--black)' }}>
+        <div className="space-y-1 md:space-y-2">
+          <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--black)' }}>
             Bem-vindo de volta
           </h1>
-          <p style={{ color: 'var(--gray)' }} className="text-sm">
-            Faça login com seu CPF para acessar a plataforma
+          <p style={{ color: 'var(--gray)' }} className="text-xs md:text-sm">
+            Faça login com seu CPF para acessar
           </p>
         </div>
 
         {/* Formulário */}
-        <div className="space-y-4">
+        <div className="space-y-4 md:space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--black)' }}>Seu CPF</label>
-            <div className="flex items-center px-4 py-3 rounded-xl transition" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
-              <ShieldCheck size={18} style={{ color: 'var(--secondary)' }} />
+            <label className="block text-xs md:text-sm font-medium mb-2" style={{ color: 'var(--black)' }}>Seu CPF</label>
+            <div className="flex items-center px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl transition" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
+              <ShieldCheck size={16} className="md:w-[18px] md:h-[18px]" style={{ color: 'var(--secondary)' }} />
               <input
                 type="text"
                 placeholder="000.000.000-00"
                 value={cpf}
                 onChange={handleChange}
-                className="w-full bg-transparent outline-none ml-3 text-sm"
+                className="w-full bg-transparent outline-none ml-2 md:ml-3 text-sm"
                 style={{ color: 'var(--black)' }}
               />
             </div>
@@ -105,7 +105,7 @@ async function handleLogin() {
           <button
             onClick={handleLogin}
             disabled={loading || cpf.replace(/\D/g, "").length !== 11}
-            className="w-full py-3 rounded-xl text-white font-medium transition hover:opacity-90 disabled:opacity-50"
+            className="w-full py-2.5 md:py-3 rounded-lg md:rounded-xl text-white font-medium text-sm md:text-base transition hover:opacity-90 disabled:opacity-50"
             style={{ backgroundColor: loading || cpf.replace(/\D/g, "").length !== 11 ? 'var(--gray)' : 'var(--primary-dark)' }}
           >
             {loading ? "Entrando..." : "Entrar"}
@@ -114,7 +114,7 @@ async function handleLogin() {
 
         {/* Mensagem de erro ou sucesso */}
         {message && (
-          <div className="text-center text-sm rounded-xl p-3" style={{ 
+          <div className="text-center text-xs md:text-sm rounded-lg md:rounded-xl p-3" style={{ 
             backgroundColor: message.includes('Erro') ? '#FFE5E5' : '#E8F5E9',
             color: message.includes('Erro') ? 'var(--black)' : 'var(--success)',
             border: `1px solid ${message.includes('Erro') ? 'var(--border)' : 'var(--success)'}`
