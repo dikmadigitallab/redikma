@@ -185,22 +185,20 @@ const stories: Story[] = [
   }
 
   return (
-<aside className="hidden lg:flex flex-col gap-6 rounded-xl p-6 w-72 shadow-sm" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+<div className="hidden lg:flex flex-col gap-0">
 
-  <div className="rounded-lg p-4 flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
-    
-    <h2 className="font-semibold mb-4" style={{ color: 'var(--black)' }}>
-      Atualizações
-    </h2>
+  <h2 className="font-semibold mb-4 px-4 pt-4" style={{ color: 'var(--black)' }}>
+    Atualizações
+  </h2>
 
-    <div className="flex flex-col gap-3">
+  <div className="flex flex-col gap-2">
 
       {stories.map((story) => (
         <div
           key={story.id}
           onClick={() => handleOpenStory(story.id)}
-          className="flex gap-3 cursor-pointer p-3 rounded-lg transition hover:opacity-70 w-full"
-          style={{ backgroundColor: story.visto ? 'transparent' : 'var(--white)', border: story.visto ? 'none' : `1px solid var(--border)` }}
+          className="flex gap-3 cursor-pointer p-3 rounded-lg transition hover:bg-gray-50 w-full mx-4"
+          style={{ borderBottom: '1px solid var(--border)' }}
         >
           
           {/* Avatar */}
@@ -230,8 +228,6 @@ const stories: Story[] = [
 
     </div>
 
-  </div>
-
-</aside>
+</div>
   )
 }

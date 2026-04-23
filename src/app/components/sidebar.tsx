@@ -18,13 +18,13 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex flex-col gap-6 rounded-xl p-6 w-72 shadow-sm" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+    <div className="hidden lg:flex flex-col gap-6">
       
       {/* Usuário */}
       <UserCard/>
 
       {/* Menu */}
-      <nav className="flex flex-col gap-3" style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+      <nav className="flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
         
         <div 
           onClick={() => router.push("/feed")}
@@ -53,7 +53,7 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="mt-auto pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="pt-4" style={{ borderTop: '1px solid var(--border)' }}>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer w-full text-sm"
@@ -63,6 +63,6 @@ export function Sidebar() {
         </button>
       </div>
 
-    </aside>
+    </div>
   )
 }

@@ -64,7 +64,7 @@ export function FeedNoticias() {
   }, [])
 
   return (
-<section className="w-full xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
+<section className="w-full space-y-6">
 
       {/* Header mobile */}
       <div className="flex items-center justify-between gap-3 lg:hidden">
