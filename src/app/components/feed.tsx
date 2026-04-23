@@ -64,29 +64,7 @@ export function FeedNoticias() {
   }, [])
 
   return (
-<section className="w-full space-y-6">
-
-      {/* Header mobile */}
-      <div className="flex items-center justify-between gap-3 lg:hidden">
-
-        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
-
-        <div className="flex-1">
-          <div className="flex items-center rounded-full px-4 py-2 shadow-sm" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
-            <Search size={16} style={{ color: 'var(--gray)' }} />
-            <input
-              placeholder="Pesquisar"
-              className="bg-transparent outline-none ml-2 text-sm w-full"
-              style={{ color: 'var(--black)' }}
-            />
-          </div>
-        </div>
-
-        <img
-          src="https://i.pravatar.cc/100"
-          className="w-10 h-10 rounded-full"
-        />
-      </div>
+<section className="w-full space-y-6 max-w-3xl">
 
       {/* Criar post */}
       <div className="flex items-center gap-3 rounded-xl shadow-sm p-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>

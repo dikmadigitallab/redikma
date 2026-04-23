@@ -185,20 +185,22 @@ const stories: Story[] = [
   }
 
   return (
-<div className="hidden lg:flex flex-col gap-0">
+<div className="hidden lg:flex flex-col gap-0 h-full">
 
-  <h2 className="font-semibold mb-4 px-4 pt-4" style={{ color: 'var(--black)' }}>
-    Atualizações
-  </h2>
+  <div className="flex-shrink-0">
+    <h2 className="font-semibold mb-4 text-base" style={{ color: 'var(--black)' }}>
+      Atualizações
+    </h2>
+  </div>
 
-  <div className="flex flex-col gap-2">
+  <div className="flex-1 flex flex-col gap-0 overflow-y-auto">
 
       {stories.map((story) => (
         <div
           key={story.id}
           onClick={() => handleOpenStory(story.id)}
-          className="flex gap-3 cursor-pointer p-3 rounded-lg transition hover:bg-gray-50 w-full mx-4"
-          style={{ borderBottom: '1px solid var(--border)' }}
+          className="flex gap-3 cursor-pointer p-3 transition hover:opacity-70 w-full"
+          style={{ borderBottom: '1px solid var(--border)', backgroundColor: story.visto ? 'transparent' : 'var(--background)' }}
         >
           
           {/* Avatar */}
@@ -219,6 +221,11 @@ const stories: Story[] = [
             {/* DESCRIÇÃO (2 linhas + ... ) */}
             <p className="text-xs line-clamp-2" style={{ color: 'var(--gray)' }}>
               {story.descricao || "Atualização recente da empresa com informações importantes para o time."}
+            </p>
+
+            {/* Timestamp */}
+            <p className="text-xs mt-1" style={{ color: 'var(--gray)' }}>
+              {story.criadoEm}
             </p>
 
           </div>

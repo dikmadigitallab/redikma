@@ -18,13 +18,13 @@ export function Sidebar() {
   }
 
   return (
-    <div className="hidden lg:flex flex-col gap-6">
+    <div className="hidden lg:flex flex-col gap-6 h-full">
       
       {/* Usuário */}
       <UserCard/>
 
       {/* Menu */}
-      <nav className="flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+      <nav className="flex-1 flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
         
         <div 
           onClick={() => router.push("/feed")}
@@ -32,22 +32,22 @@ export function Sidebar() {
           style={{ color: 'var(--gray)' }}
         >
           <Home size={18}/> 
-          <span className="text-sm">Início</span>
+          <span className="text-sm font-medium">Início</span>
         </div>
 
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer" style={{ color: 'var(--gray)' }}>
           <Search size={18}/> 
-          <span className="text-sm">Buscar</span>
+          <span className="text-sm font-medium">Buscar</span>
         </div>
 
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer" style={{ color: 'var(--gray)' }}>
           <Video size={18}/> 
-          <span className="text-sm">Vídeos</span>
+          <span className="text-sm font-medium">Vídeos</span>
         </div>
 
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer" style={{ color: 'var(--gray)' }}>
           <User size={18}/> 
-          <span className="text-sm">Perfil</span>
+          <span className="text-sm font-medium">Perfil</span>
         </div>
 
       </nav>
@@ -56,7 +56,7 @@ export function Sidebar() {
       <div className="pt-4" style={{ borderTop: '1px solid var(--border)' }}>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer w-full text-sm"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer w-full text-sm font-medium"
           style={{ color: 'var(--warning)' }}
         >
           <LogOut size={18}/> Sair
