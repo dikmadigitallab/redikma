@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { Sidebar } from "../components/sidebar"
 import { RightSidebar } from "../components/stories"
 import { FeedNoticias } from "../components/feed"
+import { Footer } from "../components/footer"
 
 export default function Feed() {
   const [openModal, setOpenModal] = useState(false)
@@ -72,41 +73,7 @@ export default function Feed() {
       </div>
 
       {/* Footer - Hidden on mobile, compact on tablet */}
-      <footer className="hidden md:flex flex-shrink-0 shadow-sm" style={{ backgroundColor: 'var(--white)', borderTop: '1px solid var(--border)' }}>
-        <div className="px-4 md:px-[10%] py-4 md:py-6 w-full">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-4">
-            <div>
-              <h3 className="font-semibold text-sm mb-2 md:mb-3" style={{ color: 'var(--black)' }}>Sobre</h3>
-              <p className="text-xs md:text-sm" style={{ color: 'var(--gray)' }}>Plataforma de engajamento corporativo.</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm mb-2 md:mb-3" style={{ color: 'var(--black)' }}>Produto</h3>
-              <ul className="text-xs md:text-sm space-y-1 md:space-y-2" style={{ color: 'var(--gray)' }}>
-                <li className="hover:opacity-70 cursor-pointer transition">Recursos</li>
-                <li className="hover:opacity-70 cursor-pointer transition">Preços</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm mb-2 md:mb-3" style={{ color: 'var(--black)' }}>Empresa</h3>
-              <ul className="text-xs md:text-sm space-y-1 md:space-y-2" style={{ color: 'var(--gray)' }}>
-                <li className="hover:opacity-70 cursor-pointer transition">Blog</li>
-                <li className="hover:opacity-70 cursor-pointer transition">Contato</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm mb-2 md:mb-3" style={{ color: 'var(--black)' }}>Legal</h3>
-              <ul className="text-xs md:text-sm space-y-1 md:space-y-2" style={{ color: 'var(--gray)' }}>
-                <li className="hover:opacity-70 cursor-pointer transition">Privacidade</li>
-                <li className="hover:opacity-70 cursor-pointer transition">Termos</li>
-              </ul>
-            </div>
-          </div>
-          <div className="text-center text-xs pt-3 md:pt-4" style={{ color: 'var(--gray)', borderTop: '1px solid var(--border)' }}>
-            © 2026 Dikma v1.0.0
-          </div>
-        </div>
-      </footer>
-
+       <Footer/>
       {/* Bottom nav - Mobile only */}
       <div className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 rounded-full px-6 py-3 shadow-lg flex justify-between items-center z-50 border gap-4" 
         style={{ backgroundColor: 'var(--white)', borderColor: 'var(--border)', width: 'calc(100% - 2rem)', maxWidth: '420px' }}>
