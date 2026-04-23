@@ -185,7 +185,7 @@ const stories: Story[] = [
   }
 
   return (
-<aside className="hidden lg:flex flex-col h-screen">
+<aside className="hidden lg:flex flex-col gap-6 bg-white rounded-4xl p-10 shadow-sm border ml-70 w-72">
 
   <div className="bg-white rounded-2xl p-4 shadow-sm border flex-1 overflow-y-auto">
     

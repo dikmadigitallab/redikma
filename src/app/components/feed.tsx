@@ -28,6 +28,7 @@ export function FeedNoticias() {
   const [loading, setLoading] = useState(true)
   const [text, setText] = useState<string>("nova postagem...")
   const [user, setUser] = useState<User | null>(null)
+  const [liked,setLiked] = useState<boolean>(false)
 
   useEffect(() => {
     async function loadPosts() {
@@ -63,7 +64,7 @@ export function FeedNoticias() {
   }, [])
 
   return (
-    <section className="w-full xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
+<section className="w-full xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
 
       {/* Header mobile */}
       <div className="flex items-center justify-between gap-3 lg:hidden">
@@ -149,7 +150,7 @@ export function FeedNoticias() {
 
             <button
               type="button"
-              onClick={() => alert("clicou no ícone")}
+              onClick={() => setLiked(!liked)}
               className="flex items-center gap-2"
             >
               <Image
@@ -157,8 +158,13 @@ export function FeedNoticias() {
                 alt="reação"
                 width={20}
                 height={20}
+                className={`transition-all duration-300 ${liked ? "opacity-100 scale-110" : "opacity-50"
+                  }`}
               />
-              <span>reações</span>
+              <span className={`transition-all duration-300 ${liked ? "text-red-500" : ""
+                }`}>
+                {liked ? "curtido" : "reações"}
+              </span>
             </button>
 
             <button
@@ -176,6 +182,7 @@ export function FeedNoticias() {
             </button>
 
           </div>
+
 
           {/* Comentário */}
           <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
