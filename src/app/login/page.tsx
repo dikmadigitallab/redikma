@@ -56,38 +56,48 @@ async function handleLogin() {
   }
 }
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#E5E7EB] px-4">
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--background)' }}>
 
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-20" />
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-10" />
       <div className="absolute inset-0 backdrop-blur-sm" />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="relative w-full max-w-md bg-white/90 backdrop-blur-xl rounded-[28px] shadow-2xl p-8 space-y-6"
+        className="relative w-full max-w-md rounded-2xl shadow-lg p-8 space-y-6"
+        style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
       >
 
-        <div className="flex items-center gap-2 text-gray-700 font-semibold text-lg">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
-          Dikma
+        {/* Logo */}
+        <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
+          <span className="font-semibold text-lg" style={{ color: 'var(--black)' }}>Dikma</span>
         </div>
 
-        <h1 className="text-xl font-semibold text-gray-700">
-          Login com CPF
-        </h1>
+        {/* Título */}
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--black)' }}>
+            Bem-vindo de volta
+          </h1>
+          <p style={{ color: 'var(--gray)' }} className="text-sm">
+            Faça login com seu CPF para acessar a plataforma
+          </p>
+        </div>
 
+        {/* Formulário */}
         <div className="space-y-4">
           <div>
-            <p className="text-sm text-gray-600 mb-1">Seu CPF</p>
-            <div className="flex items-center border border-gray-200 focus-within:border-teal-400 rounded-xl px-4 py-3 bg-white transition">
-              <ShieldCheck size={18} className="text-gray-400" />
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--black)' }}>Seu CPF</label>
+            <div className="flex items-center px-4 py-3 rounded-xl transition" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
+              <ShieldCheck size={18} style={{ color: 'var(--secondary)' }} />
               <input
                 type="text"
                 placeholder="000.000.000-00"
                 value={cpf}
                 onChange={handleChange}
                 className="w-full bg-transparent outline-none ml-3 text-sm"
+                style={{ color: 'var(--black)' }}
               />
             </div>
           </div>
@@ -95,16 +105,22 @@ async function handleLogin() {
           <button
             onClick={handleLogin}
             disabled={loading || cpf.replace(/\D/g, "").length !== 11}
-            className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 to-teal-400 shadow-md hover:opacity-90 transition disabled:opacity-50"
+            className="w-full py-3 rounded-xl text-white font-medium transition hover:opacity-90 disabled:opacity-50"
+            style={{ backgroundColor: loading || cpf.replace(/\D/g, "").length !== 11 ? 'var(--gray)' : 'var(--primary-dark)' }}
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </div>
 
+        {/* Mensagem de erro ou sucesso */}
         {message && (
-          <p className="text-center text-sm text-gray-500">
+          <div className="text-center text-sm rounded-xl p-3" style={{ 
+            backgroundColor: message.includes('Erro') ? '#FFE5E5' : '#E8F5E9',
+            color: message.includes('Erro') ? 'var(--black)' : 'var(--success)',
+            border: `1px solid ${message.includes('Erro') ? 'var(--border)' : 'var(--success)'}`
+          }}>
             {message}
-          </p>
+          </div>
         )}
 
       </motion.div>

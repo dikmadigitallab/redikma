@@ -3,20 +3,32 @@
 import { Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { RiImageEditFill } from "react-icons/ri"
+import Image from "next/image"
 
 type Post = {
   id: string
   label: string
   image?: string | null
   createdAt: string
-  authorId: string, 
-  postador:string
+  authorId: string
+  postador: string
+}
+
+type User = {
+  nome: string
+  username: string
+  foto?: string | null
 }
 
 export function FeedNoticias() {
   const router = useRouter()
+
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [text, setText] = useState<string>("nova postagem...")
+  const [user, setUser] = useState<User | null>(null)
+  const [liked,setLiked] = useState<boolean>(false)
 
   useEffect(() => {
     async function loadPosts() {
@@ -34,76 +46,79 @@ export function FeedNoticias() {
     loadPosts()
   }, [])
 
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await fetch("/api/autenticar")
+
+        if (!res.ok) return
+
+        const data = await res.json()
+        setUser(data)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    loadUser()
+  }, [])
+
   return (
-    <section className="w-full xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
-
-      {/* Header mobile */}
-      <div className="flex items-center justify-between gap-3 lg:hidden">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
-
-        <div className="flex-1">
-          <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-sm border">
-            <Search size={16} className="text-gray-400" />
-            <input
-              placeholder="Pesquisar"
-              className="bg-transparent outline-none ml-2 text-sm w-full text-gray-700"
-            />
-          </div>
-        </div>
-
-        <img
-          src="https://i.pravatar.cc/100"
-          className="w-10 h-10 rounded-full"
-        />
-      </div>
+<section className="w-full mx-auto space-y-6 max-w-3xl">
 
       {/* Criar post */}
-      <div className="flex items-center gap-3 bg-white rounded-2xl shadow-sm border p-3">
-        <img
-          src="https://i.pravatar.cc/100"
-          className="w-10 h-10 rounded-full"
-        />
+      <div className="flex items-center gap-3 rounded-xl shadow-sm p-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+        <RiImageEditFill className="w-6 h-6" style={{ color: 'var(--secondary)' }} />
 
-        <button
-          onClick={() => router.push("/post/novo")}
-          className="flex-1 text-left bg-gray-100 rounded-full px-4 py-2 text-gray-500 hover:bg-gray-200 transition"
-        >
-          No que você está pensando?
-        </button>
+        <textarea
+          placeholder="No que você está pensando?"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="flex-1 rounded-full px-4 py-2 resize-none outline-none text-sm"
+          style={{ backgroundColor: 'var(--background)', color: 'var(--gray)' }}
+        />
       </div>
 
       {/* Loading */}
       {loading && (
-        <p className="text-sm text-gray-500">Carregando posts...</p>
+        <p className="text-sm" style={{ color: 'var(--gray)' }}>Carregando posts...</p>
       )}
 
-      {/* Posts dinâmicos */}
+      {/* Posts */}
       {posts.map((post) => (
         <div
           key={post.id}
-          className="bg-white rounded-2xl shadow-sm border p-4 space-y-3"
+          className="rounded-xl shadow-sm p-4 space-y-3"
+          style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img
-                src={`https://i.pravatar.cc/100?u=${post.authorId}`}
-                className="w-10 h-10 rounded-full"
-              />
 
-              <div>
-                <p className="text-sm font-semibold text-gray-800">
-                  {post.postador}
-                </p>
+          {/* Header post */}
+          <div className="flex items-center gap-3" style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+            <Image
+              src="/userdefaut.png"
+              alt="user"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
 
-                <p className="text-xs text-gray-400">
-                  {new Date(post.createdAt).toLocaleString()}
-                </p>
-              </div>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--black)' }}>
+                {post.postador}
+              </p>
+
+              <p className="text-xs" style={{ color: 'var(--gray)' }}>
+                {new Date(post.createdAt).toLocaleString()}
+              </p>
             </div>
           </div>
 
-          <p className="text-sm text-gray-700">{post.label}</p>
+          {/* Texto */}
+          <p className="text-sm" style={{ color: 'var(--black)' }}>
+            {post.label}
+          </p>
 
+          {/* Imagem */}
           {post.image && (
             <img
               src={post.image}
@@ -111,13 +126,47 @@ export function FeedNoticias() {
             />
           )}
 
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>0 reações</span>
-            <span>0 comentários</span>
-            <span>0 compartilhamentos</span>
+          {/* Ações */}
+          <div className="flex justify-between text-sm" style={{ color: 'var(--gray)', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
+
+            <button
+              type="button"
+              onClick={() => setLiked(!liked)}
+              className="flex items-center gap-2 transition hover:opacity-70"
+            >
+              <Image
+                src="/icons/like.png"
+                alt="reação"
+                width={20}
+                height={20}
+                className={`transition-all duration-300 ${liked ? "opacity-100 scale-110" : "opacity-50"
+                  }`}
+              />
+              <span className={`transition-all duration-300 ${liked ? "font-semibold" : ""
+                }`} style={{ color: liked ? 'var(--warning)' : 'var(--gray)' }}>
+                {liked ? "curtido" : "reações"}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => alert("clicou no ícone")}
+              className="flex items-center gap-2 transition hover:opacity-70"
+            >
+              <Image
+                src="/icons/coments.png"
+                alt="comentários"
+                width={20}
+                height={20}
+              />
+              <span>0 comentários</span>
+            </button>
+
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
+
+          {/* Comentário */}
+          <div className="flex items-center gap-2 rounded-full px-3 py-2" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
             <img
               src="https://i.pravatar.cc/100?img=1"
               className="w-7 h-7 rounded-full"
@@ -125,11 +174,14 @@ export function FeedNoticias() {
 
             <input
               placeholder="Escreva um comentário..."
-              className="bg-transparent outline-none text-sm w-full text-gray-700"
+              className="bg-transparent outline-none text-sm w-full"
+              style={{ color: 'var(--black)' }}
             />
           </div>
+
         </div>
       ))}
+
     </section>
   )
 }

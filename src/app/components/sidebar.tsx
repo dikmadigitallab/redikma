@@ -18,45 +18,51 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex flex-col gap-6 bg-white rounded-2xl p-5 shadow-sm border">
+    <div className="hidden lg:flex flex-col gap-6 h-full">
       
       {/* Usuário */}
       <UserCard/>
 
       {/* Menu */}
-      <nav className="flex flex-col gap-4 text-gray-600">
+      <nav className="flex-1 flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
         
         <div 
           onClick={() => router.push("/feed")}
-          className="flex items-center gap-3 hover:text-black cursor-pointer"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer"
+          style={{ color: 'var(--gray)' }}
         >
-          <Home size={18}/> Início
+          <Home size={18}/> 
+          <span className="text-sm font-medium">Início</span>
         </div>
 
-        <div className="flex items-center gap-3 hover:text-black cursor-pointer">
-          <Search size={18}/> Buscar
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer" style={{ color: 'var(--gray)' }}>
+          <Search size={18}/> 
+          <span className="text-sm font-medium">Buscar</span>
         </div>
 
-        <div className="flex items-center gap-3 hover:text-black cursor-pointer">
-          <Video size={18}/> Vídeos
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer" style={{ color: 'var(--gray)' }}>
+          <Video size={18}/> 
+          <span className="text-sm font-medium">Vídeos</span>
         </div>
 
-        <div className="flex items-center gap-3 hover:text-black cursor-pointer">
-          <User size={18}/> Perfil
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer" style={{ color: 'var(--gray)' }}>
+          <User size={18}/> 
+          <span className="text-sm font-medium">Perfil</span>
         </div>
 
       </nav>
 
       {/* Logout */}
-      <div className="mt-auto pt-4 border-t">
+      <div className="pt-4" style={{ borderTop: '1px solid var(--border)' }}>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 text-red-500 hover:text-red-700 transition cursor-pointer"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer w-full text-sm font-medium"
+          style={{ color: 'var(--warning)' }}
         >
           <LogOut size={18}/> Sair
         </button>
       </div>
 
-    </aside>
+    </div>
   )
 }

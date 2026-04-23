@@ -185,60 +185,55 @@ const stories: Story[] = [
   }
 
   return (
-<aside className="hidden lg:flex flex-col h-screen">
+<div className="hidden lg:flex flex-col gap-0 h-full mt-[10%]">
 
-  <div className="bg-white rounded-2xl p-4 shadow-sm border flex-1 overflow-y-auto">
-    
-    <h2 className="text-gray-800 font-semibold mb-4">
+  <div className="flex-shrink-0">
+    <h2 className="font-semibold mb-4 text-base" style={{ color: 'var(--black)' }}>
       Atualizações
     </h2>
+  </div>
 
-    <div className="flex flex-col gap-4">
+  <div className="flex-1 flex flex-col gap-5 overflow-y-auto">
 
-      {stories.map((story) => (
+    {stories.map((story) => (
+      <div
+        key={story.id}
+        onClick={() => handleOpenStory(story.id)}
+        className="flex gap-3 cursor-pointer p-3 transition hover:opacity-70 w-full"
+        style={{
+          borderBottom: '1px solid var(--border)',
+          backgroundColor: story.visto ? 'transparent' : 'var(--background)'
+        }}
+      >
+        
         <div
-          key={story.id}
-          onClick={() => handleOpenStory(story.id)}
-          className="flex gap-3 cursor-pointer hover:bg-gray-50 p-3 rounded-xl transition w-full"
+          className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-semibold text-white"
+          style={{ backgroundColor: story.visto ? 'var(--gray)' : 'var(--secondary)' }}
         >
+          {story.nome.charAt(0)}
+        </div>
+
+        <div className="flex flex-col flex-1 min-w-0">
           
-          {/* Avatar */}
-          <div
-            className={`
-              p-[2px] rounded-xl flex-shrink-0
-              ${story.visto 
-                ? "bg-gray-300" 
-                : "bg-gradient-to-tr from-yellow-400 to-teal-400"}
-            `}
-          >
-            <div className="bg-white p-[2px] rounded-xl">
-              <div className="w-14 h-14 rounded-xl bg-gray-200 flex items-center justify-center text-sm font-semibold">
-                {story.nome.charAt(0)}
-              </div>
-            </div>
-          </div>
+          <p className="text-sm font-medium" style={{ color: 'var(--black)' }}>
+            {story.nome}
+          </p>
 
-          {/* Conteúdo */}
-          <div className="flex flex-col flex-1 min-w-0">
-            
-            <p className="text-sm font-medium text-gray-800">
-              {story.nome}
-            </p>
+          <p className="text-xs line-clamp-2" style={{ color: 'var(--gray)' }}>
+            {story.descricao || "Atualização recente da empresa com informações importantes para o time."}
+          </p>
 
-            {/* DESCRIÇÃO (2 linhas + ... ) */}
-            <p className="text-xs text-gray-500 line-clamp-2">
-              {story.descricao || "Atualização recente da empresa com informações importantes para o time."}
-            </p>
-
-          </div>
+          <p className="text-xs mt-1" style={{ color: 'var(--gray)' }}>
+            {story.criadoEm}
+          </p>
 
         </div>
-      ))}
 
-    </div>
+      </div>
+    ))}
 
   </div>
 
-</aside>
+</div>
   )
 }
