@@ -14,7 +14,7 @@ export default function LandingPage() {
         <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-xl">
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
-            <span style={{ color: 'var(--primary-dark)' }}>Dikma</span>
+            <span style={{ color: 'var(--primary-dark)' }}>ReDikma</span>
           </div>
           <button
             onClick={() => route.push('/login')}
