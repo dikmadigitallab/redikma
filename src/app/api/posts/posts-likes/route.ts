@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 import { prisma } from "@//lib/prisma"
 
 //curtir
@@ -30,13 +30,10 @@ export async function POST(req: Request) {
 }
 
 
-/* recupera likes das curtidas */
-export async function GET(
-  req: Request,
-  { params }: { params: { postId: string } }
-) {
+export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const { postId } = params
+    const { searchParams } = new URL(req.url)
+    const postId = searchParams.get("postId")
 
     if (!postId) {
       return NextResponse.json(
@@ -64,10 +61,8 @@ export async function GET(
       }
     })
 
-    const total = likes.length
-
     return NextResponse.json({
-      total,
+      total: likes.length,
       likes
     })
   } catch (error) {
