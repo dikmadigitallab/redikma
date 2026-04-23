@@ -64,7 +64,7 @@ export function FeedNoticias() {
   }, [])
 
   return (
-<section className="w-full space-y-6 max-w-3xl">
+<section className="w-full mx-auto space-y-6 max-w-3xl">
 
       {/* Criar post */}
       <div className="flex items-center gap-3 rounded-xl shadow-sm p-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
