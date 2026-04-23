@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 
-
 type User = {
   nome: string
   username: string
@@ -45,7 +44,7 @@ export function UserCard({ size = "md" }: CardUserProps) {
       {/* FOTO */}
       {user?.foto ? (
         <img
-          src={'../../../public/photoProfile/Jaila.jpeg'}
+          src={user.foto}
           className={`${sizes[size]} rounded-full object-cover`}
         />
       ) : (
