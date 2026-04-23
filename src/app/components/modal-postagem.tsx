@@ -142,9 +142,9 @@ export function CreatNewPost({ open, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-lg rounded-2xl p-6 space-y-5 shadow-xl">
+      <div className="w-full max-w-lg rounded-xl p-6 space-y-5 shadow-xl" style={{ backgroundColor: 'var(--white)' }}>
 
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2 className="text-xl font-semibold" style={{ color: 'var(--black)' }}>
           Criar postagem
         </h2>
 
@@ -152,10 +152,11 @@ export function CreatNewPost({ open, onClose }: Props) {
           placeholder="Escreva algo..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="w-full border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl p-3 resize-none h-28 outline-none text-sm"
+          className="w-full rounded-xl p-3 resize-none h-28 outline-none text-sm"
+          style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
         />
 
-        <div className="border border-dashed border-gray-300 rounded-xl p-4 text-center space-y-3">
+        <div className="rounded-xl p-4 text-center space-y-3" style={{ border: `2px dashed var(--border)` }}>
 
           {!preview && (
             <>
@@ -165,9 +166,10 @@ export function CreatNewPost({ open, onClose }: Props) {
                 onChange={(e) =>
                   handleImageChange(e.target.files?.[0] || null)
                 }
-                className="w-full text-sm text-gray-500"
+                className="w-full text-sm"
+                style={{ color: 'var(--gray)' }}
               />
-              <p className="text-xs text-gray-400">
+              <p className="text-xs" style={{ color: 'var(--gray)' }}>
                 Adicione uma imagem opcional
               </p>
             </>
@@ -184,7 +186,8 @@ export function CreatNewPost({ open, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => handleImageChange(null)}
-                className="text-xs text-red-500 hover:underline"
+                className="text-xs hover:underline transition"
+                style={{ color: 'var(--warning)' }}
               >
                 Remover imagem
               </button>
@@ -192,35 +195,36 @@ export function CreatNewPost({ open, onClose }: Props) {
           )}
         </div>
 
-        <div className="space-y-4 pt-2 border-t">
+        <div className="space-y-4 pt-4" style={{ borderTop: `1px solid var(--border)` }}>
 
-          <label className="flex justify-between items-center text-sm text-gray-700">
-            <span>Post recorrente</span>
+          <label className="flex justify-between items-center text-sm">
+            <span style={{ color: 'var(--black)' }}>Post recorrente</span>
             <input
               type="checkbox"
               checked={isRecurring}
               onChange={(e) => setIsRecurring(e.target.checked)}
-              className="accent-blue-600"
+              style={{ accentColor: 'var(--primary-dark)' }}
             />
           </label>
 
-          <label className="flex justify-between items-center text-sm text-gray-700">
-            <span>Post fixo</span>
+          <label className="flex justify-between items-center text-sm">
+            <span style={{ color: 'var(--black)' }}>Post fixo</span>
             <input
               type="checkbox"
               checked={isFixed}
               onChange={(e) => setIsFixed(e.target.checked)}
-              className="accent-blue-600"
+              style={{ accentColor: 'var(--primary-dark)' }}
             />
           </label>
 
           {!isFixed && (
             <div>
-              <p className="text-sm text-gray-600 mb-1">Duração</p>
+              <p className="text-sm mb-2" style={{ color: 'var(--black)' }}>Duração</p>
               <select
                 value={duration}
                 onChange={(e) => setDuration(e.target.value as DurationType)}
-                className="w-full border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl p-2 text-sm outline-none"
+                className="w-full rounded-xl p-2 text-sm outline-none"
+                style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
               >
                 <option value="1h">1 hora</option>
                 <option value="6h">6 horas</option>
@@ -235,16 +239,17 @@ export function CreatNewPost({ open, onClose }: Props) {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-3 py-2">
+          <div className="text-sm rounded-xl px-3 py-2" style={{ backgroundColor: '#FFE5E5', border: `1px solid var(--border)`, color: 'var(--black)' }}>
             {error}
           </div>
         )}
 
-        <div className="flex justify-end gap-2 pt-2">
+        <div className="flex justify-end gap-2 pt-4" style={{ borderTop: `1px solid var(--border)` }}>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 text-sm"
+            className="px-4 py-2 rounded-xl text-sm font-medium transition hover:opacity-70"
+            style={{ backgroundColor: 'var(--background)', color: 'var(--black)', border: `1px solid var(--border)` }}
           >
             Cancelar
           </button>
@@ -253,7 +258,8 @@ export function CreatNewPost({ open, onClose }: Props) {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-teal-400 text-white text-sm font-medium hover:opacity-90 disabled:opacity-50"
+            className="px-4 py-2 rounded-xl text-white text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+            style={{ backgroundColor: 'var(--primary-dark)' }}
           >
             {loading ? "Postando..." : "Postar"}
           </button>

@@ -69,14 +69,15 @@ export function FeedNoticias() {
       {/* Header mobile */}
       <div className="flex items-center justify-between gap-3 lg:hidden">
 
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
 
         <div className="flex-1">
-          <div className="flex items-center bg-white rounded-full px-4 py-2 shadow-sm border">
-            <Search size={16} className="text-gray-400" />
+          <div className="flex items-center rounded-full px-4 py-2 shadow-sm" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+            <Search size={16} style={{ color: 'var(--gray)' }} />
             <input
               placeholder="Pesquisar"
-              className="bg-transparent outline-none ml-2 text-sm w-full text-gray-700"
+              className="bg-transparent outline-none ml-2 text-sm w-full"
+              style={{ color: 'var(--black)' }}
             />
           </div>
         </div>
@@ -88,31 +89,33 @@ export function FeedNoticias() {
       </div>
 
       {/* Criar post */}
-      <div className="flex items-center gap-3 bg-white rounded-2xl shadow-sm border p-3">
-        <RiImageEditFill className="w-6 h-6 text-red-500" />
+      <div className="flex items-center gap-3 rounded-xl shadow-sm p-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+        <RiImageEditFill className="w-6 h-6" style={{ color: 'var(--secondary)' }} />
 
         <textarea
           placeholder="No que você está pensando?"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-gray-500 resize-none outline-none"
+          className="flex-1 rounded-full px-4 py-2 resize-none outline-none text-sm"
+          style={{ backgroundColor: 'var(--background)', color: 'var(--gray)' }}
         />
       </div>
 
       {/* Loading */}
       {loading && (
-        <p className="text-sm text-gray-500">Carregando posts...</p>
+        <p className="text-sm" style={{ color: 'var(--gray)' }}>Carregando posts...</p>
       )}
 
       {/* Posts */}
       {posts.map((post) => (
         <div
           key={post.id}
-          className="bg-white rounded-2xl shadow-sm border p-4 space-y-3"
+          className="rounded-xl shadow-sm p-4 space-y-3"
+          style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
         >
 
           {/* Header post */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
             <Image
               src="/userdefaut.png"
               alt="user"
@@ -122,18 +125,18 @@ export function FeedNoticias() {
             />
 
             <div>
-              <p className="text-sm font-semibold text-gray-800">
+              <p className="text-sm font-semibold" style={{ color: 'var(--black)' }}>
                 {post.postador}
               </p>
 
-              <p className="text-xs text-gray-400">
+              <p className="text-xs" style={{ color: 'var(--gray)' }}>
                 {new Date(post.createdAt).toLocaleString()}
               </p>
             </div>
           </div>
 
           {/* Texto */}
-          <p className="text-sm text-gray-700">
+          <p className="text-sm" style={{ color: 'var(--black)' }}>
             {post.label}
           </p>
 
@@ -146,12 +149,12 @@ export function FeedNoticias() {
           )}
 
           {/* Ações */}
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-sm" style={{ color: 'var(--gray)', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
 
             <button
               type="button"
               onClick={() => setLiked(!liked)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 transition hover:opacity-70"
             >
               <Image
                 src="/icons/like.png"
@@ -161,8 +164,8 @@ export function FeedNoticias() {
                 className={`transition-all duration-300 ${liked ? "opacity-100 scale-110" : "opacity-50"
                   }`}
               />
-              <span className={`transition-all duration-300 ${liked ? "text-red-500" : ""
-                }`}>
+              <span className={`transition-all duration-300 ${liked ? "font-semibold" : ""
+                }`} style={{ color: liked ? 'var(--warning)' : 'var(--gray)' }}>
                 {liked ? "curtido" : "reações"}
               </span>
             </button>
@@ -170,7 +173,7 @@ export function FeedNoticias() {
             <button
               type="button"
               onClick={() => alert("clicou no ícone")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 transition hover:opacity-70"
             >
               <Image
                 src="/icons/coments.png"
@@ -185,7 +188,7 @@ export function FeedNoticias() {
 
 
           {/* Comentário */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
+          <div className="flex items-center gap-2 rounded-full px-3 py-2" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
             <img
               src="https://i.pravatar.cc/100?img=1"
               className="w-7 h-7 rounded-full"
@@ -193,7 +196,8 @@ export function FeedNoticias() {
 
             <input
               placeholder="Escreva um comentário..."
-              className="bg-transparent outline-none text-sm w-full text-gray-700"
+              className="bg-transparent outline-none text-sm w-full"
+              style={{ color: 'var(--black)' }}
             />
           </div>
 

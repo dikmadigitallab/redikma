@@ -49,7 +49,8 @@ export function UserCard({ size = "md" }: CardUserProps) {
         />
       ) : (
         <div
-          className={`${sizes[size]} rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400 flex items-center justify-center text-white font-semibold`}
+          className={`${sizes[size]} rounded-full flex items-center justify-center text-white font-semibold`}
+          style={{ backgroundColor: 'var(--secondary)' }}
         >
           {user?.nome?.charAt(0) || "?"}
         </div>
@@ -57,10 +58,10 @@ export function UserCard({ size = "md" }: CardUserProps) {
 
       {/* INFO */}
       <div>
-        <p className="text-sm font-semibold text-gray-800">
+        <p className="text-sm font-semibold" style={{ color: 'var(--black)' }}>
           {user?.nome || "Carregando..."}
         </p>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs" style={{ color: 'var(--gray)' }}>
           @{user?.username || "..."}
         </p>
       </div>

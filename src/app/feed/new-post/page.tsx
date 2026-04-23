@@ -112,18 +112,19 @@ export default function CreatePostPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
   
       {/* Header */}
-      <header className="w-full bg-white border-b px-6 py-4 flex items-center justify-between">
+      <header className="w-full px-6 py-4 flex items-center justify-between shadow-sm" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
         <button
           onClick={() => window.history.back()}
-          className="text-sm text-gray-600"
+          className="text-sm font-medium transition hover:opacity-70"
+          style={{ color: 'var(--primary-dark)' }}
         >
           Voltar
         </button>
   
-        <h1 className="text-lg font-semibold text-gray-800">
+        <h1 className="text-lg font-semibold" style={{ color: 'var(--black)' }}>
           Nova postagem
         </h1>
   
@@ -134,8 +135,8 @@ export default function CreatePostPage() {
       <section className="flex-1 w-full max-w-3xl mx-auto px-6 py-6 space-y-6">
   
         {/* Texto */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border space-y-3">
-          <label className="text-sm text-gray-600">
+        <div className="rounded-xl p-6 shadow-sm space-y-3" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+          <label className="text-sm font-medium" style={{ color: 'var(--black)' }}>
             Conteúdo
           </label>
   
@@ -143,23 +144,25 @@ export default function CreatePostPage() {
             placeholder="Escreva algo..."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full h-32 resize-none outline-none text-sm"
+            className="w-full h-32 resize-none outline-none text-sm rounded-lg p-3"
+            style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
           />
         </div>
   
         {/* Imagem */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border space-y-4">
-          <label className="text-sm text-gray-600">
+        <div className="rounded-xl p-6 shadow-sm space-y-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+          <label className="text-sm font-medium" style={{ color: 'var(--black)' }}>
             Imagem
           </label>
   
           {!preview && (
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+            <div className="rounded-lg p-6 text-center" style={{ border: `2px dashed var(--border)` }}>
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
                 className="w-full text-sm"
+                style={{ color: 'var(--gray)' }}
               />
             </div>
           )}
@@ -168,13 +171,14 @@ export default function CreatePostPage() {
             <div className="space-y-3">
               <img
                 src={preview}
-                className="w-full h-64 object-cover rounded-xl"
+                className="w-full h-64 object-cover rounded-lg"
               />
   
               <button
                 type="button"
                 onClick={() => handleImageChange(null)}
-                className="text-xs text-red-500"
+                className="text-xs transition hover:underline"
+                style={{ color: 'var(--warning)' }}
               >
                 Remover imagem
               </button>
@@ -183,23 +187,25 @@ export default function CreatePostPage() {
         </div>
   
         {/* Configurações */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border space-y-4">
+        <div className="rounded-xl p-6 shadow-sm space-y-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
   
           <div className="flex items-center justify-between text-sm">
-            <span>Post recorrente</span>
+            <span style={{ color: 'var(--black)' }}>Post recorrente</span>
             <input
               type="checkbox"
               checked={isRecurring}
               onChange={(e) => setIsRecurring(e.target.checked)}
+              style={{ accentColor: 'var(--primary-dark)' }}
             />
           </div>
   
           <div className="flex items-center justify-between text-sm">
-            <span>Post fixo</span>
+            <span style={{ color: 'var(--black)' }}>Post fixo</span>
             <input
               type="checkbox"
               checked={isFixed}
               onChange={(e) => setIsFixed(e.target.checked)}
+              style={{ accentColor: 'var(--primary-dark)' }}
             />
           </div>
   
@@ -207,7 +213,8 @@ export default function CreatePostPage() {
             <select
               value={duration}
               onChange={(e) => setDuration(e.target.value as DurationType)}
-              className="w-full border rounded-xl p-2 text-sm"
+              className="w-full rounded-lg p-2 text-sm outline-none"
+              style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
             >
               <option value="1h">1 hora</option>
               <option value="6h">6 horas</option>
@@ -222,7 +229,7 @@ export default function CreatePostPage() {
   
         {/* Erro */}
         {error && (
-          <div className="text-red-600 text-sm">
+          <div className="text-sm rounded-lg p-4" style={{ backgroundColor: '#FFE5E5', border: `1px solid var(--border)`, color: 'var(--black)' }}>
             {error}
           </div>
         )}
@@ -230,11 +237,12 @@ export default function CreatePostPage() {
       </section>
   
       {/* Footer fixo */}
-      <footer className="w-full bg-white border-t p-4 flex justify-end gap-3">
+      <footer className="w-full p-4 flex justify-end gap-3 shadow-sm" style={{ backgroundColor: 'var(--white)', borderTop: '1px solid var(--border)' }}>
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="px-4 py-2 rounded-xl border text-gray-600"
+          className="px-4 py-2 rounded-lg text-sm font-medium transition hover:opacity-70"
+          style={{ backgroundColor: 'var(--background)', color: 'var(--black)', border: `1px solid var(--border)` }}
         >
           Cancelar
         </button>
@@ -243,7 +251,8 @@ export default function CreatePostPage() {
           type="button"
           onClick={handleSubmit}
           disabled={loading}
-          className="px-5 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-teal-400 text-white text-sm disabled:opacity-50"
+          className="px-5 py-2 rounded-lg text-white text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: 'var(--primary-dark)' }}
         >
           {loading ? "Postando..." : "Publicar"}
         </button>
