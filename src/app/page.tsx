@@ -2,8 +2,33 @@
 
 import { ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useState,useEffect } from "react"
+
+type User = {
+  nome: string
+  username: string
+  foto?: string | null
+}
 
 export default function LandingPage() {
+  const [user, setUser] = useState<User | null>(null)
+
+    useEffect(() => {
+      async function loadUser() {
+        try {
+          const res = await fetch("/api/autenticar")
+  
+          if (!res.ok) return
+  
+          const data = await res.json()
+          setUser(data)
+        } catch (err) {
+          console.error(err)
+        }
+      }
+  
+      loadUser()
+    }, [])
 
   const route = useRouter()
   return (
@@ -14,7 +39,7 @@ export default function LandingPage() {
         <nav className="max-w-6xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-lg md:text-xl">
             <div className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-white text-sm md:text-base" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
-            <span className="hidden sm:inline" style={{ color: 'var(--primary-dark)' }}>Dikma</span>
+            <span className="hidden sm:inline" style={{ color: 'var(--primary-dark)' }}>ReDikma</span>
           </div>
           <button
             onClick={() => route.push('/login')}
@@ -143,7 +168,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="text-center text-xs md:text-sm py-6 md:py-8" style={{ color: 'var(--gray)', borderTop: `1px solid var(--border)` }}>
-        © 2026 Dikma - Plataforma Corporativa
+        © 2026 ReDikma - Comunicando Cultura
       </footer>
 
     </main>

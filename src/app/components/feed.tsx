@@ -11,6 +11,7 @@ type Post = {
   label: string
   createdAt: string
   authorId: string
+  image:string
   author: {
     id: string
     nome: string
@@ -104,6 +105,7 @@ export function FeedNoticias() {
               alt="user"
               className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover object-center flex-shrink-0 border border-gray-200"
             />
+
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate" style={{ color: 'var(--black)' }}>
                 {post.postador}

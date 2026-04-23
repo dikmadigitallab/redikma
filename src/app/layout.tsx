@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dikma - Rede Social Corporativa",
+  title: "ReDikma - Comunicando Cultura",
   description: "Plataforma de comunicação interna para engajamento e colaboração corporativa",
 };
 
