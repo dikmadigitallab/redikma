@@ -3,20 +3,34 @@
 import { Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { RiImageEditFill } from "react-icons/ri";
 
 type Post = {
   id: string
   label: string
   image?: string | null
   createdAt: string
-  authorId: string, 
-  postador:string
+  authorId: string,
+  postador: string
 }
+
+
+type User = {
+  nome: string
+  username: string
+  foto?: string | null
+}
+
+
+
+
+
 
 export function FeedNoticias() {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [text, setText] = useState<string>("nova postagem...")
 
   useEffect(() => {
     async function loadPosts() {
@@ -34,11 +48,33 @@ export function FeedNoticias() {
     loadPosts()
   }, [])
 
+  const [user, setUser] = useState<User | null>(null)
+
+useEffect(() => {
+  async function loadUser() {
+    try {
+      const res = await fetch("/api/autenticar")
+
+      if (!res.ok) return
+
+      const data = await res.json()
+      setUser(data)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  loadUser()
+}, [])
+
   return (
     <section className="w-full xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
 
       {/* Header mobile */}
       <div className="flex items-center justify-between gap-3 lg:hidden">
+
+
+
         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
 
         <div className="flex-1">
@@ -59,17 +95,17 @@ export function FeedNoticias() {
 
       {/* Criar post */}
       <div className="flex items-center gap-3 bg-white rounded-2xl shadow-sm border p-3">
-        <img
-          src="https://i.pravatar.cc/100"
-          className="w-10 h-10 rounded-full"
+        <RiImageEditFill
+         color="red"
+          className="w-6 h-6 rounded-full"
         />
 
-        <button
-          onClick={() => router.push("/post/novo")}
-          className="flex-1 text-left bg-gray-100 rounded-full px-4 py-2 text-gray-500 hover:bg-gray-200 transition"
-        >
-          No que você está pensando?
-        </button>
+        <textarea
+          placeholder="No que você está pensando?"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-gray-500 resize-none outline-none"
+        />
       </div>
 
       {/* Loading */}
@@ -113,8 +149,10 @@ export function FeedNoticias() {
 
           <div className="flex justify-between text-sm text-gray-600">
             <span>0 reações</span>
+            
             <span>0 comentários</span>
-            <span>0 compartilhamentos</span>
+
+
           </div>
 
           <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">

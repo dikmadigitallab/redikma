@@ -35,8 +35,8 @@ export default function Feed() {
               setOpenModal(true)
               return
             }
-
             router.push("/feed/new-post")
+
           }}
         >
           <Plus size={20} />
