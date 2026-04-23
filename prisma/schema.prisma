@@ -47,14 +47,17 @@ model Postagem {
 }
 
 model Like {
-  id        String    @id @default(uuid())
-  postId    String
-  post      Postagem  @relation(fields: [postId], references: [id])
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  createdAt DateTime  @default(now())
+  id          String      @id @default(uuid())
+  postId      String?
+  post        Postagem?   @relation(fields: [postId], references: [id])
+  comentarioId String?
+  comentario   Comentario? @relation(fields: [comentarioId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime    @default(now())
 
   @@unique([postId, userId])
+  @@unique([comentarioId, userId])
 }
 
 model Comentario {
@@ -66,6 +69,7 @@ model Comentario {
   authorId  String
   author    User      @relation(fields: [authorId], references: [id])
   createdAt DateTime  @default(now())
+  likes     Like[]
 }
 
 model User {
@@ -81,4 +85,5 @@ model User {
   likes       Like[]
   aniversario DateTime
   admissao    DateTime
+
 }
