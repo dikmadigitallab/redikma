@@ -18,7 +18,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex flex-col gap-6 bg-white rounded-2xl p-5 shadow-sm border">
+    <aside className="hidden lg:flex flex-col gap-6 bg-white rounded-4xl p-10 shadow-sm border -ml-70 w-72">
       
       {/* Usuário */}
       <UserCard/>
