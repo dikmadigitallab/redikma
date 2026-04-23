@@ -53,12 +53,39 @@ export async function POST(req: Request) {
   }
 }
 
-
+/* 
 export async function GET() {
   try {
     const postagens = await prisma.postagem.findMany({
       orderBy: {
         createdAt: "desc"
+      }
+    })
+
+    return NextResponse.json(postagens, { status: 200 })
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Erro ao buscar postagens" },
+      { status: 500 }
+    )
+  }
+} */
+
+
+  export async function GET() {
+  try {
+    const postagens = await prisma.postagem.findMany({
+      orderBy: {
+        createdAt: "desc"
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            nome: true,
+            foto: true
+          }
+        }
       }
     })
 

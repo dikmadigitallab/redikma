@@ -9,9 +9,13 @@ import Image from "next/image"
 type Post = {
   id: string
   label: string
-  image?: string | null
   createdAt: string
   authorId: string
+  author: {
+    id: string
+    nome: string
+    foto: string
+  }
   postador: string
 }
 
@@ -28,7 +32,7 @@ export function FeedNoticias() {
   const [loading, setLoading] = useState(true)
   const [text, setText] = useState<string>("nova postagem...")
   const [user, setUser] = useState<User | null>(null)
-  const [liked,setLiked] = useState<boolean>(false)
+  const [liked, setLiked] = useState<boolean>(false)
 
   useEffect(() => {
     async function loadPosts() {
@@ -36,6 +40,7 @@ export function FeedNoticias() {
         const res = await fetch("/api/posts")
         const data = await res.json()
         setPosts(data)
+        console.log(data)
       } catch (err) {
         console.error(err)
       } finally {
@@ -64,7 +69,7 @@ export function FeedNoticias() {
   }, [])
 
   return (
-<section className="w-full space-y-4 md:space-y-6 max-w-3xl">
+    <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
 
       {/* Criar post */}
       <div className="flex items-center gap-2 md:gap-3 rounded-lg md:rounded-xl shadow-sm p-3 md:p-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
@@ -94,14 +99,11 @@ export function FeedNoticias() {
 
           {/* Header post */}
           <div className="flex items-center gap-2 md:gap-3" style={{ paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
-            <Image
-              src="/userdefaut.png"
+            <img
+              src={post.author.foto}
               alt="user"
-              width={32}
-              height={32}
-              className="rounded-full flex-shrink-0 w-8 h-8 md:w-10 md:h-10"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover object-center flex-shrink-0 border border-gray-200"
             />
-
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate" style={{ color: 'var(--black)' }}>
                 {post.postador}
