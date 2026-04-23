@@ -36,7 +36,7 @@ export default function Feed() {
               return
             }
             router.push("/feed/new-post")
-
+            
           }}
         >
           <Plus size={20} />

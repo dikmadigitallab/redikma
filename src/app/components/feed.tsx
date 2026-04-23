@@ -3,17 +3,17 @@
 import { Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { RiImageEditFill } from "react-icons/ri";
+import { RiImageEditFill } from "react-icons/ri"
+import Image from "next/image"
 
 type Post = {
   id: string
   label: string
   image?: string | null
   createdAt: string
-  authorId: string,
+  authorId: string
   postador: string
 }
-
 
 type User = {
   nome: string
@@ -21,16 +21,13 @@ type User = {
   foto?: string | null
 }
 
-
-
-
-
-
 export function FeedNoticias() {
   const router = useRouter()
+
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [text, setText] = useState<string>("nova postagem...")
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     async function loadPosts() {
@@ -48,32 +45,28 @@ export function FeedNoticias() {
     loadPosts()
   }, [])
 
-  const [user, setUser] = useState<User | null>(null)
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await fetch("/api/autenticar")
 
-useEffect(() => {
-  async function loadUser() {
-    try {
-      const res = await fetch("/api/autenticar")
+        if (!res.ok) return
 
-      if (!res.ok) return
-
-      const data = await res.json()
-      setUser(data)
-    } catch (err) {
-      console.error(err)
+        const data = await res.json()
+        setUser(data)
+      } catch (err) {
+        console.error(err)
+      }
     }
-  }
 
-  loadUser()
-}, [])
+    loadUser()
+  }, [])
 
   return (
     <section className="w-full xl:max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
 
       {/* Header mobile */}
       <div className="flex items-center justify-between gap-3 lg:hidden">
-
-
 
         <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
 
@@ -95,10 +88,7 @@ useEffect(() => {
 
       {/* Criar post */}
       <div className="flex items-center gap-3 bg-white rounded-2xl shadow-sm border p-3">
-        <RiImageEditFill
-         color="red"
-          className="w-6 h-6 rounded-full"
-        />
+        <RiImageEditFill className="w-6 h-6 text-red-500" />
 
         <textarea
           placeholder="No que você está pensando?"
@@ -113,33 +103,40 @@ useEffect(() => {
         <p className="text-sm text-gray-500">Carregando posts...</p>
       )}
 
-      {/* Posts dinâmicos */}
+      {/* Posts */}
       {posts.map((post) => (
         <div
           key={post.id}
           className="bg-white rounded-2xl shadow-sm border p-4 space-y-3"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img
-                src={`https://i.pravatar.cc/100?u=${post.authorId}`}
-                className="w-10 h-10 rounded-full"
-              />
 
-              <div>
-                <p className="text-sm font-semibold text-gray-800">
-                  {post.postador}
-                </p>
+          {/* Header post */}
+          <div className="flex items-center gap-3">
+            <Image
+              src="/userdefaut.png"
+              alt="user"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
 
-                <p className="text-xs text-gray-400">
-                  {new Date(post.createdAt).toLocaleString()}
-                </p>
-              </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-800">
+                {post.postador}
+              </p>
+
+              <p className="text-xs text-gray-400">
+                {new Date(post.createdAt).toLocaleString()}
+              </p>
             </div>
           </div>
 
-          <p className="text-sm text-gray-700">{post.label}</p>
+          {/* Texto */}
+          <p className="text-sm text-gray-700">
+            {post.label}
+          </p>
 
+          {/* Imagem */}
           {post.image && (
             <img
               src={post.image}
@@ -147,14 +144,40 @@ useEffect(() => {
             />
           )}
 
+          {/* Ações */}
           <div className="flex justify-between text-sm text-gray-600">
-            <span>0 reações</span>
-            
-            <span>0 comentários</span>
 
+            <button
+              type="button"
+              onClick={() => alert("clicou no ícone")}
+              className="flex items-center gap-2"
+            >
+              <Image
+                src="/icons/like.png"
+                alt="reação"
+                width={20}
+                height={20}
+              />
+              <span>reações</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => alert("clicou no ícone")}
+              className="flex items-center gap-2"
+            >
+              <Image
+                src="/icons/coments.png"
+                alt="comentários"
+                width={20}
+                height={20}
+              />
+              <span>0 comentários</span>
+            </button>
 
           </div>
 
+          {/* Comentário */}
           <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
             <img
               src="https://i.pravatar.cc/100?img=1"
@@ -166,8 +189,10 @@ useEffect(() => {
               className="bg-transparent outline-none text-sm w-full text-gray-700"
             />
           </div>
+
         </div>
       ))}
+
     </section>
   )
 }
