@@ -1,154 +1,263 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowLeft, Image as ImageIcon } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
-export default function CreatePostPage() {
-  const router = useRouter()
+type User = {
+  nome: string
+  username: string
+  foto?: string | null
+  id: string
+}
 
+export default function CreatePostPage() {
   const [text, setText] = useState("")
   const [image, setImage] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
 
   const [isRecurring, setIsRecurring] = useState(false)
   const [isFixed, setIsFixed] = useState(false)
   const [duration, setDuration] = useState<DurationType>("24h")
 
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
 
-  function handleSubmit() {
+  function handleImageChange(file: File | null) {
+    setImage(file)
+
+    if (file) {
+      const url = URL.createObjectURL(file)
+      setPreview(url)
+    } else {
+      setPreview(null)
+    }
+  }
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await fetch("/api/autenticar")
+
+        if (!res.ok) return
+
+        const data = await res.json()
+        setUser(data)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    loadUser()
+  }, [])
+
+  async function handleSubmit() {
+    if (!user?.id) {
+      setError("Usuário não carregado")
+      return
+    }
+
     if (!text && !image) {
       setError("Adicione texto ou imagem para postar")
       return
     }
 
     setError("")
+    setLoading(true)
 
-    const payload = {
-      text,
-      image,
-      isRecurring,
-      isFixed,
-      duration: isFixed ? null : duration,
+    try {
+      let imageUrl: string | undefined = undefined
+
+      if (image) {
+        imageUrl = preview || ""
+      }
+
+      const payload = {
+        label: text,
+        authorId: user.id,
+        duration: isFixed ? "" : duration,
+        image: imageUrl,
+        video: null,
+        postador:user.username
+      }
+
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao criar postagem")
+      }
+
+      setText("")
+      setImage(null)
+      setPreview(null)
+      setIsRecurring(false)
+      setIsFixed(false)
+      setDuration("24h")
+
+      alert("Post criado")
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-
-    console.log(payload)
-
-    router.back()
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
-
+    <main className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
+  
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white shadow-sm">
-        <button onClick={() => router.back()} className="text-gray-600">
-          <ArrowLeft />
-        </button>
-
-        <h1 className="font-semibold text-gray-800">Nova postagem</h1>
-
+      <header className="w-full px-6 py-4 flex items-center justify-between shadow-sm" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
         <button
-          onClick={handleSubmit}
-          className="text-sm font-semibold text-white bg-gradient-to-r from-yellow-400 to-teal-400 px-4 py-1.5 rounded-full"
+          onClick={() => window.history.back()}
+          className="text-sm font-medium transition hover:opacity-70"
+          style={{ color: 'var(--primary-dark)' }}
         >
-          Postar
+          Voltar
         </button>
-      </div>
-
+  
+        <h1 className="text-lg font-semibold" style={{ color: 'var(--black)' }}>
+          Nova postagem
+        </h1>
+  
+        <div />
+      </header>
+  
       {/* Conteúdo */}
-      <div className="flex-1 p-4 space-y-5">
-
-        {/* Caixa de texto */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
+      <section className="flex-1 w-full max-w-3xl mx-auto px-6 py-6 space-y-6">
+  
+        {/* Texto */}
+        <div className="rounded-xl p-6 shadow-sm space-y-3" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+          <label className="text-sm font-medium" style={{ color: 'var(--black)' }}>
+            Conteúdo
+          </label>
+  
           <textarea
-            placeholder="O que você quer compartilhar?"
+            placeholder="Escreva algo..."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full h-32 resize-none outline-none text-gray-700 placeholder-gray-400"
+            className="w-full h-32 resize-none outline-none text-sm rounded-lg p-3"
+            style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
           />
         </div>
-
-        {/* Upload */}
-        <label className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-400 to-teal-400 flex items-center justify-center text-white">
-            <ImageIcon size={18} />
-          </div>
-
-          <div>
-            <p className="text-sm font-medium text-gray-700">
-              Adicionar imagem
-            </p>
-            <p className="text-xs text-gray-400">
-              PNG, JPG ou JPEG
-            </p>
-          </div>
-
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => setImage(e.target.files?.[0] || null)}
-          />
-        </label>
-
+  
+        {/* Imagem */}
+        <div className="rounded-xl p-6 shadow-sm space-y-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+          <label className="text-sm font-medium" style={{ color: 'var(--black)' }}>
+            Imagem
+          </label>
+  
+          {!preview && (
+            <div className="rounded-lg p-6 text-center" style={{ border: `2px dashed var(--border)` }}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e.target.files?.[0] || null)}
+                className="w-full text-sm"
+                style={{ color: 'var(--gray)' }}
+              />
+            </div>
+          )}
+  
+          {preview && (
+            <div className="space-y-3">
+              <img
+                src={preview}
+                className="w-full h-64 object-cover rounded-lg"
+              />
+  
+              <button
+                type="button"
+                onClick={() => handleImageChange(null)}
+                className="text-xs transition hover:underline"
+                style={{ color: 'var(--warning)' }}
+              >
+                Remover imagem
+              </button>
+            </div>
+          )}
+        </div>
+  
         {/* Configurações */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm space-y-4">
-
-          <p className="text-sm font-semibold text-gray-700">
-            Configurações da postagem
-          </p>
-
-          <label className="flex justify-between items-center">
-            <span className="text-gray-600">Post recorrente</span>
+        <div className="rounded-xl p-6 shadow-sm space-y-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
+  
+          <div className="flex items-center justify-between text-sm">
+            <span style={{ color: 'var(--black)' }}>Post recorrente</span>
             <input
               type="checkbox"
               checked={isRecurring}
               onChange={(e) => setIsRecurring(e.target.checked)}
+              style={{ accentColor: 'var(--primary-dark)' }}
             />
-          </label>
-
-          <label className="flex justify-between items-center">
-            <span className="text-gray-600">Post fixo</span>
+          </div>
+  
+          <div className="flex items-center justify-between text-sm">
+            <span style={{ color: 'var(--black)' }}>Post fixo</span>
             <input
               type="checkbox"
               checked={isFixed}
               onChange={(e) => setIsFixed(e.target.checked)}
+              style={{ accentColor: 'var(--primary-dark)' }}
             />
-          </label>
-
+          </div>
+  
           {!isFixed && (
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Duração</p>
-              <select
-                value={duration}
-                onChange={(e) =>
-                  setDuration(e.target.value as DurationType)
-                }
-                className="w-full border border-gray-200 rounded-xl p-2 text-gray-700"
-              >
-                <option value="1h">1 hora</option>
-                <option value="6h">6 horas</option>
-                <option value="12h">12 horas</option>
-                <option value="24h">24 horas</option>
-                <option value="7d">7 dias</option>
-                <option value="30d">30 dias</option>
-              </select>
-            </div>
+            <select
+              value={duration}
+              onChange={(e) => setDuration(e.target.value as DurationType)}
+              className="w-full rounded-lg p-2 text-sm outline-none"
+              style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
+            >
+              <option value="1h">1 hora</option>
+              <option value="6h">6 horas</option>
+              <option value="12h">12 horas</option>
+              <option value="24h">24 horas</option>
+              <option value="7d">7 dias</option>
+              <option value="30d">30 dias</option>
+            </select>
           )}
+  
         </div>
-
+  
         {/* Erro */}
         {error && (
-          <div className="bg-red-50 text-red-600 text-sm p-3 rounded-xl">
+          <div className="text-sm rounded-lg p-4" style={{ backgroundColor: '#FFE5E5', border: `1px solid var(--border)`, color: 'var(--black)' }}>
             {error}
           </div>
         )}
-
-      </div>
-
+  
+      </section>
+  
+      {/* Footer fixo */}
+      <footer className="w-full p-4 flex justify-end gap-3 shadow-sm" style={{ backgroundColor: 'var(--white)', borderTop: '1px solid var(--border)' }}>
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="px-4 py-2 rounded-lg text-sm font-medium transition hover:opacity-70"
+          style={{ backgroundColor: 'var(--background)', color: 'var(--black)', border: `1px solid var(--border)` }}
+        >
+          Cancelar
+        </button>
+  
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={loading}
+          className="px-5 py-2 rounded-lg text-white text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: 'var(--primary-dark)' }}
+        >
+          {loading ? "Postando..." : "Publicar"}
+        </button>
+      </footer>
+  
     </main>
   )
 }

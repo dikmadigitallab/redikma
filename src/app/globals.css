@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Cores Primárias */
+  --primary-dark: #0A4554;
+  --secondary: #4FC3D9;
+  --success: #6BC28D;
+  --warning: #FBB04B;
+  --accent: #FDE205;
+  
+  /* Escala de Cinza */
+  --black: #1A1A1A;
+  --gray: #757575;
+  --border: #E0E0E0;
+  --background: #F5F5F5;
+  --white: #FFFFFF;
+  
+  /* Fontes */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme inline {
+  --color-primary: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-text-primary: var(--black);
+  --color-text-secondary: var(--gray);
+  --color-border: var(--border);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--black);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Estilos globais para garantir tema consistente */
+a {
+  color: var(--primary-dark);
+}
+
+button {
+  transition: all 0.2s ease;
 }

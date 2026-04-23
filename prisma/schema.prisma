@@ -1,4 +1,3 @@
-// generator client e datasource (Padrão Prisma 7)
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,169 +6,84 @@ datasource db {
   provider = "postgresql"
 }
 
-// --- ENUMS ---
-
-enum UserStatus {
-  ATIVO
-  INATIVO
-  PENDENTE
+enum Roles {
+  SYSTEM_ADM
+  ADMIN
+  POSTADOR
+  COMMON
 }
 
-enum PostType {
-  MANUAL
-  AUTOMATICA_ANIVERSARIO
-  AUTOMATICA_PROMOCAO
+enum post {
+  ANIVERSARIO
+  PROMOÇÃO
+  TEMPODECASA
 }
 
-enum PostStatus {
-  PUBLICADO
-  AGENDADO
-  RECORRENTE
+
+
+model autoPost {
+  id        String @id @default(uuid())
+  label     String
+  author    String?
+  type      post
+  mensagem  String
+  imagem    String?
+  video     String?
 }
 
-// --- MODELOS ---
-
-model Role {
-  id    String @id @default(uuid())
-  nome  String @unique
-  users User[]
-}
-
-model JobTitle {
-  id             String             @id @default(uuid())
-  nome_cargo     String
-  departamento   String
-  users          User[]
-  promocoes_de   PromotionHistory[] @relation("CargoAnterior")
-  promocoes_para PromotionHistory[] @relation("NovoCargo")
-}
-
-model User {
-  id                       String             @id @default(uuid())
-  cpf                      String             @unique
-  nome_completo            String
-  email_recuperacao        String?
-  telefone                 String?
-  senha_hash               String
-  foto_url                 String?
-  data_nascimento          DateTime
-  data_admissao            DateTime
-  primeiro_acesso          Boolean            @default(true)
-  status                   UserStatus         @default(PENDENTE)
-  data_exclusao_programada DateTime?
-  
-  role_id                  String
-  role                     Role               @relation(fields: [role_id], references: [id])
-  cargo_id                 String
-  cargo                    JobTitle           @relation(fields: [cargo_id], references: [id])
-  
-  posts                    Post[]
-  visualizacoes            PostView[]
-  curtidas                 Like[]
-  comentarios              Comment[]
-  reacoes                  Reaction[]
-  historico_promocoes      PromotionHistory[]
-
-  createdAt                DateTime           @default(now())
-  updatedAt                DateTime           @updatedAt
-}
-
-model Post {
-  id                       String      @id @default(uuid())
-  tipo                     PostType    @default(MANUAL)
-  mensagem                 String      @db.Text
-  midia_url                String?
-  data_publicacao          DateTime    @default(now())
-  status                   PostStatus  @default(PUBLICADO)
-  configuracao_recorrencia Json?       
-  visualizacoes_count      Int         @default(0)
-
-  autor_id                 String
-  autor                    User        @relation(fields: [autor_id], references: [id])
-  
-  visualizacoes_detalhe    PostView[]
-  curtidas_rel             Like[]
-  comentarios_rel          Comment[]
-  reacoes_rel              Reaction[]
-
-  // RELACIONAMENTOS ADICIONADOS PARA OS CONTADORES
-  count_views              countviews?
-  count_likes              countLikes?
-  count_comments           countComments?
-
-  createdAt                DateTime    @default(now())
-}
-
-model PostView {
-  id         String   @id @default(uuid())
-  data_hora  DateTime @default(now())
-  post_id    String
-  post       Post     @relation(fields: [post_id], references: [id])
-  usuario_id String
-  usuario    User     @relation(fields: [usuario_id], references: [id])
-
-  @@index([post_id, usuario_id])
+model Postagem {
+  id          String       @id @default(uuid())
+  label       String
+  authorId    String
+  duration    String?
+  publicado   Boolean      @default(false)
+  image       String?
+  video       String?
+  author      User         @relation(fields: [authorId], references: [id])
+  postador    String
+  comentarios Comentario[]
+  likes       Like[]
+  createdAt   DateTime     @default(now())
 }
 
 model Like {
-  id         String @id @default(uuid())
-  post_id    String
-  post       Post   @relation(fields: [post_id], references: [id])
-  usuario_id String
-  usuario    User   @relation(fields: [usuario_id], references: [id])
+  id          String      @id @default(uuid())
+  postId      String?
+  post        Postagem?   @relation(fields: [postId], references: [id])
+  comentarioId String?
+  comentario   Comentario? @relation(fields: [comentarioId], references: [id])
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime    @default(now())
 
-  @@unique([post_id, usuario_id]) 
+  @@unique([postId, userId])
+  @@unique([comentarioId, userId])
 }
 
-model Comment {
-  id         String   @id @default(uuid())
-  texto      String   @db.VarChar(100) 
-  data_hora  DateTime @default(now())
-  post_id    String
-  post       Post     @relation(fields: [post_id], references: [id])
-  usuario_id String
-  usuario    User     @relation(fields: [usuario_id], references: [id])
+model Comentario {
+  id        String    @id @default(uuid())
+  texto     String
+  aprovado  Boolean   @default(true)
+  postId    String
+  post      Postagem  @relation(fields: [postId], references: [id])
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  createdAt DateTime  @default(now())
+  likes     Like[]
 }
 
-model Reaction {
-  id            String @id @default(uuid())
-  emoji_unicode String
-  post_id       String
-  post          Post   @relation(fields: [post_id], references: [id])
-  usuario_id    String
-  usuario       User   @relation(fields: [usuario_id], references: [id])
-}
+model User {
+  id          String       @id @default(uuid())
+  nome        String
+  username    String       @unique
+  cpf         String       @unique
+  cargo       String
+  role        Roles        @default(COMMON)
+  foto        String?
+  postagens   Postagem[]
+  comentarios Comentario[]
+  likes       Like[]
+  aniversario DateTime
+  admissao    DateTime
 
-model PromotionHistory {
-  id                     String   @id @default(uuid())
-  data_promocao          DateTime @default(now())
-  post_automatico_gerado Boolean  @default(false)
-  usuario_id             String
-  usuario                User     @relation(fields: [usuario_id], references: [id])
-  cargo_anterior_id      String
-  cargo_anterior         JobTitle @relation("CargoAnterior", fields: [cargo_anterior_id], references: [id])
-  novo_cargo_id          String
-  novo_cargo             JobTitle @relation("NovoCargo", fields: [novo_cargo_id], references: [id])
-}
-
-// MODELOS DE CONTADORES AJUSTADOS PARA RELAÇÃO 1:1
-model countviews {
-  id      String @id @default(uuid())
-  post_id String @unique
-  post    Post   @relation(fields: [post_id], references: [id])
-  count   Int    @default(0)
-}
-
-model countLikes {
-  id      String @id @default(uuid())
-  post_id String @unique
-  post    Post   @relation(fields: [post_id], references: [id])
-  count   Int    @default(0)
-}
-
-model countComments {
-  id      String @id @default(uuid())
-  post_id String @unique
-  post    Post   @relation(fields: [post_id], references: [id])
-  count   Int    @default(0)
 }

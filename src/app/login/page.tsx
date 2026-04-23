@@ -1,223 +1,129 @@
 "use client"
 
 import { useState } from "react"
-import { Phone, ShieldCheck, Mail, Lock } from "lucide-react"
+import { ShieldCheck } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
 
-export default function LoginTelefone() {
-  const [mode, setMode] = useState<"phone" | "email">("phone")
-
-  const [step, setStep] = useState<"phone" | "code" | "success">("phone")
-  const [phone, setPhone] = useState("")
-  const [code, setCode] = useState("")
-  const [generatedCode, setGeneratedCode] = useState("")
-
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
+export default function LoginCPF() {
+  const [cpf, setCpf] = useState("")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
+
   const route = useRouter()
 
-  function generateCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString()
+  function formatCPF(value: string) {
+    return value
+      .replace(/\D/g, "")
+      .slice(0, 11)
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
   }
 
-  function sendCode() {
-    setLoading(true)
-    setMessage("")
-
-    setTimeout(() => {
-      const newCode = generateCode()
-      setGeneratedCode(newCode)
-
-      console.log("Código mock enviado:", newCode)
-
-      setStep("code")
-      setLoading(false)
-      setMessage("Código enviado")
-    }, 1200)
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setCpf(formatCPF(e.target.value))
   }
 
-  function verifyCode() {
-    setLoading(true)
-    setMessage("")
+async function handleLogin() {
+  setLoading(true)
+  setMessage("")
 
-    setTimeout(() => {
-      if (code === generatedCode) {
-        setStep("success")
-        route.push("/feed")
-        setMessage("Login realizado com sucesso")
-      } else {
-        setMessage("Código inválido")
-        route.push("/error")
-      }
-      setLoading(false)
-    }, 1200)
+  try {
+    const res = await fetch("/api/autenticar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ cpf }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      setMessage(data.error || "Erro ao fazer login")
+      return
+    }
+
+    // ✅ login ok → cookie já foi salvo no backend
+    route.push("/feed")
+
+  } catch (error) {
+    console.error(error)
+    setMessage("Erro de conexão")
+  } finally {
+    setLoading(false)
   }
-
-  function loginEmail() {
-    setLoading(true)
-    setMessage("")
-
-    setTimeout(() => {
-      if (email === "admin@dikma.com" && password === "123456") {
-        route.push("/feed")
-        setMessage("Login realizado com sucesso")
-      } else {
-        setMessage("Email ou senha inválidos")
-        route.push("/error")
-      }
-      setLoading(false)
-    }, 1200)
-  }
-
+}
   return (
-    <main className="min-h-[100dvh] flex items-start justify-center bg-[#E5E7EB] px-4 pt-10 pb-20 overflow-y-auto">
-      <div className="w-full max-w-sm sm:max-w-md bg-white/70 backdrop-blur-xl rounded-[32px] shadow-2xl p-6 sm:p-8 space-y-6 mt-6 sm:mt-0">
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: 'var(--background)' }}>
 
-        <div className="flex flex-col items-center text-center space-y-2">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-400 to-teal-400" />
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-10" />
+      <div className="absolute inset-0 backdrop-blur-sm" />
 
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-700">
-            Bem-vindo de volta!
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className="relative w-full max-w-md rounded-2xl shadow-lg p-8 space-y-6"
+        style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
+      >
+
+        {/* Logo */}
+        <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
+          <span className="font-semibold text-lg" style={{ color: 'var(--black)' }}>Dikma</span>
+        </div>
+
+        {/* Título */}
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--black)' }}>
+            Bem-vindo de volta
           </h1>
-
-          <p className="text-sm text-gray-500">
-            Escolha como deseja entrar
+          <p style={{ color: 'var(--gray)' }} className="text-sm">
+            Faça login com seu CPF para acessar a plataforma
           </p>
         </div>
 
-        <div className="flex bg-gray-100 rounded-xl p-1">
-          <button
-            onClick={() => {
-              setMode("phone")
-              setStep("phone")
-              setMessage("")
-            }}
-            className={`w-1/2 py-2 text-sm rounded-lg ${
-              mode === "phone" ? "bg-white shadow text-gray-700" : "text-gray-400"
-            }`}
-          >
-            Telefone
-          </button>
-
-          <button
-            onClick={() => {
-              setMode("email")
-              setMessage("")
-            }}
-            className={`w-1/2 py-2 text-sm rounded-lg ${
-              mode === "email" ? "bg-white shadow text-gray-700" : "text-gray-400"
-            }`}
-          >
-            Email
-          </button>
-        </div>
-
-        {mode === "phone" && step === "phone" && (
-          <div className="space-y-4">
-            <div className="flex items-center bg-white rounded-xl px-4 py-3 shadow-sm">
-              <Phone size={18} className="text-gray-400" />
-              <input
-                type="tel"
-                placeholder="Telefone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
-              />
-            </div>
-
-            <button
-              onClick={sendCode}
-              disabled={loading || phone.length < 10}
-              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 shadow-md disabled:opacity-50"
-            >
-              {loading ? "Enviando..." : "Enviar código"}
-            </button>
-          </div>
-        )}
-
-        {mode === "phone" && step === "code" && (
-          <div className="space-y-4">
-            <div className="flex items-center bg-white rounded-xl px-4 py-3 shadow-sm">
-              <ShieldCheck size={18} className="text-gray-400" />
+        {/* Formulário */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--black)' }}>Seu CPF</label>
+            <div className="flex items-center px-4 py-3 rounded-xl transition" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
+              <ShieldCheck size={18} style={{ color: 'var(--secondary)' }} />
               <input
                 type="text"
-                placeholder="Código"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
+                placeholder="000.000.000-00"
+                value={cpf}
+                onChange={handleChange}
+                className="w-full bg-transparent outline-none ml-3 text-sm"
+                style={{ color: 'var(--black)' }}
               />
             </div>
-
-            <button
-              onClick={verifyCode}
-              disabled={loading || code.length !== 6}
-              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 shadow-md disabled:opacity-50"
-            >
-              {loading ? "Verificando..." : "Confirmar código"}
-            </button>
-
-            <button
-              onClick={sendCode}
-              className="w-full text-sm text-gray-400 hover:text-gray-600"
-            >
-              Reenviar código
-            </button>
           </div>
-        )}
 
-        {mode === "email" && (
-          <div className="space-y-4">
-            <div className="flex items-center bg-white rounded-xl px-4 py-3 shadow-sm">
-              <Mail size={18} className="text-gray-400" />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
-              />
-            </div>
+          <button
+            onClick={handleLogin}
+            disabled={loading || cpf.replace(/\D/g, "").length !== 11}
+            className="w-full py-3 rounded-xl text-white font-medium transition hover:opacity-90 disabled:opacity-50"
+            style={{ backgroundColor: loading || cpf.replace(/\D/g, "").length !== 11 ? 'var(--gray)' : 'var(--primary-dark)' }}
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </div>
 
-            <div className="flex items-center bg-white rounded-xl px-4 py-3 shadow-sm">
-              <Lock size={18} className="text-gray-400" />
-              <input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent outline-none ml-3 text-sm text-gray-700 placeholder-gray-400"
-              />
-            </div>
-
-            <button
-              onClick={loginEmail}
-              disabled={loading || !email || !password}
-              className="w-full py-3 rounded-xl text-white font-medium bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 shadow-md disabled:opacity-50"
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </button>
-
-            <p className="text-xs text-gray-400 text-center">
-              Mock: admin@dikma.com / 123456
-            </p>
-          </div>
-        )}
-
-        {generatedCode && mode === "phone" && step === "code" && (
-          <p className="text-xs text-gray-400 text-center">
-            Código mock: {generatedCode}
-          </p>
-        )}
-
+        {/* Mensagem de erro ou sucesso */}
         {message && (
-          <p className="text-center text-sm text-gray-500">
+          <div className="text-center text-sm rounded-xl p-3" style={{ 
+            backgroundColor: message.includes('Erro') ? '#FFE5E5' : '#E8F5E9',
+            color: message.includes('Erro') ? 'var(--black)' : 'var(--success)',
+            border: `1px solid ${message.includes('Erro') ? 'var(--border)' : 'var(--success)'}`
+          }}>
             {message}
-          </p>
+          </div>
         )}
-      </div>
+
+      </motion.div>
     </main>
   )
 }
