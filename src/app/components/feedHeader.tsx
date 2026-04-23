@@ -10,7 +10,7 @@ export function Header (){
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg text-white" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
             <div>
-              <h1 className="text-lg font-bold" style={{ color: 'var(--primary-dark)' }}>Dikma</h1>
+              <h1 className="text-lg font-bold" style={{ color: 'var(--primary-dark)' }}>ReDikma</h1>
               <p className="text-xs" style={{ color: 'var(--gray)' }}>Rede Social Corporativa</p>
             </div>
           </div>
