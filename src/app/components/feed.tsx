@@ -136,15 +136,21 @@ export function FeedNoticias() {
           <p className="text-sm" style={{ color: 'var(--black)' }}>
             {post.label}
           </p>
+        <div
+        className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]"
+        >
 
           {/* Imagem */}
           {post.image && (
             <img
               src={post.image}
-              className="w-full max-h-[300px] md:max-h-[500px] object-cover rounded-lg md:rounded-xl"
+              className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl"
               alt="Post image"
             />
           )}
+
+
+        </div>
 
           {/* Ações */}
           <div className="flex justify-between text-xs md:text-sm gap-2" style={{ color: 'var(--gray)', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
@@ -180,7 +186,7 @@ export function FeedNoticias() {
                 alt="comentários"
                 width={2}
                 height={2}
-                className="w-6 h-6 md:w-6 md:h-6"
+                className="w-6 h-6 md:w-6 md:h-"
               />
               <span className="hidden sm:inline">0 comentários</span>
               <span className="sm:hidden">0</span>
