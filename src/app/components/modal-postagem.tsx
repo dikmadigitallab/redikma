@@ -61,6 +61,9 @@ export function CreatNewPost({ open, onClose }: Props) {
     loadUser()
   }, [])
 
+
+
+/* 
   async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
 
@@ -133,6 +136,61 @@ export function CreatNewPost({ open, onClose }: Props) {
       console.error("ERRO:", err)
       setError(err.message)
       alert("🔥 erro: " + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+ */
+
+
+    async function handleSubmit() {
+    if (!user?.id) {
+      setError("Usuário não carregado")
+      return
+    }
+
+    if (!text && !image) {
+      setError("Adicione texto ou imagem para postar")
+      return
+    }
+
+    setError("")
+    setLoading(true)
+
+    try {
+      const formData = new FormData()
+
+      formData.append("label", text)
+      formData.append("authorId", user.id)
+      formData.append("duration", isFixed ? "" : duration)
+      formData.append("postador", user.username)
+
+      if (image) {
+        formData.append("image", image)
+      }
+
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        body: formData
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao criar postagem")
+      }
+
+      setText("")
+      setImage(null)
+      setPreview(null)
+      setIsRecurring(false)
+      setIsFixed(false)
+      setDuration("24h")
+
+      alert("Post criado")
+    } catch (err: any) {
+      setError(err.message)
     } finally {
       setLoading(false)
     }

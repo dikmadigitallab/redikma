@@ -8,8 +8,22 @@ import { Sidebar } from "../components/sidebar"
 import { RightSidebar } from "../components/stories"
 import { FeedNoticias } from "../components/feed"
 import { Footer } from "../components/footer"
+type Post = {
+  id: string
+  label: string
+  createdAt: string
+  authorId: string
+  image: string
+  author: {
+    id: string
+    nome: string
+    foto: string
+  }
+  postador: string
+}
 
 type User = {
+  id:string
   nome: string
   username: string
   foto?: string | null

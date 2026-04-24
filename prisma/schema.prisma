@@ -47,18 +47,17 @@ model Postagem {
 }
 
 model Like {
-  id          String      @id @default(uuid())
-  postId      String?
-  post        Postagem?   @relation(fields: [postId], references: [id])
+  id           String      @id @default(uuid())
+  postId       String
+  post         Postagem    @relation(fields: [postId], references: [id])
   comentarioId String?
   comentario   Comentario? @relation(fields: [comentarioId], references: [id])
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  createdAt   DateTime    @default(now())
-
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  createdAt    DateTime    @default(now())
   @@unique([postId, userId])
-  @@unique([comentarioId, userId])
 }
+
 
 model Comentario {
   id        String    @id @default(uuid())
