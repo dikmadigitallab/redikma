@@ -223,7 +223,7 @@ const stories: Story[] = [
               {story.descricao || "Atualização recente da empresa com informações importantes para o time."}
             </p>
 
-            {/* Timestamp */}
+            {/* Timestamp */} 
             <p className="text-xs mt-1" style={{ color: 'var(--gray)' }}>
               {story.criadoEm}
             </p>
