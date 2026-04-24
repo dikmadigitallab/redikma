@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { RiImageEditFill } from "react-icons/ri"
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
+import { PostBar } from "./posts-bar"
 
 type Post = {
   id: string
@@ -18,7 +19,7 @@ type Post = {
     foto: string
   }
   postador: string
-  comentarios:[]
+  comentarios: []
 }
 
 type User = {
@@ -77,7 +78,7 @@ export function FeedNoticias() {
         const res = await fetch("/api/posts")
         const data = await res.json()
         setPosts(data)
-        
+
       } catch (err) {
         console.error(err)
       } finally {
@@ -86,7 +87,7 @@ export function FeedNoticias() {
     }
 
     loadPosts()
-    
+
   }, [])
 
 
@@ -221,50 +222,52 @@ export function FeedNoticias() {
     }
   }
 
-// contagem de comentarios
-useEffect(() => {
-  if (!posts.length) return
+  // contagem de comentarios
+  useEffect(() => {
+    if (!posts.length) return
 
-  let isActive = true
+    let isActive = true
 
-  async function loadCommentsCount() {
-    try {
-      const counts: Record<string, number> = {}
+    async function loadCommentsCount() {
+      try {
+        const counts: Record<string, number> = {}
 
-      await Promise.all(
-        posts.map(async (post) => {
-          const res = await fetch(
-            `/api/posts/posts-comments?postId=${post.id}`
-          )
+        await Promise.all(
+          posts.map(async (post) => {
+            const res = await fetch(
+              `/api/posts/posts-comments?postId=${post.id}`
+            )
 
-          if (!res.ok) return
+            if (!res.ok) return
 
-          const data = await res.json()
+            const data = await res.json()
 
-          console.log("comments response:", post.id, data)
+            console.log("comments response:", post.id, data)
 
-          counts[post.id] = data.length || 0
-        })
-      )
+            counts[post.id] = data.length || 0
+          })
+        )
 
-      console.log("final counts:", counts)
+        console.log("final counts:", counts)
 
-      if (isActive) {
-        setCommentsCount(counts)
+        if (isActive) {
+          setCommentsCount(counts)
+        }
+      } catch (error) {
+        console.error(error)
       }
-    } catch (error) {
-      console.error(error)
     }
-  }
 
-  loadCommentsCount()
+    loadCommentsCount()
 
-  return () => {
-    isActive = false
-  }
-}, [posts])
+    return () => {
+      isActive = false
+    }
+  }, [posts])
   return (
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
+
+      {/* 
       <div
         className="flex items-center gap-2 md:gap-3 rounded-lg md:rounded-xl shadow-sm p-3 md:p-4"
         style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}
@@ -282,6 +285,11 @@ useEffect(() => {
           style={{ backgroundColor: "var(--background)", color: "var(--gray)" }}
         />
       </div>
+
+ */}
+
+      <PostBar />
+
 
       {loading && (
         <p className="text-sm" style={{ color: "var(--gray)" }}>
@@ -400,7 +408,7 @@ useEffect(() => {
                     height={20}
                     className="w-5 h-5 md:w-6 md:h-6 opacity-70"
                   />
-                  <span className="hidden sm:inline">{commentsCount[post.id||0]} comentários</span>
+                  <span className="hidden sm:inline">{commentsCount[post.id || 0]} comentários</span>
                   <span className="sm:hidden">0</span>
                 </button>
               </div>
@@ -449,7 +457,7 @@ useEffect(() => {
               )}
 
             </div>
-         
+
             <CommentsBox
               postId={post.id}
             />

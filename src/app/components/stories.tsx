@@ -33,7 +33,7 @@ const stories: Story[] = [
     descricao: "Novo comunicado interno disponível com atualizações importantes sobre os projetos.",
     criadoEm: "4h"
   },
-  {
+  { 
     id: "3",
     nome: "Diretoria",
     username: "diretoria",
