@@ -25,36 +25,37 @@ export default function LoginCPF() {
     setCpf(formatCPF(e.target.value))
   }
 
-async function handleLogin() {
-  setLoading(true)
-  setMessage("")
+  async function handleLogin() {
+    if (loading || cpf.replace(/\D/g, "").length !== 11) return
 
-  try {
-    const res = await fetch("/api/autenticar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ cpf }),
-    })
+    setLoading(true)
+    setMessage("")
 
-    const data = await res.json()
+    try {
+      const res = await fetch("/api/autenticar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cpf }),
+      })
 
-    if (!res.ok) {
-      setMessage(data.error || "Erro ao fazer login")
-      return
+      const data = await res.json()
+
+      if (!res.ok) {
+        setMessage(data.error || "Erro ao fazer login")
+        return
+      }
+
+      route.push("/feed")
+    } catch (error) {
+      console.error(error)
+      setMessage("Erro de conexão")
+    } finally {
+      setLoading(false)
     }
-
-    // ✅ login ok → cookie já foi salvo no backend
-    route.push("/feed")
-
-  } catch (error) {
-    console.error(error)
-    setMessage("Erro de conexão")
-  } finally {
-    setLoading(false)
   }
-}
+
   return (
     <main className="min-h-screen flex items-center justify-center px-4 md:px-6" style={{ backgroundColor: 'var(--background)' }}>
 
@@ -69,13 +70,11 @@ async function handleLogin() {
         style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
       >
 
-        {/* Logo */}
         <div className="flex items-center gap-2 md:gap-3 pb-3 md:pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
           <div className="w-8 md:w-10 h-8 md:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-lg" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
           <span className="font-semibold text-base md:text-lg" style={{ color: 'var(--black)' }}>Dikma</span>
         </div>
 
-        {/* Título */}
         <div className="space-y-1 md:space-y-2">
           <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--black)' }}>
             Bem-vindo de volta
@@ -85,7 +84,6 @@ async function handleLogin() {
           </p>
         </div>
 
-        {/* Formulário */}
         <div className="space-y-4 md:space-y-5">
           <div>
             <label className="block text-xs md:text-sm font-medium mb-2" style={{ color: 'var(--black)' }}>Seu CPF</label>
@@ -96,6 +94,11 @@ async function handleLogin() {
                 placeholder="000.000.000-00"
                 value={cpf}
                 onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleLogin()
+                  }
+                }}
                 className="w-full bg-transparent outline-none ml-2 md:ml-3 text-sm"
                 style={{ color: 'var(--black)' }}
               />
@@ -112,7 +115,6 @@ async function handleLogin() {
           </button>
         </div>
 
-        {/* Mensagem de erro ou sucesso */}
         {message && (
           <div className="text-center text-xs md:text-sm rounded-lg md:rounded-xl p-3" style={{ 
             backgroundColor: message.includes('Erro') ? '#FFE5E5' : '#E8F5E9',
