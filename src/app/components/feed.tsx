@@ -34,6 +34,8 @@ export function FeedNoticias() {
   const [text, setText] = useState<string>("nova postagem...")
   const [user, setUser] = useState<User | null>(null)
   const [liked, setLiked] = useState<boolean>(false)
+  const [comment, setComment] = useState("")
+  const [comments, setComments] = useState<Record<string, string>>({})
 
   useEffect(() => {
     async function loadPosts() {
@@ -150,13 +152,13 @@ export function FeedNoticias() {
             <button
               type="button"
               onClick={() => setLiked(!liked)}
-              className="flex items-center gap-1 md:gap-2 transition hover:opacity-70 min-w-fit"
+              className="flex items-center gap-1 md:gap-2 transition hover:opacity-70 "
             >
               <Image
                 src="/icons/like.png"
                 alt="reação"
-                width={16}
-                height={16}
+                width={2}
+                height={2}
                 className={`transition-all duration-300 w-4 h-4 md:w-5 md:h-5 ${liked ? "opacity-100 scale-110" : "opacity-50"
                   }`}
               />
@@ -170,15 +172,15 @@ export function FeedNoticias() {
 
             <button
               type="button"
-              onClick={() => alert("clicou no ícone")}
-              className="flex items-center gap-1 md:gap-2 transition hover:opacity-70 min-w-fit"
+              
+              className="flex items-center gap-1 md:gap-2 transition hover:opacity-70 "
             >
               <Image
                 src="/icons/coments.png"
                 alt="comentários"
-                width={16}
-                height={16}
-                className="w-4 h-4 md:w-5 md:h-5"
+                width={2}
+                height={2}
+                className="w-6 h-6 md:w-6 md:h-6"
               />
               <span className="hidden sm:inline">0 comentários</span>
               <span className="sm:hidden">0</span>
@@ -202,24 +204,43 @@ export function FeedNoticias() {
             />
 
             <input
+              value={comments[post.id] || ""}
+              maxLength={50}
+              onChange={(e) =>
+                setComments((prev) => ({
+                  ...prev,
+                  [post.id]: e.target.value
+                }))
+              }
+              onKeyDown={(e) => {
+                const value = comments[post.id] || ""
+                if (e.key === "Enter" && !e.shiftKey && value.trim() !== "") {
+                  e.preventDefault()
+                  alert("EM BREVE")
+                }
+              }}
               placeholder="Comentar..."
-              className="bg-transparent outline-none text-xs md:text-sm w-full pr-16"
+              className="bg-transparent outline-none text-xs md:text-sm w-full pr-10"
               style={{ color: "var(--black)" }}
             />
 
-            <button
-              className="absolute right-2 p-2 rounded-full flex items-center justify-center"
-              style={{
-                backgroundColor: "var(--primary)"
-              }}
-            >
-              <img
-                src="/icons/enviar.png"
+            {(comments[post.id] || "").trim() !== "" && (
+              <button
+                className="absolute right-2 p-2 rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: "var(--primary)"
+                }}
                 onClick={() => alert("EM BREVE")}
-                alt="enviar"
-                className="w-5 h-5"
-              />
-            </button>
+              >
+                <img
+                  src="/icons/enviar.png"
+                  alt="enviar"
+                  className="w-5 h-5"
+                />
+              </button>
+
+
+            )}
           </div>
 
         </div>
