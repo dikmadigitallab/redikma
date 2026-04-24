@@ -52,6 +52,69 @@ export default function CreatePostPage() {
     loadUser()
   }, [])
 
+
+  /*  
+   async function handleSubmit() {
+     if (!user?.id) {
+       setError("Usuário não carregado")
+       return
+     }
+ 
+     if (!text && !image) {
+       setError("Adicione texto ou imagem para postar")
+       return
+     }
+ 
+     setError("")
+     setLoading(true)
+ 
+     try {
+       let imageUrl: string | undefined = undefined
+ 
+       if (image) {
+         imageUrl = preview || ""
+       }
+ 
+       const payload = {
+         label: text,
+         authorId: user.id,
+         duration: isFixed ? "" : duration,
+         image: imageUrl,
+         video: null,
+         postador:user.username
+       }
+ 
+       const res = await fetch("/api/posts", {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json"
+         },
+         body: JSON.stringify(payload)
+       })
+ 
+       const data = await res.json()
+ 
+       if (!res.ok) {
+         throw new Error(data.error || "Erro ao criar postagem")
+       }
+ 
+       setText("")
+       setImage(null)
+       setPreview(null)
+       setIsRecurring(false)
+       setIsFixed(false)
+       setDuration("24h")
+ 
+       alert("Post criado")
+     } catch (err: any) {
+       setError(err.message)
+     } finally {
+       setLoading(false)
+     }
+   }
+ 
+  */
+
   async function handleSubmit() {
     if (!user?.id) {
       setError("Usuário não carregado")
@@ -67,27 +130,20 @@ export default function CreatePostPage() {
     setLoading(true)
 
     try {
-      let imageUrl: string | undefined = undefined
+      const formData = new FormData()
+
+      formData.append("label", text)
+      formData.append("authorId", user.id)
+      formData.append("duration", isFixed ? "" : duration)
+      formData.append("postador", user.username)
 
       if (image) {
-        imageUrl = preview || ""
-      }
-
-      const payload = {
-        label: text,
-        authorId: user.id,
-        duration: isFixed ? "" : duration,
-        image: imageUrl,
-        video: null,
-        postador:user.username
+        formData.append("image", image)
       }
 
       const res = await fetch("/api/posts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
+        body: formData
       })
 
       const data = await res.json()
@@ -113,7 +169,7 @@ export default function CreatePostPage() {
 
   return (
     <main className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
-  
+
       {/* Header */}
       <header className="w-full px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
         <button
@@ -123,23 +179,23 @@ export default function CreatePostPage() {
         >
           Voltar
         </button>
-  
+
         <h1 className="text-base md:text-lg font-semibold" style={{ color: 'var(--black)' }}>
           Nova postagem
         </h1>
-  
+
         <div />
       </header>
-  
+
       {/* Conteúdo */}
       <section className="flex-1 w-full max-w-3xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-4 md:space-y-6">
-  
+
         {/* Texto */}
         <div className="rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm space-y-3" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
           <label className="text-xs md:text-sm font-medium" style={{ color: 'var(--black)' }}>
             Conteúdo
           </label>
-  
+
           <textarea
             placeholder="Escreva algo..."
             value={text}
@@ -148,13 +204,13 @@ export default function CreatePostPage() {
             style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
           />
         </div>
-  
+
         {/* Imagem */}
         <div className="rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm space-y-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
           <label className="text-xs md:text-sm font-medium" style={{ color: 'var(--black)' }}>
             Imagem
           </label>
-  
+
           {!preview && (
             <div className="rounded-lg p-4 md:p-6 text-center" style={{ border: `2px dashed var(--border)` }}>
               <input
@@ -166,7 +222,7 @@ export default function CreatePostPage() {
               />
             </div>
           )}
-  
+
           {preview && (
             <div className="space-y-3">
               <img
@@ -174,7 +230,7 @@ export default function CreatePostPage() {
                 className="w-full h-48 md:h-64 object-cover rounded-lg"
                 alt="preview"
               />
-  
+
               <button
                 type="button"
                 onClick={() => handleImageChange(null)}
@@ -186,10 +242,10 @@ export default function CreatePostPage() {
             </div>
           )}
         </div>
-  
+
         {/* Configurações */}
         <div className="rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm space-y-4" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}>
-  
+
           <div className="flex items-center justify-between text-xs md:text-sm">
             <span style={{ color: 'var(--black)' }}>Post recorrente</span>
             <input
@@ -199,7 +255,7 @@ export default function CreatePostPage() {
               style={{ accentColor: 'var(--primary-dark)' }}
             />
           </div>
-  
+
           <div className="flex items-center justify-between text-xs md:text-sm">
             <span style={{ color: 'var(--black)' }}>Post fixo</span>
             <input
@@ -209,7 +265,7 @@ export default function CreatePostPage() {
               style={{ accentColor: 'var(--primary-dark)' }}
             />
           </div>
-  
+
           {!isFixed && (
             <select
               value={duration}
@@ -225,18 +281,18 @@ export default function CreatePostPage() {
               <option value="30d">30 dias</option>
             </select>
           )}
-  
+
         </div>
-  
+
         {/* Erro */}
         {error && (
           <div className="text-xs md:text-sm rounded-lg p-3 md:p-4" style={{ backgroundColor: '#FFE5E5', border: `1px solid var(--border)`, color: 'var(--black)' }}>
             {error}
           </div>
         )}
-  
+
       </section>
-  
+
       {/* Footer fixo */}
       <footer className="w-full p-3 md:p-4 flex justify-end gap-2 md:gap-3 shadow-sm" style={{ backgroundColor: 'var(--white)', borderTop: '1px solid var(--border)' }}>
         <button
@@ -247,7 +303,7 @@ export default function CreatePostPage() {
         >
           Cancelar
         </button>
-  
+
         <button
           type="button"
           onClick={handleSubmit}
@@ -258,7 +314,7 @@ export default function CreatePostPage() {
           {loading ? "Postando..." : "Publicar"}
         </button>
       </footer>
-  
+
     </main>
   )
 }
