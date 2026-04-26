@@ -266,7 +266,7 @@ export function FeedNoticias() {
     }
   }, [posts])
 
-//
+  //
 
 
 
@@ -417,7 +417,9 @@ export function FeedNoticias() {
                     className="w-5 h-5 md:w-6 md:h-6 opacity-70"
                   />
                   <span className="hidden sm:inline">{commentsCount[post.id || 0]} comentários</span>
-                  <span className="sm:hidden">0</span>
+                  <span className="inline-flex items-center justify-center bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full sm:hidden">
+                    {commentsCount[post.id] || 0}
+                  </span>
                 </button>
               </div>
             </div>
