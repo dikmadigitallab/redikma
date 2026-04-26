@@ -122,7 +122,7 @@ export default function Feed() {
       <Footer />
       {/* Bottom nav - Mobile only */}
       <div
-  className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full flex items-center justify-center cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:scale-105 active:scale-95 transition-all z-50 overflow-hidden"
+  className="lg:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full flex items-center justify-center cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:scale-105 active:scale-95 transition-all z-50 overflow-hidden"
   style={{
     background: 'linear-gradient(135deg, #60a5fa 0%, #34d399 50%, #facc15 100%)',
     border: '4px solid var(--white)'
