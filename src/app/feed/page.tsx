@@ -23,7 +23,7 @@ type Post = {
 }
 
 type User = {
-  id: string
+  id:string
   nome: string
   username: string
   foto?: string | null
@@ -121,33 +121,8 @@ export default function Feed() {
       {/* Footer - Hidden on mobile, compact on tablet */}
       <Footer />
       {/* Bottom nav - Mobile only */}
-      {/*  
-
-      <div className="lg:hidden fixed bottom-0 left-1/2 -translate-x-1/2 rounded-full px-6 py-3 shadow-lg flex justify-between items-center z-50 border gap-4"
-        style={{ backgroundColor: 'var(--white)', borderColor: 'var(--border)', width: 'calc(100% - 2rem)', maxWidth: '420px' }}>
-        <Home size={18} style={{ color: 'var(--gray)' }} className="hover:opacity-70 cursor-pointer transition flex-shrink-0" />
-        <Search size={18} style={{ color: 'var(--gray)' }} className="hover:opacity-70 cursor-pointer transition flex-shrink-0" />
-
-        <div
-          className="w-12 h-10 rounded-full flex items-center justify-center text-white cursor-pointer shadow-md hover:opacity-90 transition flex-shrink-0"
-          style={{ backgroundColor: 'var(--primary-dark)' }}
-          onClick={() => {
-            if (window.innerWidth >= 1024) {
-              setOpenModal(true)
-              return
-            }
-            router.push("/feed/new-post")
-          }}
-        >
-          <Plus size={18} />
-        </div>
-
-        <Video size={18} style={{ color: 'var(--gray)' }} className="hover:opacity-70 cursor-pointer transition flex-shrink-0" />
-        <User size={18} style={{ color: 'var(--gray)' }} className="hover:opacity-70 cursor-pointer transition flex-shrink-0" />
-      </div> 
-       */}
-    <div
-  className="lg:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:scale-105 active:scale-95 transition-all z-50 overflow-hidden"
+      <div
+  className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full flex items-center justify-center cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:scale-105 active:scale-95 transition-all z-50 overflow-hidden"
   style={{
     background: 'linear-gradient(135deg, #60a5fa 0%, #34d399 50%, #facc15 100%)',
     border: '4px solid var(--white)'
@@ -167,6 +142,7 @@ export default function Feed() {
     className="text-white drop-shadow-md relative z-10" 
   />
 </div>
+
       <CreatNewPost
         open={openModal}
         onClose={() => setOpenModal(false)}
