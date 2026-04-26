@@ -42,6 +42,7 @@ export function FeedNoticias() {
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
 
 
+
   //conta os liker
   useEffect(() => {
     async function loadLikesCount() {
@@ -264,6 +265,13 @@ export function FeedNoticias() {
       isActive = false
     }
   }, [posts])
+
+//
+
+
+
+
+
   return (
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
 
