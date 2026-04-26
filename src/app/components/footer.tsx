@@ -6,7 +6,7 @@ export function Footer (){
   <div className="px-[10%] h-20 py-4">
     <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
       <span>© 2026 ReDikma</span>
-      <span>Versão 1.0.0</span>
+      <span className="text-gray-500 sm:hidden">Versão 1.0.0</span>
     </div>
   </div>
 </footer>
