@@ -121,88 +121,88 @@ export function PostBar({ onCreated }: Props) {
   }
 
   return (
-    <div className="relative">
-      <div
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 md:gap-3 rounded-lg md:rounded-xl shadow-sm p-3 md:p-4 cursor-pointer"
+<div className="relative hidden md:block">
+  <div
+    onClick={() => setOpen((v) => !v)}
+    className="flex items-center gap-2 md:gap-3 rounded-lg md:rounded-xl shadow-sm p-3 md:p-4 cursor-pointer"
+    style={{
+      backgroundColor: "var(--white)",
+      border: "1px solid var(--border)",
+    }}
+  >
+    <RiImageEditFill
+      className="w-5 md:w-6 h-5 md:h-6 flex-shrink-0"
+      style={{ color: "var(--secondary)" }}
+    />
+
+    <div className="text-sm" style={{ color: "var(--gray)" }}>
+      No que você está pensando?
+    </div>
+  </div>
+
+  {open && (
+    <div
+      ref={boxRef}
+      className="absolute z-50 mt-2 w-full rounded-xl shadow-lg p-4 space-y-3"
+      style={{
+        backgroundColor: "var(--white)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Escreva seu post..."
+        className="w-full min-h-24 resize-none outline-none text-sm p-2 rounded-lg"
         style={{
-          backgroundColor: "var(--white)",
-          border: "1px solid var(--border)",
+          backgroundColor: "var(--background)",
+          color: "var(--gray)",
         }}
-      >
-        <RiImageEditFill
-          className="w-5 md:w-6 h-5 md:h-6 flex-shrink-0"
-          style={{ color: "var(--secondary)" }}
+      />
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => handleImage(e.target.files?.[0] || null)}
+      />
+
+      {preview && (
+        <img
+          src={preview}
+          className="w-full max-h-56 object-cover rounded-lg"
+          alt="preview"
         />
+      )}
 
-        <div className="text-sm" style={{ color: "var(--gray)" }}>
-          No que você está pensando?
-        </div>
-      </div>
-
-      {open && (
-        <div
-          ref={boxRef}
-          className="absolute z-50 mt-2 w-full rounded-xl shadow-lg p-4 space-y-3"
-          style={{
-            backgroundColor: "var(--white)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Escreva seu post..."
-            className="w-full min-h-24 resize-none outline-none text-sm p-2 rounded-lg"
-            style={{
-              backgroundColor: "var(--background)",
-              color: "var(--gray)",
-            }}
-          />
-
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleImage(e.target.files?.[0] || null)}
-          />
-
-          {preview && (
-            <img
-              src={preview}
-              className="w-full max-h-56 object-cover rounded-lg"
-              alt="preview"
-            />
-          )}
-
-          {error && (
-            <div className="text-xs" style={{ color: "var(--warning)" }}>
-              {error}
-            </div>
-          )}
-
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => setOpen(false)}
-              className="px-3 py-1 text-sm rounded-lg"
-              style={{ background: "var(--background)" }}
-            >
-              cancelar
-            </button>
-
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="px-3 py-1 text-sm rounded-lg text-white"
-              style={{
-                backgroundColor: "#2563eb",
-                color: "#fff",
-              }}
-            >
-              {loading ? "enviando..." : "publicar"}
-            </button>
-          </div>
+      {error && (
+        <div className="text-xs" style={{ color: "var(--warning)" }}>
+          {error}
         </div>
       )}
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setOpen(false)}
+          className="px-3 py-1 text-sm rounded-lg"
+          style={{ background: "var(--background)" }}
+        >
+          cancelar
+        </button>
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="px-3 py-1 text-sm rounded-lg text-white"
+          style={{
+            backgroundColor: "#2563eb",
+            color: "#fff",
+          }}
+        >
+          {loading ? "enviando..." : "publicar"}
+        </button>
+      </div>
     </div>
+  )}
+</div>
   )
 }
