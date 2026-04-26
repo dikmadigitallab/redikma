@@ -40,6 +40,7 @@ export function FeedNoticias() {
   const [comments, setComments] = useState<Record<string, string>>({})
   const [commentsCount, setCommentsCount] = useState<Record<string, number>>({})
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
+  const [isActive, setIsActive] = useState(true)
 
 
 
@@ -188,85 +189,60 @@ export function FeedNoticias() {
 
 
   //comentar
-  async function comentar(postId: string) {
-    if (!user) return
-
-    const texto = comments[postId]?.trim()
-    if (!texto) return
-
-    try {
-      const res = await fetch("/api/posts/posts-comments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          texto,
-          postId,
-          authorId: user.id,
-        }),
+ // 1. Mova a lógica de carregar contagem para uma função fora do useEffect para que possa ser reutilizada
+async function loadCommentsCount() {
+  try {
+    const counts: Record<string, number> = {}
+    await Promise.all(
+      posts.map(async (post) => {
+        const res = await fetch(`/api/posts/posts-comments?postId=${post.id}`)
+        if (!res.ok) return
+        const data = await res.json()
+        counts[post.id] = data.length || 0
       })
-
-      if (!res.ok) {
-        const err = await res.json()
-        console.error(err)
-        throw new Error("Erro ao comentar")
-      }
-
-      // limpa o input do comentário
-      setComments((prev) => ({
-        ...prev,
-        [postId]: "",
-      }))
-    } catch (error) {
-      console.error(error)
-    }
+    )
+    setCommentsCount(counts)
+  } catch (error) {
+    console.error(error)
   }
+}
 
-  // contagem de comentarios
-  useEffect(() => {
-    if (!posts.length) return
+// 2. Chame a função dentro do seu método de comentar
+async function comentar(postId: string) {
+  if (!user) return
+  const texto = comments[postId]?.trim()
+  if (!texto) return
 
-    let isActive = true
+  try {
+    const res = await fetch("/api/posts/posts-comments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texto, postId, authorId: user.id }),
+    })
 
-    async function loadCommentsCount() {
-      try {
-        const counts: Record<string, number> = {}
+    if (!res.ok) throw new Error("Erro ao comentar")
 
-        await Promise.all(
-          posts.map(async (post) => {
-            const res = await fetch(
-              `/api/posts/posts-comments?postId=${post.id}`
-            )
+    setComments((prev) => ({ ...prev, [postId]: "" }))
+    
+    // Atualiza a contagem assim que o comentário é enviado com sucesso
+    loadCommentsCount() 
+    
+  } catch (error) {
+    console.error(error)
+  }
+}
 
-            if (!res.ok) return
+// 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
+useEffect(() => {
+  if (!posts.length) return
 
-            const data = await res.json()
+  loadCommentsCount()
+  const interval = setInterval(loadCommentsCount, 30000)
 
-            console.log("comments response:", post.id, data)
-
-            counts[post.id] = data.length || 0
-          })
-        )
-
-        console.log("final counts:", counts)
-
-        if (isActive) {
-          setCommentsCount(counts)
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    loadCommentsCount()
-
-    return () => {
-      isActive = false
-    }
-  }, [posts])
-
-  //
+  return () => clearInterval(interval)
+}, [posts])
+  
+  
 
 
 
@@ -275,27 +251,7 @@ export function FeedNoticias() {
   return (
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
 
-      {/* 
-      <div
-        className="flex items-center gap-2 md:gap-3 rounded-lg md:rounded-xl shadow-sm p-3 md:p-4"
-        style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}
-      >
-        <RiImageEditFill
-          className="w-5 md:w-6 h-5 md:h-6 flex-shrink-0"
-          style={{ color: "var(--secondary)" }}
-        />
-
-        <textarea
-          placeholder="No que você está pensando?"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="flex-1 rounded-lg md:rounded-full px-3 md:px-4 py-2 resize-none outline-none text-sm min-h-10"
-          style={{ backgroundColor: "var(--background)", color: "var(--gray)" }}
-        />
-      </div>
-
- */}
-
+    
       <PostBar />
 
 
