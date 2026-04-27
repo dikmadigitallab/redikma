@@ -308,15 +308,15 @@ useEffect(() => {
               {post.label}
             </p>
 
-            <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
               {post.image && (
+            <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
                 <img
                   src={post.image}
                   className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl"
                   alt="Post image"
                 />
-              )}
             </div>
+              )}
             <div
               className="flex items-center justify-between text-xs md:text-sm gap-3"
               style={{

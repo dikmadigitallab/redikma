@@ -33,6 +33,9 @@ export default function Feed() {
   const [openModal, setOpenModal] = useState(false)
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
+  const [open, setOpen]= useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+
 
   useEffect(() => {
     async function loadUser() {
@@ -80,13 +83,37 @@ export default function Feed() {
         <Bell size={18} style={{ color: 'var(--gray)' }} />
         <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: 'var(--warning)' }}>3</span>
       </div>
-      {user?.foto && (
-        <img
-          src={user?.foto}
-          alt="user"
-          className="w-9 h-9 md:hidden rounded-full object-cover object-center cursor-pointer hover:opacity-70 transition"
-        />
-      )}
+
+<div className="relative">
+  {user?.foto && (
+    <img
+      src={user?.foto}
+      alt="user"
+      onClick={() => setOpen(!open)}
+      className="w-9 h-9 rounded-full object-cover object-center cursor-pointer border-2 border-transparent hover:border-gray-300 transition"
+    />
+  )}
+
+  {open && (
+    <div
+      className="absolute right-0 mt-2 w-40 rounded-xl shadow-lg py-1 z-50"
+      style={{
+        backgroundColor: "var(--white)",
+        border: "1px solid var(--border)"
+      }}
+    >
+      <button
+        onClick={() => router.push("/login")}
+        className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
+      >
+        Sair
+      </button>
+    </div>
+  )}
+</div>
+
+      
+   
     </div>
   </div>
 </header>

@@ -8,6 +8,7 @@
 1.2 Editar dados (foto, senha, email, telefone)  
 1.3 Atualizar foto de perfil  
 1.4 Persistência de dados do usuário  
+1.5 Sair pela foto de perfil no mobile
 
 ## 2. Feed e Postagens
 
@@ -83,3 +84,4 @@
 ### 11.3 Mobile
 13.1 Aplicativo iOS  
 13.2 Ajustes nativos mobile  
+
