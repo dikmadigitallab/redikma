@@ -2,34 +2,8 @@
 
 import { ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState,useEffect } from "react"
-
-type User = {
-  nome: string
-  username: string
-  foto?: string | null
-}
 
 export default function LandingPage() {
-  const [user, setUser] = useState<User | null>(null)
-
-    useEffect(() => {
-      async function loadUser() {
-        try {
-          const res = await fetch("/api/autenticar")
-  
-          if (!res.ok) return
-  
-          const data = await res.json()
-          setUser(data)
-        } catch (err) {
-          console.error(err)
-        }
-      }
-  
-      loadUser()
-    }, [])
-
   const route = useRouter()
   return (
     <main style={{ backgroundColor: 'var(--background)', color: 'var(--black)' }} className="min-h-screen">

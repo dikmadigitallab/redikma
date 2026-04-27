@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../../auth/[...nextauth]/route"
 
 function gerarSenhaPadrao(cpf: string) {
   return cpf.replace(/\D/g, "").slice(0, 6)
@@ -22,6 +24,17 @@ function gerarUsername(nome: string, cpf: string): string {
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session) {
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
+    }
+
+    const user = session.user as { role?: string }
+    if (user.role !== "SYSTEM_ADM" && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Sem permissão" }, { status: 403 })
+    }
+
     const { nome, admissao, cargo, nascimento, cpf } = await req.json()
 
     if (!nome || !admissao || !cargo || !nascimento || !cpf) {
@@ -46,7 +59,7 @@ export async function POST(req: Request) {
     const senhaHash = await hash(senhaPadrao, 10)
     const username = gerarUsername(nome, cpfLimpo)
 
-    const user = await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         nome,
         username,
@@ -61,10 +74,10 @@ export async function POST(req: Request) {
     return NextResponse.json({
       message: "Usuário cadastrado com sucesso",
       user: {
-        id: user.id,
-        nome: user.nome,
-        username: user.username,
-        cpf: user.cpf,
+        id: newUser.id,
+        nome: newUser.nome,
+        username: newUser.username,
+        cpf: newUser.cpf,
       },
       senhaPadrao,
     })

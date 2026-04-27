@@ -56,18 +56,22 @@ model Like {
   user         User        @relation(fields: [userId], references: [id])
   createdAt    DateTime    @default(now())
   @@unique([postId, userId])
+  @@unique([comentarioId, userId])
 }
 
 
 model Comentario {
-  id        String    @id @default(uuid())
+  id        String      @id @default(uuid())
   texto     String
-  aprovado  Boolean   @default(true)
+  aprovado  Boolean    @default(true)
   postId    String
-  post      Postagem  @relation(fields: [postId], references: [id])
+  post      Postagem    @relation(fields: [postId], references: [id])
   authorId  String
-  author    User      @relation(fields: [authorId], references: [id])
-  createdAt DateTime  @default(now())
+  author    User        @relation(fields: [authorId], references: [id])
+  parentId  String?
+  parent    Comentario? @relation("ComentarioToComentario", fields: [parentId], references: [id])
+  children  Comentario[] @relation("ComentarioToComentario")
+  createdAt DateTime    @default(now())
   likes     Like[]
 }
 

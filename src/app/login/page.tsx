@@ -5,13 +5,13 @@ import { ShieldCheck, Lock, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { signIn } from "next-auth/react"
+import { toast } from "sonner"
 
 export default function LoginCPF() {
   const [cpf, setCpf] = useState("")
   const [senha, setSenha] = useState("")
   const [showSenha, setShowSenha] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
 
   const route = useRouter()
 
@@ -33,7 +33,6 @@ export default function LoginCPF() {
     if (loading || cpfNumerico.length !== 11 || !senha) return
 
     setLoading(true)
-    setMessage("")
 
     try {
       const result = await signIn("credentials", {
@@ -43,14 +42,14 @@ export default function LoginCPF() {
       })
 
       if (result?.error) {
-        setMessage("CPF ou senha incorretos")
+        toast.error("CPF ou senha incorretos")
         return
       }
 
+      toast.success("Login realizado com sucesso!")
       route.push("/feed")
-    } catch (error) {
-      console.error(error)
-      setMessage("Erro de conexão")
+    } catch {
+      toast.error("Erro de conexão")
     } finally {
       setLoading(false)
     }
@@ -141,16 +140,6 @@ export default function LoginCPF() {
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </div>
-
-        {message && (
-          <div className="text-center text-xs md:text-sm rounded-lg md:rounded-xl p-3" style={{ 
-            backgroundColor: message.includes('Erro') ? '#FFE5E5' : '#E8F5E9',
-            color: message.includes('Erro') ? 'var(--black)' : 'var(--success)',
-            border: `1px solid ${message.includes('Erro') ? 'var(--border)' : 'var(--success)'}`
-          }}>
-            {message}
-          </div>
-        )}
 
       </motion.div>
     </main>

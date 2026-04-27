@@ -2,27 +2,22 @@
 
 import { useEffect, useRef, useState } from "react"
 import { RiImageEditFill } from "react-icons/ri"
-
-type User = {
-  nome: string
-  username: string
-  foto?: string | null
-  id: string
-}
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 type Props = {
   onCreated?: () => void
+  onRefresh?: () => void
 }
 
-export function PostBar({ onCreated }: Props) {
+export function PostBar({ onCreated, onRefresh }: Props) {
   const [open, setOpen] = useState(false)
   const [text, setText] = useState("")
   const [image, setImage] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
-
-  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const { data: session } = useSession()
+  const user = session?.user
 
   const boxRef = useRef<HTMLDivElement | null>(null)
 
@@ -35,22 +30,6 @@ export function PostBar({ onCreated }: Props) {
       setPreview(null)
     }
   }
-
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const res = await fetch("/api/autenticar")
-        if (!res.ok) return
-
-        const data = await res.json()
-        setUser(data)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
-    loadUser()
-  }, [])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -72,16 +51,15 @@ export function PostBar({ onCreated }: Props) {
 
   async function handleSubmit() {
     if (!user?.id) {
-      setError("Usuário não carregado")
+      toast.error("Usuário não identificado")
       return
     }
 
     if (!text.trim() && !image) {
-      setError("Escreva algo ou adicione imagem")
+      toast.warning("Escreva algo ou adicione uma imagem")
       return
     }
 
-    setError("")
     setLoading(true)
 
     try {
@@ -104,17 +82,20 @@ export function PostBar({ onCreated }: Props) {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || "Erro ao criar post")
+        toast.error(data.error || "Erro ao criar post")
+        return
       }
 
+      toast.success("Post criado com sucesso!")
       setText("")
       setImage(null)
       setPreview(null)
       setOpen(false)
 
       onCreated?.()
-    } catch (err: any) {
-      setError(err.message)
+      onRefresh?.()
+    } catch {
+      toast.error("Erro ao criar post")
     } finally {
       setLoading(false)
     }
@@ -172,12 +153,6 @@ export function PostBar({ onCreated }: Props) {
           className="w-full max-h-56 object-cover rounded-lg"
           alt="preview"
         />
-      )}
-
-      {error && (
-        <div className="text-xs" style={{ color: "var(--warning)" }}>
-          {error}
-        </div>
       )}
 
       <div className="flex justify-end gap-2">

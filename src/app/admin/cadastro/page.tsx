@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { UserPlus, Upload, FileText, X, CheckCircle } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 type Tab = "individual" | "lote"
 
@@ -35,7 +36,6 @@ export default function CadastroPage() {
 
   const [tab, setTab] = useState<Tab>("individual")
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const [form, setForm] = useState({
     nome: "",
     admissao: "",
@@ -76,7 +76,6 @@ export default function CadastroPage() {
   async function handleSubmitIndividual(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    setMessage(null)
 
     try {
       const res = await fetch("/api/usuarios/criar", {
@@ -91,14 +90,14 @@ export default function CadastroPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setMessage({ type: "error", text: data.error })
+        toast.error(data.error)
         return
       }
 
-      setMessage({ type: "success", text: `Usuário ${data.user.nome} cadastrado! Username: ${data.user.username} | Senha: ${data.senhaPadrao}` })
+      toast.success(`${data.user.nome} cadastrado!\nUsername: ${data.user.username}\nSenha: ${data.senhaPadrao}`)
       setForm({ nome: "", admissao: "", cargo: "", nascimento: "", cpf: "" })
     } catch {
-      setMessage({ type: "error", text: "Erro de conexão" })
+      toast.error("Erro de conexão")
     } finally {
       setLoading(false)
     }
@@ -108,8 +107,6 @@ export default function CadastroPage() {
     if (!file) return
 
     setLoading(true)
-    setMessage(null)
-    setResult(null)
 
     try {
       const formData = new FormData()
@@ -123,17 +120,25 @@ export default function CadastroPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setMessage({ type: "error", text: data.error })
+        toast.error(data.error)
         return
       }
 
       setResult(data)
-      setMessage({
-        type: "success",
-        text: `${data.summary.success} usuários importados com sucesso!`,
-      })
+      
+      if (data.summary.success > 0) {
+        toast.success(`${data.summary.success} usuário(s) importado(s) com sucesso!`)
+      }
+      
+      if (data.summary.errors > 0) {
+        toast.warning(`${data.summary.errors} erro(s) ao importar`)
+      }
+      
+      if (data.summary.skipped > 0) {
+        toast.info(`${data.summary.skipped} usuário(s) ignorado(s) (já cadastrados)`)
+      }
     } catch {
-      setMessage({ type: "error", text: "Erro ao processar arquivo" })
+      toast.error("Erro ao processar arquivo")
     } finally {
       setLoading(false)
     }
@@ -180,19 +185,6 @@ export default function CadastroPage() {
             Importar Planilha
           </button>
         </div>
-
-        {message && (
-          <div
-            className="mb-6 p-4 rounded-lg text-sm"
-            style={{
-              backgroundColor: message.type === "success" ? "#E8F5E9" : "#FFE5E5",
-              border: `1px solid ${message.type === "success" ? "var(--success)" : "var(--border)"}`,
-              color: "var(--black)",
-            }}
-          >
-            {message.text}
-          </div>
-        )}
 
         {tab === "individual" && (
           <motion.div

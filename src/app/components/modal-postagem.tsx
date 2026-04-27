@@ -1,33 +1,28 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
-
-type User = {
-  nome: string
-  username: string
-  foto?: string | null
-  id: string
-}
 
 type Props = {
   open: boolean
   onClose: () => void
+  onSuccess?: () => void
+  onRefresh?: () => void
 }
 
-export function CreatNewPost({ open, onClose }: Props) {
+export function CreatNewPost({ open, onClose, onSuccess, onRefresh }: Props) {
   const [text, setText] = useState("")
   const [image, setImage] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
-
   const [isRecurring, setIsRecurring] = useState(false)
   const [isFixed, setIsFixed] = useState(false)
   const [duration, setDuration] = useState<DurationType>("24h")
-
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const { data: session } = useSession()
+  const user = session?.user
 
   function handleImageChange(file: File | null) {
     setImage(file)
@@ -40,122 +35,17 @@ export function CreatNewPost({ open, onClose }: Props) {
     }
   }
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const res = await fetch("/api/autenticar")
-
-        if (!res.ok) {
-          console.log("auth falhou:", res.status)
-          return
-        }
-
-        const data = await res.json()
-        console.log("user carregado:", data)
-        setUser(data)
-      } catch (err) {
-        console.error("erro auth:", err)
-      }
-    }
-
-    loadUser()
-  }, [])
-
-
-
-/* 
-  async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault()
-
-    alert("clicou em postar")
-
-    console.log("USER ATUAL:", user)
-
-    if (!user?.id) {
-      setError("Usuário não carregado")
-      alert("❌ usuário não carregado")
-      return
-    }
-
-    if (!text && !image) {
-      setError("Adicione texto ou imagem para postar")
-      alert("❌ sem texto e sem imagem")
-      return
-    }
-
-    setError("")
-    setLoading(true)
-
-    try {
-      let imageUrl: string | undefined = undefined
-
-      if (image) {
-        imageUrl = preview || ""
-      }
-
-      const payload = {
-        label: text,
-        authorId: user.id,
-        duration: isFixed ? "" : duration,
-        image: imageUrl,
-        video: null,
-        postador:user.username
-      }
-
-      console.log("PAYLOAD:", payload)
-
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
-
-      console.log("STATUS:", res.status)
-
-      const data = await res.json()
-      console.log("RESPONSE:", data)
-
-      if (!res.ok) {
-        alert("❌ erro da API: " + data.error)
-        throw new Error(data.error || "Erro ao criar postagem")
-      }
-
-      alert("✅ post criado")
-
-      setText("")
-      setImage(null)
-      setPreview(null)
-      setIsRecurring(false)
-      setIsFixed(false)
-      setDuration("24h")
-
-      onClose()
-    } catch (err: any) {
-      console.error("ERRO:", err)
-      setError(err.message)
-      alert("🔥 erro: " + err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
- */
-
-
     async function handleSubmit() {
     if (!user?.id) {
-      setError("Usuário não carregado")
+      toast.error("Usuário não identificado")
       return
     }
 
     if (!text && !image) {
-      setError("Adicione texto ou imagem para postar")
+      toast.warning("Adicione texto ou imagem para postar")
       return
     }
 
-    setError("")
     setLoading(true)
 
     try {
@@ -178,9 +68,11 @@ export function CreatNewPost({ open, onClose }: Props) {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || "Erro ao criar postagem")
+        toast.error(data.error || "Erro ao criar postagem")
+        return
       }
 
+      toast.success("Post criado com sucesso!")
       setText("")
       setImage(null)
       setPreview(null)
@@ -188,9 +80,11 @@ export function CreatNewPost({ open, onClose }: Props) {
       setIsFixed(false)
       setDuration("24h")
 
-      alert("Post criado")
-    } catch (err: any) {
-      setError(err.message)
+      onClose()
+      onSuccess?.()
+      onRefresh?.()
+    } catch {
+      toast.error("Erro ao criar postagem")
     } finally {
       setLoading(false)
     }
@@ -295,12 +189,6 @@ export function CreatNewPost({ open, onClose }: Props) {
           )}
 
         </div>
-
-        {error && (
-          <div className="text-sm rounded-xl px-3 py-2" style={{ backgroundColor: '#FFE5E5', border: `1px solid var(--border)`, color: 'var(--black)' }}>
-            {error}
-          </div>
-        )}
 
         <div className="flex justify-end gap-2 pt-4" style={{ borderTop: `1px solid var(--border)` }}>
           <button

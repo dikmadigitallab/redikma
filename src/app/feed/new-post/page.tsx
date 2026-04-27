@@ -1,28 +1,27 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
-type User = {
-  nome: string
-  username: string
-  foto?: string | null
-  id: string
+type Props = {
+  onRefresh?: () => void
 }
 
-export default function CreatePostPage() {
+export default function CreatePostPage({ onRefresh }: Props) {
   const [text, setText] = useState("")
   const [image, setImage] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
-
   const [isRecurring, setIsRecurring] = useState(false)
   const [isFixed, setIsFixed] = useState(false)
   const [duration, setDuration] = useState<DurationType>("24h")
-
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const { data: session } = useSession()
+  const router = useRouter()
+  const user = session?.user
 
   function handleImageChange(file: File | null) {
     setImage(file)
@@ -35,98 +34,17 @@ export default function CreatePostPage() {
     }
   }
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const res = await fetch("/api/autenticar")
-
-        if (!res.ok) return
-
-        const data = await res.json()
-        setUser(data)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
-    loadUser()
-  }, [])
-
-
-  /*  
-   async function handleSubmit() {
-     if (!user?.id) {
-       setError("Usuário não carregado")
-       return
-     }
- 
-     if (!text && !image) {
-       setError("Adicione texto ou imagem para postar")
-       return
-     }
- 
-     setError("")
-     setLoading(true)
- 
-     try {
-       let imageUrl: string | undefined = undefined
- 
-       if (image) {
-         imageUrl = preview || ""
-       }
- 
-       const payload = {
-         label: text,
-         authorId: user.id,
-         duration: isFixed ? "" : duration,
-         image: imageUrl,
-         video: null,
-         postador:user.username
-       }
- 
-       const res = await fetch("/api/posts", {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json"
-         },
-         body: JSON.stringify(payload)
-       })
- 
-       const data = await res.json()
- 
-       if (!res.ok) {
-         throw new Error(data.error || "Erro ao criar postagem")
-       }
- 
-       setText("")
-       setImage(null)
-       setPreview(null)
-       setIsRecurring(false)
-       setIsFixed(false)
-       setDuration("24h")
- 
-       alert("Post criado")
-     } catch (err: any) {
-       setError(err.message)
-     } finally {
-       setLoading(false)
-     }
-   }
- 
-  */
-
-  async function handleSubmit() {
+async function handleSubmit() {
     if (!user?.id) {
-      setError("Usuário não carregado")
+      toast.error("Usuário não identificado")
       return
     }
 
     if (!text && !image) {
-      setError("Adicione texto ou imagem para postar")
+      toast.warning("Adicione texto ou imagem para postar")
       return
     }
 
-    setError("")
     setLoading(true)
 
     try {
@@ -149,19 +67,14 @@ export default function CreatePostPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || "Erro ao criar postagem")
+        toast.error(data.error || "Erro ao criar postagem")
+        return
       }
 
-      setText("")
-      setImage(null)
-      setPreview(null)
-      setIsRecurring(false)
-      setIsFixed(false)
-      setDuration("24h")
-
-      alert("Post criado")
-    } catch (err: any) {
-      setError(err.message)
+      toast.success("Post criado com sucesso!")
+      router.push("/feed")
+    } catch {
+      toast.error("Erro ao criar postagem")
     } finally {
       setLoading(false)
     }
@@ -283,13 +196,6 @@ export default function CreatePostPage() {
           )}
 
         </div>
-
-        {/* Erro */}
-        {error && (
-          <div className="text-xs md:text-sm rounded-lg p-3 md:p-4" style={{ backgroundColor: '#FFE5E5', border: `1px solid var(--border)`, color: 'var(--black)' }}>
-            {error}
-          </div>
-        )}
 
       </section>
 

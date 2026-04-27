@@ -6,6 +6,8 @@ import { RiImageEditFill } from "react-icons/ri"
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 type Post = {
   id: string
@@ -22,25 +24,33 @@ type Post = {
   comentarios: []
 }
 
-type User = {
-  id: string
-  nome: string
-  username: string
-  foto?: string | null
-}
-
-export function FeedNoticias() {
+export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const router = useRouter()
+  const { data: session } = useSession()
+  const user = session?.user
 
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [text, setText] = useState<string>("nova postagem...")
-  const [user, setUser] = useState<User | null>(null)
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({})
   const [comments, setComments] = useState<Record<string, string>>({})
   const [commentsCount, setCommentsCount] = useState<Record<string, number>>({})
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
   const [isActive, setIsActive] = useState(true)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => {
+    const handleFocus = () => {
+      setPosts([])
+    }
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [])
+
+function handleRefresh() {
+    setRefreshKey(k => k + 1)
+    onRefresh?.()
+  }
 
 
 
@@ -76,6 +86,7 @@ export function FeedNoticias() {
   //traz os posts
   useEffect(() => {
     async function loadPosts() {
+      setLoading(true)
       try {
         const res = await fetch("/api/posts")
         const data = await res.json()
@@ -90,25 +101,7 @@ export function FeedNoticias() {
 
     loadPosts()
 
-  }, [])
-
-
-  //lê o usuario logado
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const res = await fetch("/api/autenticar")
-        if (!res.ok) return
-
-        const data = await res.json()
-        setUser(data)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
-    loadUser()
-  }, [])
+  }, [refreshKey])
 
   //puxar o status do curtir do banco:
   useEffect(() => {
@@ -208,29 +201,29 @@ async function loadCommentsCount() {
 }
 
 // 2. Chame a função dentro do seu método de comentar
-async function comentar(postId: string) {
-  if (!user) return
-  const texto = comments[postId]?.trim()
-  if (!texto) return
+  async function comentar(postId: string) {
+    if (!user) return
+    const texto = comments[postId]?.trim()
+    if (!texto) return
 
-  try {
-    const res = await fetch("/api/posts/posts-comments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ texto, postId, authorId: user.id }),
-    })
+    try {
+      const res = await fetch("/api/posts/posts-comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto, postId, authorId: user.id }),
+      })
 
-    if (!res.ok) throw new Error("Erro ao comentar")
+      if (!res.ok) throw new Error("Erro ao comentar")
 
-    setComments((prev) => ({ ...prev, [postId]: "" }))
-    
-    // Atualiza a contagem assim que o comentário é enviado com sucesso
-    loadCommentsCount() 
-    
-  } catch (error) {
-    console.error(error)
+      setComments((prev) => ({ ...prev, [postId]: "" }))
+      toast.success("Comentário postado!")
+      
+      loadCommentsCount() 
+      
+    } catch {
+      toast.error("Erro ao postar comentário")
+    }
   }
-}
 
 // 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
 useEffect(() => {
@@ -252,7 +245,7 @@ useEffect(() => {
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
 
     
-      <PostBar />
+      <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
 
       {loading && (
