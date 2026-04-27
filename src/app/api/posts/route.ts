@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       )
     }
 
-    if (user.role !== "COMMON") {
+    if (user.role !== "COMMON") { //no futuro sometne postador
       return NextResponse.json(
         { error: "Sem permissão para postar" },
         { status: 403 }
@@ -120,6 +120,8 @@ export async function POST(req: Request) {
     )
   }
 }
+
+
 
   export async function GET() {
   try {

@@ -76,6 +76,7 @@ model User {
   nome        String
   username    String       @unique
   cpf         String       @unique
+  senha_hash  String?
   cargo       String
   role        Roles        @default(COMMON)
   foto        String?
