@@ -85,3 +85,5 @@
 13.1 Aplicativo iOS  
 13.2 Ajustes nativos mobile  
 
+gerenciar permissoes
+
