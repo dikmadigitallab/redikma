@@ -73,9 +73,6 @@ CREATE TABLE "User" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Like_postId_userId_key" ON "Like"("postId", "userId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Like_comentarioId_userId_key" ON "Like"("comentarioId", "userId");
 
 -- CreateIndex
