@@ -128,7 +128,7 @@ export async function POST(req: Request) {
     }
 
     const results = {
-      success: [] as { nome: string; cpf: string; senha: string }[],
+      success: [] as { nome: string; cpf: string; senha: string; username: string }[],
       errors: [] as { linha: number; erro: string; debug?: string }[],
       skipped: [] as { linha: number; cpf: string; motivo: string }[],
     }
