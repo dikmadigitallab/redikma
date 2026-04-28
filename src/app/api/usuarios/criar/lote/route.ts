@@ -209,7 +209,7 @@ export async function POST(req: Request) {
         nome,
         cpf,
         senha: senhaPadrao,
-       
+        username,
       })
     }
 

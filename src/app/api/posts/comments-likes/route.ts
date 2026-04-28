@@ -33,11 +33,7 @@ export async function POST(req: Request) {
       data: {
         comentarioId: commentId,
         userId: userId,
-<<<<<<< HEAD
-        postId: postId,
-=======
         postId: comment.postId,
->>>>>>> 624d1f729bca0b5a5e297eb6515b759b5866e8fb
       },
     })
 
