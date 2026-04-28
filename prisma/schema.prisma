@@ -55,7 +55,6 @@ model Like {
   userId       String
   user         User        @relation(fields: [userId], references: [id])
   createdAt    DateTime    @default(now())
-  @@unique([postId, userId])
   @@unique([comentarioId, userId])
 }
 

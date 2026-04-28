@@ -9,6 +9,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
     }
 
+    const comment = await prisma.comentario.findUnique({
+      where: { id: commentId },
+      select: { postId: true },
+    })
+
+    if (!comment) {
+      return NextResponse.json({ error: "Comentário não encontrado" }, { status: 404 })
+    }
+
     const existingLike = await prisma.like.findFirst({
       where: {
         comentarioId: commentId,
@@ -24,6 +33,7 @@ export async function POST(req: Request) {
       data: {
         comentarioId: commentId,
         userId: userId,
+        postId: comment.postId,
       },
     })
 

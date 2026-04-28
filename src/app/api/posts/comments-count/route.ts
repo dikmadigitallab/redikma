@@ -1,7 +1,7 @@
 
 
 import { NextRequest, NextResponse } from "next/server"
-import { countCommentsByPostId } from "@//lib/comentarios"
+import { countCommentsByPostId } from "@/lib/comentarios"
 
 export async function GET(req: NextRequest) {
   try {

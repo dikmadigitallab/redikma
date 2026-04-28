@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { RiImageEditFill } from "react-icons/ri"
 import Image from "next/image"
@@ -38,21 +38,29 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
   const [isActive, setIsActive] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
+  const pathname = usePathname()
 
   useEffect(() => {
-    const handleFocus = () => {
-      setPosts([])
-    }
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
-  }, [])
+    loadPosts()
+  }, [pathname, refreshKey])
 
-function handleRefresh() {
+  async function loadPosts() {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/posts", { cache: 'no-store' })
+      const data = await res.json()
+      setPosts(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleRefresh() {
     setRefreshKey(k => k + 1)
     onRefresh?.()
   }
-
-
 
   //conta os liker
   useEffect(() => {
@@ -62,7 +70,7 @@ function handleRefresh() {
 
         await Promise.all(
           posts.map(async (post) => {
-            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`)
+            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`, { cache: 'no-store' })
 
             if (!res.ok) return
 
@@ -81,27 +89,6 @@ function handleRefresh() {
       loadLikesCount()
     }
   }, [posts])
-
-
-  //traz os posts
-  useEffect(() => {
-    async function loadPosts() {
-      setLoading(true)
-      try {
-        const res = await fetch("/api/posts")
-        const data = await res.json()
-        setPosts(data)
-
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadPosts()
-
-  }, [refreshKey])
 
   //puxar o status do curtir do banco:
   useEffect(() => {

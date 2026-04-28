@@ -46,6 +46,7 @@ export function CommentsBox({ postId }: Props) {
   const user = session?.user
 
   const boxRef = useRef<HTMLDivElement>(null)
+  const commentsCache = useRef<Record<string, Comment[]>>({})
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -67,10 +68,19 @@ export function CommentsBox({ postId }: Props) {
     try {
       setLoading(true)
 
-      const res = await fetch(`/api/posts/posts-comments?postId=${postId}`)
+      const cached = commentsCache.current[postId]
+      if (cached) {
+        setComments(cached)
+        setLoading(false)
+      }
+
+      const res = await fetch(`/api/posts/posts-comments?postId=${postId}`, {
+        cache: 'no-store',
+      })
       if (!res.ok) return
 
       const data = await res.json()
+      commentsCache.current[postId] = data || []
       setComments(data || [])
     } catch (err) {
       console.error(err)
@@ -80,10 +90,18 @@ export function CommentsBox({ postId }: Props) {
   }
 
   useEffect(() => {
-    if (open) {
-      loadComments()
+    const stored = sessionStorage.getItem(`comments-${postId}`)
+    if (stored) {
+      setComments(JSON.parse(stored))
     }
-  }, [open, postId])
+    loadComments()
+  }, [postId])
+
+  useEffect(() => {
+    if (comments.length > 0) {
+      sessionStorage.setItem(`comments-${postId}`, JSON.stringify(comments))
+    }
+  }, [comments, postId])
 
   async function delComents(id: string) {
     toast.promise(
@@ -110,6 +128,7 @@ export function CommentsBox({ postId }: Props) {
       await fetch("/api/posts/comments-likes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        cache: 'no-store',
         body: JSON.stringify({ commentId, userId: user.id }),
       })
       loadComments()
@@ -125,6 +144,7 @@ export function CommentsBox({ postId }: Props) {
       await fetch("/api/posts/comments-likes", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
+        cache: 'no-store',
         body: JSON.stringify({ commentId, userId: user.id }),
       })
       loadComments()

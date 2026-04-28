@@ -1,55 +1,10 @@
 import { NextResponse, NextRequest } from "next/server"
-import { prisma } from "@//lib/prisma"
-import { addLike } from "@//lib/likes"
+import { prisma } from "@/lib/prisma"
+import { addLike } from "@/lib/likes"
 
 //curtir
 
 
-/* 
-export async function POST(req: Request) {
-  try {
-    const { postId, userId } = await req.json()
-
-    if (!postId || !userId) {
-      return NextResponse.json(
-        { error: "Dados obrigatórios não informados" },
-        { status: 400 }
-      )
-    }
-
-    const existing = await prisma.like.findUnique({
-      where: {
-        postId_userId: {
-          postId,
-          userId,
-        },
-      },
-    })
-
-    if (existing) {
-      return NextResponse.json(existing)
-    }
-
-    const like = await prisma.like.create({
-      data: {
-        postId,
-        userId,
-      },
-    })
-
-    return NextResponse.json(like)
-  } catch (error) {
-    console.error(error)
-
-    return NextResponse.json(
-      { error: "Erro ao curtir postagem" },
-      { status: 500 }
-    )
-  }
-}
-
- */
-
 
 export async function POST(req: Request) {
   try {
@@ -62,7 +17,7 @@ export async function POST(req: Request) {
       )
     }
 
-    const like = await addLike(postId, userId)
+    const like = await addLike({ postId, userId })
 
     return NextResponse.json(like)
   } catch (error) {
@@ -126,12 +81,10 @@ export async function DELETE(req: Request) {
   try {
     const { postId, userId } = await req.json()
 
-    await prisma.like.delete({
+    await prisma.like.deleteMany({
       where: {
-        postId_userId: {
-          postId,
-          userId
-        }
+        postId,
+        userId
       }
     })
 
