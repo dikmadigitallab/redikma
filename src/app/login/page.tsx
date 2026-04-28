@@ -56,16 +56,16 @@ export default function LoginCPF() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 md:px-6" style={{ backgroundColor: 'var(--background)' }}>
+    <main className="min-h-screen flex items-center justify-center px-4 md:px-6 overflow-y-auto" style={{ backgroundColor: 'var(--background)' }}>
 
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-10" />
-      <div className="absolute inset-0 backdrop-blur-sm" />
+      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-10" />
+      <div className="fixed inset-0 backdrop-blur-sm" />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="relative w-full max-w-sm md:max-w-md rounded-lg md:rounded-2xl shadow-lg p-6 md:p-8 space-y-5 md:space-y-6"
+        className="relative w-full max-w-sm md:max-w-md rounded-lg md:rounded-2xl shadow-lg p-6 md:p-8 space-y-5 md:space-y-6 my-auto"
         style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
       >
 
@@ -90,6 +90,7 @@ export default function LoginCPF() {
               <ShieldCheck size={16} className="md:w-[18px] md:h-[18px]" style={{ color: 'var(--secondary)' }} />
               <input
                 type="text"
+                inputMode="numeric"
                 placeholder="000.000.000-00"
                 value={cpf}
                 onChange={handleChangeCpf}
