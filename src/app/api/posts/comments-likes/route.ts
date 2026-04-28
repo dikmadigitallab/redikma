@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma"
 
 export async function POST(req: Request) {
   try {
-    const { commentId, userId } = await req.json()
+    const { commentId, userId, postId } = await req.json()
 
-    if (!commentId || !userId) {
+    if (!commentId || !userId || !postId) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
     }
 
@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       data: {
         comentarioId: commentId,
         userId: userId,
+        postId: postId,
       },
     })
 

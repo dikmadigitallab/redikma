@@ -7,6 +7,8 @@ function gerarSenhaPadrao(cpf: string) {
   return cpf.replace(/\D/g, "").slice(0, 6)
 }
 
+
+
 function gerarUsername(nome: string, cpf: string): string {
   const nomeFormatado = nome
     .toLowerCase()
@@ -207,7 +209,7 @@ export async function POST(req: Request) {
         nome,
         cpf,
         senha: senhaPadrao,
-        username,
+       
       })
     }
 
