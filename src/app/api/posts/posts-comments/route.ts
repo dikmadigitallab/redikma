@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@//lib/prisma"
+import { prisma } from "@/lib/prisma"
 
 // CREATE
 export async function POST(req: Request) {
   try {
-    const { texto, postId, authorId } = await req.json()
+    const { texto, postId, authorId, parentId } = await req.json()
 
     if (!texto || !postId || !authorId) {
       return NextResponse.json(
@@ -17,7 +17,8 @@ export async function POST(req: Request) {
       data: {
         texto,
         postId,
-        authorId
+        authorId,
+        parentId: parentId || null,
       },
       include: {
         author: {
@@ -27,12 +28,19 @@ export async function POST(req: Request) {
             username: true,
             foto: true
           }
+        },
+        likes: true,
+        _count: {
+          select: {
+            likes: true
+          }
         }
       }
     })
 
     return NextResponse.json(comentario)
-  } catch {
+  } catch (error) {
+    console.error("Erro ao criar comentário:", error)
     return NextResponse.json(
       { error: "Erro ao criar comentário" },
       { status: 500 }
@@ -58,7 +66,11 @@ export async function GET(req: Request) {
         postId,
         aprovado: true
       },
-      include: {
+      select: {
+        id: true,
+        texto: true,
+        parentId: true,
+        createdAt: true,
         author: {
           select: {
             id: true,
@@ -67,6 +79,7 @@ export async function GET(req: Request) {
             foto: true
           }
         },
+        likes: true,
         _count: {
           select: {
             likes: true
@@ -79,35 +92,10 @@ export async function GET(req: Request) {
     })
 
     return NextResponse.json(comentarios)
-  } catch {
+  } catch (error) {
+    console.error("Erro ao buscar comentários:", error)
     return NextResponse.json(
       { error: "Erro ao buscar comentários" },
-      { status: 500 }
-    )
-  }
-}
-
-// UPDATE
-export async function PUT(req: Request) {
-  try {
-    const { id, texto } = await req.json()
-
-    if (!id || !texto) {
-      return NextResponse.json(
-        { error: "Dados obrigatórios não informados" },
-        { status: 400 }
-      )
-    }
-
-    const comentario = await prisma.comentario.update({
-      where: { id },
-      data: { texto }
-    })
-
-    return NextResponse.json(comentario)
-  } catch {
-    return NextResponse.json(
-      { error: "Erro ao atualizar comentário" },
       { status: 500 }
     )
   }
@@ -130,7 +118,8 @@ export async function DELETE(req: Request) {
     })
 
     return NextResponse.json({ ok: true })
-  } catch {
+  } catch (error) {
+    console.error("Erro ao deletar comentário:", error)
     return NextResponse.json(
       { error: "Erro ao deletar comentário" },
       { status: 500 }

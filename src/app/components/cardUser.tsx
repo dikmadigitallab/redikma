@@ -1,36 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
-
-type User = {
-  nome: string
-  username: string
-  foto?: string | null
-}
+import { useSession } from "next-auth/react"
 
 type CardUserProps = {
   size?: "sm" | "md" | "lg"
 }
 
 export function UserCard({ size = "md" }: CardUserProps) {
-  const [user, setUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const res = await fetch("/api/autenticar")
-
-        if (!res.ok) return
-
-        const data = await res.json()
-        setUser(data)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
-    loadUser()
-  }, [])
+  const { data: session } = useSession()
 
   const sizes = {
     sm: "w-8 h-8 text-xs",
@@ -38,10 +15,10 @@ export function UserCard({ size = "md" }: CardUserProps) {
     lg: "w-12 h-12 text-base",
   }
 
+  const user = session?.user
+
   return (
     <div className="flex items-center gap-3">
-      
-      {/* FOTO */}
       {user?.foto ? (
         <img
           src={user.foto}
@@ -56,7 +33,6 @@ export function UserCard({ size = "md" }: CardUserProps) {
         </div>
       )}
 
-      {/* INFO */}
       <div>
         <p className="text-sm font-semibold" style={{ color: 'var(--black)' }}>
           {user?.nome || "Carregando..."}
@@ -65,7 +41,6 @@ export function UserCard({ size = "md" }: CardUserProps) {
           @{user?.username || "..."}
         </p>
       </div>
-
     </div>
   )
 }

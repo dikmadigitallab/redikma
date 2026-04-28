@@ -5,47 +5,41 @@ declare module "next-auth" {
     user: {
       id: string
       nome: string
+      username: string
       cpf: string
-      foto?: string | null
-      primeiroAcesso: boolean
-      status: string
-      dataNascimento?: Date | null
-      dataAdmissao?: Date | null
-      roleId: string
-      cargoId: string
+      cargo: string
+      role: string
+      foto: string | null
+      aniversario: string
+      admissao: string
     }
   }
 
   interface User {
     id: string
-    cpf: string
     nome: string
-    email_recuperacao?: string | null
-    telefone?: string | null
-    senha_hash: string
-    foto_url?: string | null
-    data_nascimento: Date
-    data_admissao: Date
-    primeiro_acesso: boolean
-    status: string
-    data_exclusao_programada?: Date | null
-
-    role_id: string
-    cargo_id: string
+    username: string
+    cpf: string
+    cargo: string
+    role: string
+    foto: string | null
+    aniversario: string
+    admissao: string
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    id: string
-    nome: string
-    cpf: string
-    foto?: string | null
-    primeiroAcesso: boolean
-    status: string
-    dataNascimento?: string | null
-    dataAdmissao?: string | null
-    roleId: string
-    cargoId: string
+    user: {
+      id: string
+      nome: string
+      username: string
+      cpf: string
+      cargo: string
+      role: string
+      foto: string | null
+      aniversario: string
+      admissao: string
+    }
   }
 }

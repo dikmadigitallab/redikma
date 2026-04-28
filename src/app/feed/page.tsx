@@ -1,58 +1,23 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Home, Search, Plus, Video, User, Bell } from "lucide-react"
 import { CreatNewPost } from "../components/modal-postagem"
 import { useRouter } from "next/navigation"
 import { Sidebar } from "../components/sidebar"
 import { RightSidebar } from "../components/stories"
 import { FeedNoticias } from "../components/feed"
-import { Footer } from "../components/footer"
-type Post = {
-  id: string
-  label: string
-  createdAt: string
-  authorId: string
-  image: string
-  author: {
-    id: string
-    nome: string
-    foto: string
-  }
-  postador: string
-}
-
-type User = {
-  id: string
-  nome: string
-  username: string
-  foto?: string | null
-}
+import { Footer} from '../components/footer'
+import { useSession, signOut } from "next-auth/react"
 
 export default function Feed() {
   const [openModal, setOpenModal] = useState(false)
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [open, setOpen]= useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
+  const { data: session } = useSession()
+  const [open, setOpen] = useState<boolean>(false)
+  const [refreshFeed, setRefreshFeed] = useState(0)
 
-
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const res = await fetch("/api/autenticar")
-
-        if (!res.ok) return
-
-        const data = await res.json()
-        setUser(data)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
-    loadUser()
-  }, [])
+  const user = session?.user
 
 
 
@@ -103,7 +68,7 @@ export default function Feed() {
       }}
     >
       <button
-        onClick={() => router.push("/login")}
+        onClick={() => signOut({ callbackUrl: "/login" })}
         className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
       >
         Sair
@@ -130,8 +95,8 @@ export default function Feed() {
   <div className="flex-1 flex px-4 md:px-[5%] lg:px-[5%] py-4 md:py-6 gap-4 md:gap-6 overflow-hidden">
 
     {/* Feed - Padding bottom aumentado no mobile para não cobrir comentários pelo botão central */}
-    <main className="flex-1 overflow-y-auto pb-24 md:pb-6">
-      <FeedNoticias />
+<main className="flex-1 overflow-y-auto pb-24 md:pb-6">
+      <FeedNoticias onRefresh={() => setRefreshFeed(k => k + 1)} />
     </main>
 
     {/* Stories - Desktop only */}
@@ -173,6 +138,8 @@ export default function Feed() {
 <CreatNewPost
   open={openModal}
   onClose={() => setOpenModal(false)}
+  onSuccess={() => setRefreshFeed(k => k + 1)}
+  onRefresh={() => setRefreshFeed(k => k + 1)}
 />
 </div>
   )
