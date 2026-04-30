@@ -58,6 +58,60 @@ export default function LoginCPF() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4 md:px-6" style={{ backgroundColor: 'var(--background)' }}>
 
+      <header
+  className="fixed top-0 w-full z-50 h-16 backdrop-blur-md"
+  style={{
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderBottom: "1px solid var(--border)",
+  }}
+>
+  <nav className="max-w-6xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    
+    <div className="flex items-center gap-3 cursor-pointer">
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm"
+        style={{ backgroundColor: "var(--primary-dark)" }}
+      >
+        <img
+          src="/icons/redikma_logo.png"
+          alt="Logo"
+          className="w-5 h-5 object-contain"
+        />
+      </div>
+
+      <div className="hidden sm:flex flex-col leading-tight">
+        <span
+          className="font-bold text-base"
+          style={{ color: "var(--primary-dark)" }}
+        >
+          ReDikma
+        </span>
+        <span
+          className="text-[10px]"
+          style={{ color: "var(--gray)" }}
+        >
+          Comunicando cultura
+        </span>
+      </div>
+    </div>
+
+    <div className="flex items-center gap-3">
+
+      <button
+        onClick={() => route.push("/login")}
+        className="px-5 py-2 rounded-xl text-sm font-medium transition shadow-sm hover:scale-[1.03]"
+        style={{
+          backgroundColor: "var(--primary-dark)",
+          color: "var(--white)",
+        }}
+      >
+        Login
+      </button>
+    </div>
+
+  </nav>
+</header>
+
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-10" />
       <div className="absolute inset-0 backdrop-blur-sm" />
 

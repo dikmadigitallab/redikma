@@ -9,22 +9,72 @@ export default function LandingPage() {
     <main style={{ backgroundColor: 'var(--background)', color: 'var(--black)' }} className="min-h-screen">
 
       {/* Header Navigation */}
-      <header className="fixed top-0 w-full z-50 h-14 md:h-16" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
-        <nav className="max-w-6xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-lg md:text-xl">
-            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-white text-sm md:text-base" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
-            <span className="hidden sm:inline" style={{ color: 'var(--primary-dark)' }}>ReDikma</span>
-          </div>
-          <button
-            onClick={() => route.push('/login')}
-            className="px-4 md:px-6 py-2 rounded-lg font-medium text-sm md:text-base transition"
-            style={{ backgroundColor: 'var(--primary-dark)', color: 'var(--white)' }}
-          >
-            Entrar
-          </button>
-        </nav>
-      </header>
+<header
+  className="fixed top-0 w-full z-50 h-16 backdrop-blur-md"
+  style={{
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderBottom: "1px solid var(--border)",
+  }}
+>
+  <nav className="max-w-6xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    
+    <div className="flex items-center gap-3 cursor-pointer">
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm"
+        style={{ backgroundColor: "var(--primary-dark)" }}
+      >
+        <img
+          src="/icons/redikma_logo.png"
+          alt="Logo"
+          className="w-5 h-5 object-contain"
+        />
+      </div>
 
+      <div className="hidden sm:flex flex-col leading-tight">
+        <span
+          className="font-bold text-base"
+          style={{ color: "var(--primary-dark)" }}
+        >
+          ReDikma
+        </span>
+        <span
+          className="text-[10px]"
+          style={{ color: "var(--gray)" }}
+        >
+          Comunicando cultura
+        </span>
+      </div>
+    </div>
+
+    <div className="flex items-center gap-3">
+      <button
+        className="hidden sm:block px-4 py-2 text-sm rounded-lg transition hover:bg-gray-100"
+        style={{ color: "var(--primary-dark)" }}
+      >
+        Sobre
+      </button>
+
+      <button
+        className="hidden sm:block px-4 py-2 text-sm rounded-lg transition hover:bg-gray-100"
+        style={{ color: "var(--primary-dark)" }}
+      >
+        Recursos
+      </button>
+
+      <button
+        onClick={() => route.push("/login")}
+        className="px-5 py-2 rounded-xl text-sm font-medium transition shadow-sm hover:scale-[1.03]"
+        style={{
+          backgroundColor: "var(--primary-dark)",
+          color: "var(--white)",
+        }}
+      >
+        Entrar
+      </button>
+    </div>
+
+  </nav>
+</header>
       {/* Hero */}
       <section className="flex flex-col items-center justify-center text-center px-4 md:px-6 py-20 md:py-32 pt-20 md:pt-40">
         <div className="w-12 md:w-16 h-12 md:h-16 rounded-full flex items-center justify-center text-white text-xl md:text-2xl font-bold mb-4 md:mb-6" style={{ backgroundColor: 'var(--secondary)' }}>D</div>
@@ -38,7 +88,7 @@ export default function LandingPage() {
         </p>
 
         <div className="flex gap-3 md:gap-4 mt-6 md:mt-8 flex-col sm:flex-row w-full max-w-xs md:max-w-md">
-          <button 
+          <button
             onClick={() => route.push('/login')}
             className="px-6 md:px-8 py-2.5 md:py-3 rounded-lg md:rounded-xl text-white font-medium text-sm md:text-base flex items-center justify-center gap-2 transition hover:opacity-90"
             style={{ backgroundColor: 'var(--primary-dark)' }}
@@ -122,7 +172,7 @@ export default function LandingPage() {
 
         <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 md:gap-4 w-full max-w-xs md:max-w-md">
 
-          <button 
+          <button
             onClick={() => route.push('/login')}
             className="w-full py-2.5 md:py-3 rounded-lg md:rounded-xl text-white font-medium text-sm md:text-base transition hover:opacity-90"
             style={{ backgroundColor: 'var(--secondary)' }}
