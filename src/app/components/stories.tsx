@@ -185,7 +185,7 @@ const stories: Story[] = [
   }
 
   return (
-<div className="hidden lg:flex flex-col gap-0 h-full">
+<div className="hidden lg:flex flex-col gap-0 h-full" >
 
   <div className="flex-shrink-0">
     <h2 className="font-semibold mb-4 text-base" style={{ color: 'var(--black)' }}>

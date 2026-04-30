@@ -22,7 +22,7 @@ export default function Feed() {
 
 
   return (
-<div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
+<div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)', }}>
 
 {/* Header - Sticky */}
 <header className="h-14 md:h-16 flex-shrink-0 shadow-sm z-40" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
@@ -83,24 +83,26 @@ export default function Feed() {
   </div>
 </header>
 
+
+
 {/* Main Content Area */}
 <div className="flex-1 flex overflow-hidden relative">
 
   {/* Sidebar Left - Desktop only */}
-  <aside className="hidden lg:flex lg:w-64 flex-shrink-0 p-4 lg:p-6 border-r overflow-hidden" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--white)' }}>
+  <aside className="hidden lg:flex lg:w-96 mx-6 flex-shrink-0 p-4 lg:p-6 border-r overflow-hidden" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--white)' }}>
     <Sidebar />
   </aside>
 
   {/* Centro - Responsivo */}
-  <div className="flex-1 flex px-4 md:px-[5%] lg:px-[5%] py-4 md:py-6 gap-4 md:gap-6 overflow-hidden">
+  <div className="flex-1  flex px-4  md:px-[5%] lg:px-[5%] py-4 md:py-6 gap-4 md:gap-6 overflow-hidden">
 
     {/* Feed - Padding bottom aumentado no mobile para não cobrir comentários pelo botão central */}
-<main className="flex-1 overflow-y-auto pb-24 md:pb-6">
+<main className="flex-1  overflow-y-auto pb-24 mx-auto w-full md:pb-6">
       <FeedNoticias onRefresh={() => setRefreshFeed(k => k + 1)} />
     </main>
 
     {/* Stories - Desktop only */}
-    <aside className="hidden lg:flex lg:flex-col lg:w-96 flex-shrink-0 overflow-y-auto" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '0.75rem' }}>
+    <aside className="hidden lg:flex lg:flex-col lg:w-[30%] p-4 mx-0 flex-shrink-0 overflow-y-auto" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '0.75rem' }}>
       <div className="p-6">
         <RightSidebar />
       </div>
@@ -131,6 +133,8 @@ export default function Feed() {
 </div>
 
 </div>
+
+
 
 {/* Footer - Desktop only */}
 <Footer />

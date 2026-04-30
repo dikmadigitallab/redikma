@@ -22,7 +22,7 @@ export function Sidebar() {
   }
 
   return (
-    <div className="hidden lg:flex flex-col gap-6 h-full">
+    <div className="hidden lg:flex flex-col gap-6 h-full" >
       
       {/* Usuário */}
       <UserCard/>

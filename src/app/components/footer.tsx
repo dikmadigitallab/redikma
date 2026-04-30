@@ -1,4 +1,5 @@
-const VERSION = "0.1.2"
+import { version} from '../../../package.json';
+const VERSION =` ${version} - ${new Date().getFullYear()}`;
 
 export function Footer() {
   return (
