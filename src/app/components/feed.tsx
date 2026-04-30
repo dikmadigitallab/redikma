@@ -25,37 +25,34 @@ type Post = {
 }
 
 export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
-  const router = useRouter()
   const { data: session } = useSession()
   const user = session?.user
-
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
-  const [text, setText] = useState<string>("nova postagem...")
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({})
   const [comments, setComments] = useState<Record<string, string>>({})
   const [commentsCount, setCommentsCount] = useState<Record<string, number>>({})
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
-  const [isActive, setIsActive] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
   const pathname = usePathname()
 
   useEffect(() => {
+    async function loadPosts() {
+      setLoading(true)
+      try {
+        const res = await fetch("/api/posts", { cache: 'no-store' })
+        const data = await res.json()
+        setPosts(data)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
     loadPosts()
+  
   }, [pathname, refreshKey])
 
-  async function loadPosts() {
-    setLoading(true)
-    try {
-      const res = await fetch("/api/posts", { cache: 'no-store' })
-      const data = await res.json()
-      setPosts(data)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   function handleRefresh() {
     setRefreshKey(k => k + 1)
@@ -98,14 +95,14 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
         await Promise.all(
           posts.map(async (post) => {
-            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`)
+            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`, { cache: 'no-store' })
 
             if (!res.ok) return
 
             const data = await res.json()
 
             const userLiked = data.likes.some(
-              (like: any) => like.userId === user?.id
+              (like: { userId: string }) => like.userId === user?.id
             )
 
             if (userLiked) {
@@ -216,12 +213,18 @@ async function loadCommentsCount() {
 useEffect(() => {
   if (!posts.length) return
 
-  loadCommentsCount()
-  const interval = setInterval(loadCommentsCount, 30000)
+  const run = () => {
+    loadCommentsCount()
+  }
 
-  return () => clearInterval(interval)
+  const timeout = setTimeout(run, 0)
+  const interval = setInterval(run, 30000)
+
+  return () => {
+    clearTimeout(timeout)
+    clearInterval(interval)
+  }
 }, [posts])
-  
   
 
 
@@ -254,6 +257,7 @@ useEffect(() => {
               className="flex items-center gap-2 md:gap-3"
               style={{ paddingBottom: "0.75rem", borderBottom: "1px solid var(--border)" }}
             >
+              {/* trocar por Image do next */}
               <img
                 src={post.author.foto}
                 alt="user"
@@ -290,7 +294,9 @@ useEffect(() => {
 
               {post.image && (
             <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
-                <img
+                 {/* trocar por Image do next */}
+              <img
+                
                   src={post.image}
                   className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl"
                   alt="Post image"
@@ -366,6 +372,8 @@ useEffect(() => {
                 border: `1px solid var(--border)`,
               }}
             >
+
+                 {/* trocar por Image do next */}
               <img
                 src={user?.foto || "https://i.pravatar.cc/100?img=1"}
                 className="w-6 h-6 md:w-7 md:h-7 rounded-full object-cover object-center flex-shrink-0"
@@ -398,6 +406,7 @@ useEffect(() => {
                   style={{ backgroundColor: "var(--primary)" }}
                   onClick={() => comentar(post.id)}
                 >
+                     {/* trocar por Image do next */}
                   <img src="/icons/enviar.png" alt="enviar" className="w-5 h-5" />
                 </button>
               )}
