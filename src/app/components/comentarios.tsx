@@ -38,7 +38,7 @@ type Props = {
 
 export function CommentsBox({ postId }: Props) {
   const [open, setOpen] = useState(false)
-  const [comments, setComments] = useState<Comment[]>([])
+ // const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(false)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState("")
@@ -64,43 +64,37 @@ export function CommentsBox({ postId }: Props) {
     }
   }, [open])
 
-  async function loadComments() {
-    try {
-      setLoading(true)
+async function loadComments() {
+  try {
+    setLoading(true)
 
-      const cached = commentsCache.current[postId]
-      if (cached) {
-        setComments(cached)
-        setLoading(false)
-      }
+    const res = await fetch(`/api/posts/posts-comments?postId=${postId}`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) return
 
-      const res = await fetch(`/api/posts/posts-comments?postId=${postId}`, {
-        cache: 'no-store',
-      })
-      if (!res.ok) return
-
-      const data = await res.json()
-      commentsCache.current[postId] = data || []
-      setComments(data || [])
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
+    const data = await res.json()
+    commentsCache.current[postId] = data || []
+    setComments(data || [])
+  } catch (err) {
+    console.error(err)
+  } finally {
+    setLoading(false)
   }
+}
+
+const [comments, setComments] = useState<Comment[]>(() => {
+  if (typeof window === 'undefined') return []
+  const stored = sessionStorage.getItem(`comments-${postId}`)
+  return stored ? JSON.parse(stored) : []
+})
 
 
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem(`comments-${postId}`)
-    if (stored) {
-      setComments(JSON.parse(stored))
-    }
+useEffect(() => {
+  Promise.resolve().then(() => {
     loadComments()
-  }, [postId])
-
-
-
+  })
+}, [postId])
 
   
   useEffect(() => {
