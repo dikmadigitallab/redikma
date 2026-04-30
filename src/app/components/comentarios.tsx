@@ -89,6 +89,8 @@ export function CommentsBox({ postId }: Props) {
     }
   }
 
+
+
   useEffect(() => {
     const stored = sessionStorage.getItem(`comments-${postId}`)
     if (stored) {
@@ -97,11 +99,20 @@ export function CommentsBox({ postId }: Props) {
     loadComments()
   }, [postId])
 
+
+
+
+  
   useEffect(() => {
     if (comments.length > 0) {
       sessionStorage.setItem(`comments-${postId}`, JSON.stringify(comments))
     }
   }, [comments, postId])
+
+
+
+
+
 
   async function delComents(id: string) {
     toast.promise(
