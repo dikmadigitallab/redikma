@@ -83,6 +83,8 @@ model User {
   cargo       String
   role        Roles        @default(COMMON)
   foto        String?
+  telefone    String?
+  email       String?      @unique
   postagens   Postagem[]
   comentarios Comentario[]
   likes       Like[]

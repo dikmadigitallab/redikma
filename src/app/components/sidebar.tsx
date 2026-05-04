@@ -33,7 +33,7 @@ export function Sidebar() {
   style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}
 >
   <div
-    onClick={() => router.push("/feed")}
+    onClick={() => router.push("intern/feed")}
     className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer"
     style={{ color: 'var(--gray)' }}
   >
@@ -60,8 +60,8 @@ export function Sidebar() {
   </div>
 
   <div
-    onClick={aviso}
-    className="flex items-center gap-3 px-3 py-2 rounded-lg opacity-40 cursor-not-allowed"
+    onClick={() => router.push("intern/profile")}
+    className="flex items-center gap-3 px-3 py-2 rounded-lg transition hover:opacity-70 cursor-pointer"
     style={{ color: 'var(--gray)' }}
   >
     <User size={18} />

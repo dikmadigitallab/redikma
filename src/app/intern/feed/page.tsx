@@ -2,12 +2,12 @@
 
 import { useState } from "react"
 import { Home, Search, Plus, Video, User, Bell } from "lucide-react"
-import { CreatNewPost } from "../components/modal-postagem"
+import { CreatNewPost } from "../../components/modal-postagem"
 import { useRouter } from "next/navigation"
-import { Sidebar } from "../components/sidebar"
-import { RightSidebar } from "../components/stories"
-import { FeedNoticias } from "../components/feed"
-import { Footer} from '../components/footer'
+import { Sidebar } from "../../components/sidebar"
+import { RightSidebar } from "../../components/stories"
+import { FeedNoticias } from "../../components/feed"
+import { Footer} from '../../components/footer'
 import { useSession, signOut } from "next-auth/react"
 
 export default function Feed() {
@@ -49,6 +49,8 @@ export default function Feed() {
         <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: 'var(--warning)' }}>3</span>
       </div>
 
+
+
 <div className="relative">
   {user?.foto && (
     <img
@@ -88,10 +90,13 @@ export default function Feed() {
 {/* Main Content Area */}
 <div className="flex-1 flex overflow-hidden relative">
 
-  {/* Sidebar Left - Desktop only */}
+
+{/* 
   <aside className="hidden lg:flex lg:w-96 mx-6 flex-shrink-0 p-4 lg:p-6 border-r overflow-hidden" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--white)' }}>
     <Sidebar />
   </aside>
+
+ */}
 
   {/* Centro - Responsivo */}
   <div className="flex-1  flex px-4  md:px-[5%] lg:px-[5%] py-4 md:py-6 gap-4 md:gap-6 overflow-hidden">
