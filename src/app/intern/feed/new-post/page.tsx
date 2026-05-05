@@ -137,7 +137,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
       formData.append("label", text)
       formData.append("authorId", user.id)
       formData.append("duration", isFixed ? "" : duration)
-    
       formData.append("postador", user.username)
 
       if (image) formData.append("image", image)
@@ -152,7 +151,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
         return toast.error(data.error || "Erro")
       }
 
-      toast.success("Post criado com sucesso!")
+      toast.success("Post criado com sucesso")
       router.push("/intern/feed")
     } catch {
       toast.error("Erro ao publicar")
@@ -162,49 +161,47 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white flex flex-col">
-      
+    <main className="min-h-screen bg-[#F5F5F7] text-black flex flex-col">
+
       {/* HEADER */}
-      <header className="sticky top-0 z-10 backdrop-blur-xl bg-neutral-950/70 border-b border-neutral-800 px-6 py-4 flex items-center justify-between">
-        <button onClick={() => window.history.back()} className="text-sm text-neutral-400 hover:text-white transition">
-          Voltar
-        </button>
-        <h1 className="text-sm font-medium tracking-wide">Nova postagem</h1>
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
+        <button className="text-sm text-neutral-500 hover:text-black transition">Voltar</button>
+        <h1 className="text-sm font-semibold tracking-wide">Nova postagem</h1>
         <div className="w-10" />
       </header>
 
-      <section className="flex-1 w-full max-w-xl mx-auto px-4 py-6 space-y-6">
+      <section className="flex-1 w-full max-w-lg mx-auto px-5 py-8 space-y-8">
 
-        {/* INPUT TEXTO */}
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 focus-within:border-neutral-600 transition">
+        {/* TEXTO */}
+        <div className="rounded-3xl bg-white border border-neutral-200 p-5 shadow-sm focus-within:border-neutral-400 transition">
           <textarea
             placeholder="Compartilhe algo..."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full bg-transparent outline-none text-sm placeholder:text-neutral-500 resize-none h-24"
+            className="w-full bg-transparent outline-none text-sm placeholder:text-neutral-400 resize-none h-24"
           />
         </div>
 
         {/* MIDIA */}
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 space-y-4">
+        <div className="rounded-3xl bg-white border border-neutral-200 p-4 shadow-sm space-y-4">
 
           {!preview && (
             <>
-              <div className="rounded-2xl overflow-hidden bg-black border border-neutral-800">
+              <div className="rounded-3xl overflow-hidden bg-black border">
                 <video ref={videoRef} autoPlay playsInline className="w-full h-72 object-cover" />
               </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={takePhoto}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-medium hover:opacity-90 active:scale-[0.98] transition"
+                  className="flex-1 py-3 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 active:scale-[0.97] transition"
                 >
                   Tirar foto
                 </button>
 
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-3 rounded-xl border border-neutral-700 text-sm font-medium hover:bg-neutral-800 transition"
+                  className="flex-1 py-3 rounded-2xl border border-neutral-300 text-sm font-medium hover:bg-neutral-100 transition"
                 >
                   Galeria
                 </button>
@@ -222,7 +219,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
           {preview && (
             <>
-              <div className="relative rounded-2xl overflow-hidden bg-black border border-neutral-800" style={{ aspectRatio }}>
+              <div className="relative rounded-3xl overflow-hidden bg-black border" style={{ aspectRatio }}>
                 <img
                   src={preview}
                   onWheel={handleZoom}
@@ -239,7 +236,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                 {isInteracting && (
                   <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
                     {Array.from({ length: 9 }).map((_, i) => (
-                      <div key={i} className="border border-white/20" />
+                      <div key={i} className="border border-white/30" />
                     ))}
                   </div>
                 )}
@@ -250,10 +247,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
                   <button
                     key={r}
                     onClick={() => setAspectRatio(r)}
-                    className={`flex-1 py-2 rounded-lg text-xs transition ${
+                    className={`flex-1 py-2 rounded-xl text-xs font-medium transition ${
                       aspectRatio === r
-                        ? "bg-white text-black"
-                        : "bg-neutral-800 text-neutral-400"
+                        ? "bg-black text-white"
+                        : "bg-neutral-100 text-neutral-500"
                     }`}
                   >
                     {r}
@@ -268,10 +265,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
                 step={0.01}
                 value={zoom}
                 onChange={(e) => setZoom(Number(e.target.value))}
-                className="w-full accent-white"
+                className="w-full accent-black"
               />
 
-              <button onClick={resetPhoto} className="text-xs text-red-400">
+              <button onClick={resetPhoto} className="text-xs text-red-500">
                 Remover imagem
               </button>
             </>
@@ -281,14 +278,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
         </div>
 
         {/* CONFIG */}
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 space-y-4 text-sm">
-          <div className="flex justify-between">
-            <span className="text-neutral-400">Post recorrente</span>
+        <div className="rounded-3xl bg-white border border-neutral-200 p-4 shadow-sm space-y-4 text-sm">
+          <div className="flex justify-between items-center">
+            <span className="text-neutral-500">Post recorrente</span>
             <input type="checkbox" checked={isRecurring} onChange={(e) => setIsRecurring(e.target.checked)} />
           </div>
 
-          <div className="flex justify-between">
-            <span className="text-neutral-400">Post fixo</span>
+          <div className="flex justify-between items-center">
+            <span className="text-neutral-500">Post fixo</span>
             <input type="checkbox" checked={isFixed} onChange={(e) => setIsFixed(e.target.checked)} />
           </div>
 
@@ -296,7 +293,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
             <select
               value={duration}
               onChange={(e) => setDuration(e.target.value as DurationType)}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg p-2 text-sm"
+              className="w-full bg-neutral-100 border border-neutral-300 rounded-xl p-2 text-sm"
             >
               <option value="1h">1 hora</option>
               <option value="24h">24 horas</option>
@@ -308,10 +305,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
       </section>
 
       {/* FOOTER */}
-      <footer className="sticky bottom-0 backdrop-blur-xl bg-neutral-950/80 border-t border-neutral-800 p-4 flex gap-3">
+      <footer className="sticky bottom-0 bg-white/80 backdrop-blur-xl border-t border-neutral-200 p-4 flex gap-3">
         <button
           onClick={() => window.history.back()}
-          className="flex-1 py-3 rounded-xl border border-neutral-700 text-sm hover:bg-neutral-800 transition"
+          className="flex-1 py-3 rounded-2xl border border-neutral-300 text-sm hover:bg-neutral-100 transition"
         >
           Cancelar
         </button>
@@ -319,7 +316,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-medium disabled:opacity-50 active:scale-[0.98] transition"
+          className="flex-1 py-3 rounded-2xl bg-black text-white text-sm font-semibold disabled:opacity-50 hover:opacity-90 active:scale-[0.97] transition"
         >
           {loading ? "Publicando..." : "Publicar"}
         </button>
