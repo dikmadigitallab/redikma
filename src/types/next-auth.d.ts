@@ -1,4 +1,5 @@
 import NextAuth from "next-auth"
+import { User } from "@prisma/client"
 
 declare module "next-auth" {
   interface Session {
@@ -8,6 +9,8 @@ declare module "next-auth" {
       username: string
       cpf: string
       cargo: string
+      telefone: string
+      email: string
       role: string
       foto: string | null
       aniversario: string
@@ -21,6 +24,8 @@ declare module "next-auth" {
     username: string
     cpf: string
     cargo: string
+    telefone: string
+    email: string
     role: string
     foto: string | null
     aniversario: string

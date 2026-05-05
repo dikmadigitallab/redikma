@@ -10,12 +10,12 @@ export default function NotFound() {
           Desculpe, não conseguimos encontrar esta página.<br />
           Verifique o endereço ou volte para a página inicial  oscar e andre.
         </p>
-        <a
+        <link
           href="/"
           className="inline-block bg-gradient-to-r from-yellow-400 via-green-400 to-teal-500 text-white px-6 py-3 rounded-xl font-medium shadow hover:opacity-90 transition"
-        >
+        />
           Voltar para o início
-        </a>
+       
       </div>
     </main>
   );

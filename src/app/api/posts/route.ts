@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       )
     }
 
-    if (user.role !== "COMMON") { //no futuro sometne postador
+    if (user.role !== "POSTADOR") { //no futuro sometne postador
       return NextResponse.json(
         { error: "Sem permissão para postar" },
         { status: 403 }

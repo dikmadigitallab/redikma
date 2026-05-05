@@ -38,9 +38,8 @@ body {
   background: var(--background);
   color: var(--black);
   font-family: Arial, Helvetica, sans-serif;
-
-  /* esconder scroll global */
   overflow: auto;
+
 }
 
 /* esconder scrollbar global */
@@ -61,4 +60,39 @@ a {
 
 button {
   transition: all 0.2s ease;
+}
+
+/* Estilos do Sidebar */
+aside {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--background);
+}
+
+aside::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+aside::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+aside::-webkit-scrollbar-thumb:hover {
+  background: var(--gray);
+}
+
+/* Menu items com melhor responsividade */
+button[disabled] {
+  cursor: not-allowed;
+}
+
+/* Garantir que o conteúdo principal não seja coberto no mobile */
+@media (max-width: 768px) {
+  main {
+    width: 100%;
+  }
 }

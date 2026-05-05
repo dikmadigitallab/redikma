@@ -30,9 +30,7 @@ export const authOptions: NextAuthOptions = {
           where: { cpf: cpfLimpo },
         })
 
-        if (!user) {
-          return null
-        }
+        if (!user) return null
 
         let senhaValida = false
 
@@ -43,13 +41,12 @@ export const authOptions: NextAuthOptions = {
           senhaValida = credentials.senha === senhaPadrao
         }
 
-        if (!senhaValida) {
-          return null
-        }
+        if (!senhaValida) return null
 
         if (!user.senha_hash) {
           const senhaPadrao = gerarSenhaPadrao(user.cpf)
           const senhaHash = await hash(senhaPadrao, 10)
+
           await prisma.user.update({
             where: { id: user.id },
             data: { senha_hash: senhaHash },
@@ -62,6 +59,8 @@ export const authOptions: NextAuthOptions = {
           username: user.username,
           cpf: user.cpf,
           cargo: user.cargo,
+          telefone: user.telefone
+          email: user.email ?? "",
           role: user.role,
           foto: user.foto,
           aniversario: user.aniversario.toISOString(),
@@ -70,37 +69,60 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.user = user
+        token.id = user.id
+        token.nome = user.nome
+        token.username = user.username
+        token.cpf = user.cpf
+        token.cargo = user.cargo
+        token.telefone = user.telefone
+        token.email = user.email
+        token.role = user.role
+        token.foto = user.foto
+        token.aniversario = user.aniversario
+        token.admissao = user.admissao
       }
+
+      if (trigger === "update" && session) {
+        if (session.email !== undefined) token.email = session.email
+        if (session.telefone !== undefined) token.telefone = session.telefone
+        if (session.foto !== undefined) token.foto = session.foto
+      }
+
       return token
     },
+
     async session({ session, token }) {
-      if (token.user) {
-        session.user = token.user as typeof session.user & {
-          id: string
-          nome: string
-          username: string
-          cpf: string
-          cargo: string
-          role: string
-          foto: string | null
-          aniversario: string
-          admissao: string
-        }
+      session.user = {
+        id: token.id as string,
+        nome: token.nome as string,
+        username: token.username as string,
+        cpf: token.cpf as string,
+        cargo: token.cargo as string,
+        telefone: token.telefone as string,
+        email: token.email as string,
+        role: token.role as string,
+        foto: token.foto as string | null,
+        aniversario: token.aniversario as string,
+        admissao: token.admissao as string,
       }
+
       return session
     },
   },
+
   pages: {
     signIn: "/login",
   },
+
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24,
   },
+
   secret: process.env.NEXTAUTH_SECRET,
 }
 
