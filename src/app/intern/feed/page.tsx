@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Home, Search, Plus, Video, User, Bell } from "lucide-react"
+import { Search, Plus, Bell } from "lucide-react"
 import { CreatNewPost } from "../../components/modal-postagem"
 import { useRouter } from "next/navigation"
-import { Sidebar } from "../../components/sidebar"
+
 import { RightSidebar } from "../../components/stories"
 import { FeedNoticias } from "../../components/feed"
 import { Footer} from '../../components/footer'
@@ -70,6 +70,18 @@ export default function Feed() {
       }}
     >
       <button
+        onClick={() => router.push("/intern/profile")}
+        className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
+      >
+       Meu perfil
+      </button>
+      <button
+        onClick={() => router.push("/intern/feed")}
+        className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
+      >
+       Feed
+      </button>
+      <button
         onClick={() => signOut({ callbackUrl: "/login" })}
         className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
       >
@@ -127,7 +139,7 @@ export default function Feed() {
       setOpenModal(true)
       return
     }
-    router.push("/feed/new-post")
+    router.push("intern/feed/new-post")
   }}
 >
   <Plus 

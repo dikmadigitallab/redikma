@@ -152,9 +152,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
         return toast.error(data.error || "Erro")
       }
 
-      toast.success("Publicado")
-      onRefresh?.()
-      router.push("/feed")
+      toast.success("Post criado com sucesso!")
+      router.push("/intern/feed")
     } catch {
       toast.error("Erro ao publicar")
     } finally {
