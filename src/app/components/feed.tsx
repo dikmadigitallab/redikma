@@ -1,13 +1,13 @@
 "use client"
 
-import { useRouter, usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { RiImageEditFill } from "react-icons/ri"
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
+import { ImageModal } from "./modal-view-photo"
 
 type Post = {
   id: string
@@ -36,6 +36,21 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [refreshKey, setRefreshKey] = useState(0)
   const pathname = usePathname()
 
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [openModal, setOpenModal] = useState(false)
+
+  function handleOpenImage(image: string) {
+    setSelectedImage(image)
+    setOpenModal(true)
+  }
+
+  function handleCloseImage() {
+    setOpenModal(false)
+    setSelectedImage(null)
+  }
+
+
+
   useEffect(() => {
     async function loadPosts() {
       setLoading(true)
@@ -50,7 +65,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
       }
     }
     loadPosts()
-  
+
   }, [pathname, refreshKey])
 
 
@@ -166,25 +181,25 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
 
   //comentar
- // 1. Mova a lógica de carregar contagem para uma função fora do useEffect para que possa ser reutilizada
-async function loadCommentsCount() {
-  try {
-    const counts: Record<string, number> = {}
-    await Promise.all(
-      posts.map(async (post) => {
-        const res = await fetch(`/api/posts/posts-comments?postId=${post.id}`)
-        if (!res.ok) return
-        const data = await res.json()
-        counts[post.id] = data.length || 0
-      })
-    )
-    setCommentsCount(counts)
-  } catch (error) {
-    console.error(error)
+  // 1. Mova a lógica de carregar contagem para uma função fora do useEffect para que possa ser reutilizada
+  async function loadCommentsCount() {
+    try {
+      const counts: Record<string, number> = {}
+      await Promise.all(
+        posts.map(async (post) => {
+          const res = await fetch(`/api/posts/posts-comments?postId=${post.id}`)
+          if (!res.ok) return
+          const data = await res.json()
+          counts[post.id] = data.length || 0
+        })
+      )
+      setCommentsCount(counts)
+    } catch (error) {
+      console.error(error)
+    }
   }
-}
 
-// 2. Chame a função dentro do seu método de comentar
+  // 2. Chame a função dentro do seu método de comentar
   async function comentar(postId: string) {
     if (!user) return
     const texto = comments[postId]?.trim()
@@ -201,31 +216,31 @@ async function loadCommentsCount() {
 
       setComments((prev) => ({ ...prev, [postId]: "" }))
       toast.success("Comentário postado!")
-      
-      loadCommentsCount() 
-      
+
+      loadCommentsCount()
+
     } catch {
       toast.error("Erro ao postar comentário")
     }
   }
 
-// 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
-useEffect(() => {
-  if (!posts.length) return
+  // 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
+  useEffect(() => {
+    if (!posts.length) return
 
-  const run = () => {
-    loadCommentsCount()
-  }
+    const run = () => {
+      loadCommentsCount()
+    }
 
-  const timeout = setTimeout(run, 0)
-  const interval = setInterval(run, 30000)
+    const timeout = setTimeout(run, 0)
+    const interval = setInterval(run, 30000)
 
-  return () => {
-    clearTimeout(timeout)
-    clearInterval(interval)
-  }
-}, [posts])
-  
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
+  }, [posts])
+
 
 
 
@@ -234,7 +249,7 @@ useEffect(() => {
   return (
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
 
-    
+
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
 
@@ -292,17 +307,16 @@ useEffect(() => {
               {post.label}
             </p>
 
-              {post.image && (
-            <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
-                 {/* trocar por Image do next */}
-              <img
-                
+            {post.image && (
+              <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
+                <img
                   src={post.image}
-                  className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl"
+                  onClick={() => handleOpenImage(post.image)}
+                  className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl cursor-pointer"
                   alt="Post image"
                 />
-            </div>
-              )}
+              </div>
+            )}
             <div
               className="flex items-center justify-between text-xs md:text-sm gap-3"
               style={{
@@ -373,7 +387,7 @@ useEffect(() => {
               }}
             >
 
-                 {/* trocar por Image do next */}
+              {/* trocar por Image do next */}
               <img
                 src={user?.foto || "https://i.pravatar.cc/100?img=1"}
                 className="w-6 h-6 md:w-7 md:h-7 rounded-full object-cover object-center flex-shrink-0"
@@ -406,7 +420,7 @@ useEffect(() => {
                   style={{ backgroundColor: "var(--primary)" }}
                   onClick={() => comentar(post.id)}
                 >
-                     {/* trocar por Image do next */}
+                  {/* trocar por Image do next */}
                   <img src="/icons/enviar.png" alt="enviar" className="w-5 h-5" />
                 </button>
               )}
@@ -419,6 +433,13 @@ useEffect(() => {
           </div>
         )
       })}
+      <ImageModal
+  image={selectedImage}
+  open={openModal}
+  onClose={handleCloseImage}
+/>
     </section>
+
+    
   )
 }
