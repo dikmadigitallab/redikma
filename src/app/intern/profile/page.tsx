@@ -106,9 +106,7 @@ export default function PerfilPage() {
       style={{ backgroundColor: "var(--background)" }}
     >
    
-  <aside className="hidden lg:flex lg:w-96 ml-6 flex-shrink-0 p-4 lg:p-6 border-r overflow-hidden" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--white)' }}>
-    <Sidebar />
-  </aside>
+<Sidebar/>
 
 
       <div
