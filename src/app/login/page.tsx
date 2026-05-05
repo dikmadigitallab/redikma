@@ -25,10 +25,12 @@ export default function LoginCPF() {
 
     if (session?.user) {
       router.replace("/intern/feed")
+    }else{
+      router.replace('/login')
     }
   }, [session, status, router])
 
-  return null
+
 
 
   

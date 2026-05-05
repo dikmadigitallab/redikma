@@ -20,24 +20,26 @@ type Comment = {
   _count?: { likes: number }
 }
 
-type Props = {
-  postId: string
+type CommentWithDelete = Comment & {
+  deletable: boolean
 }
 
-export function CommentsBox({ postId }: Props) {
+type Props = {
+  postId: string
+  postAuthorId: string
+}
+
+export function CommentsBox({ postId, postAuthorId }: Props) {
   const [open, setOpen] = useState(false)
-  const [comments, setComments] = useState<Comment[]>([])
+  const [comments, setComments] = useState<CommentWithDelete[]>([])
   const [loading, setLoading] = useState(false)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState("")
   const { data: session } = useSession()
   const user = session?.user
-
   const boxRef = useRef<HTMLDivElement>(null)
   const isFetching = useRef(false)
 
-
-  //controla clique fora do box
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
@@ -55,7 +57,6 @@ export function CommentsBox({ postId }: Props) {
     }
   }, [open])
 
-  //carrega os comentários
   async function loadComments() {
     if (isFetching.current) return
     isFetching.current = true
@@ -70,7 +71,20 @@ export function CommentsBox({ postId }: Props) {
       if (!res.ok) return
 
       const data = await res.json()
-      setComments(data || [])
+
+      const canDelete: CommentWithDelete[] = (data || []).map((comment: Comment) => {
+        const isOwner = comment.author.id === user?.id
+        const isPostAuthor = postAuthorId === user?.id
+        const isAdmin =
+          user?.role === "ADMIN" || user?.role === "SYSTEM_ADM"
+
+        return {
+          ...comment,
+          deletable: isOwner || isPostAuthor || isAdmin,
+        }
+      })
+
+      setComments(canDelete)
     } catch (err) {
       console.error(err)
     } finally {
@@ -79,7 +93,6 @@ export function CommentsBox({ postId }: Props) {
     }
   }
 
-  //recarrega os comentários quando o postId mudar
   useEffect(() => {
     const t = setTimeout(() => {
       loadComments()
@@ -88,23 +101,29 @@ export function CommentsBox({ postId }: Props) {
     return () => clearTimeout(t)
   }, [postId])
 
-  //deleta comentário
   async function delComents(id: string) {
     try {
-      await fetch("/api/posts/posts-comments", {
+      const res = await fetch("/api/posts/posts-comments", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       })
 
+      const data = await res.json()
+
+      if (!res.ok) {
+        toast.error(data?.error || "Erro ao deletar comentário")
+        return
+      }
+
       await loadComments()
       toast.success("Comentário deletado")
-    } catch {
-      toast.error("Erro ao deletar comentário")
+    } catch (err) {
+      console.error(err)
+      toast.error("Erro de conexão")
     }
   }
 
-  //curtir comentário
   async function likeComment(commentId: string) {
     if (!user?.id) return
 
@@ -139,7 +158,6 @@ export function CommentsBox({ postId }: Props) {
     }
   }
 
-  //descurtir comentário
   async function unlikeComment(commentId: string) {
     if (!user?.id) return
 
@@ -156,7 +174,6 @@ export function CommentsBox({ postId }: Props) {
     }
   }
 
-  //responder comentário
   async function submitReply(commentId: string) {
     if (!user?.id || !replyText.trim()) return
 
@@ -182,13 +199,10 @@ export function CommentsBox({ postId }: Props) {
     }
   }
 
-  //verifica se o usuário curtiu o comentário
   function hasUserLiked(comment: Comment): boolean {
     return comment.likes?.some(like => like.userId === user?.id) || false
   }
 
-
-  //pega a contagem de curtidas do comentário
   function getLikesCount(comment: Comment): number {
     return comment._count?.likes || comment.likes?.length || 0
   }
@@ -276,12 +290,14 @@ export function CommentsBox({ postId }: Props) {
                         <span>Responder</span>
                       </button>
 
-                      <button
-                        onClick={() => delComents(comment.id)}
-                        className="ml-auto"
-                      >
-                        <FaTrash size={10} />
-                      </button>
+                      {comment.deletable && (
+                        <button
+                          onClick={() => delComents(comment.id)}
+                          className="ml-auto"
+                        >
+                          <FaTrash size={10} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

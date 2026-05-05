@@ -21,6 +21,7 @@
 - Visualização de perfil no back-end  
 - Implementação de perfil no front-end  
 - Visualização de perfil no front-end  
+- Possibilidade de substituição de foto de Perfil
 
 ## Experiência e interface
 - Responsividade para mobile e desktop  
@@ -31,4 +32,3 @@
 ## Atualizações e controle de versão
 - Lógica de atualização automática do app (provisória até publicação na loja)  
 
-## Referências (ClickUp)

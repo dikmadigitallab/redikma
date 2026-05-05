@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route";
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
+import { uploadProfileImage } from "@/lib/uploads"
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -30,7 +31,7 @@ export async function GET() {
 
 
 
-
+/* 
 export async function PUT(req: Request) {
   const session = await getServerSession(authOptions)
 
@@ -55,6 +56,60 @@ export async function PUT(req: Request) {
     if (body.senha) {
       const hash = await bcrypt.hash(body.senha, 10)
       dataToUpdate.senha_hash = hash
+    }
+
+    const user = await prisma.user.update({
+      where: { id: session.user.id },
+      data: dataToUpdate,
+    })
+
+    return NextResponse.json({ user })
+  } catch (error) {
+    return NextResponse.json({ error: "Erro ao atualizar" }, { status: 500 })
+  }
+}
+
+ */
+
+
+export async function PUT(req: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
+  try {
+    const formData = await req.formData()
+
+    const email = formData.get("email") as string | null
+    const telefone = formData.get("telefone") as string | null
+    const senha = formData.get("senha") as string | null
+    const file = formData.get("foto") as File | null
+
+    const dataToUpdate: {
+      email?: string
+      telefone?: string
+      foto?: string
+      senha_hash?: string
+    } = {}
+
+    if (email) dataToUpdate.email = email
+    if (telefone) dataToUpdate.telefone = telefone
+
+    if (senha) {
+      const hash = await bcrypt.hash(senha, 10)
+      dataToUpdate.senha_hash = hash
+    }
+
+    if (file && file.size > 0) {
+      const url = await uploadProfileImage(
+        file,
+        session.user.id,
+        "profile" // nome do bucket
+      )
+
+      dataToUpdate.foto = url
     }
 
     const user = await prisma.user.update({
