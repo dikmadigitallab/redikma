@@ -47,7 +47,7 @@ export default function LoginCPF() {
       }
 
       toast.success("Login realizado com sucesso!")
-      route.push("/feed")
+      route.push("/intern/feed")
     } catch {
       toast.error("Erro de conexão")
     } finally {

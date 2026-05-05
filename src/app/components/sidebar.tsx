@@ -26,7 +26,7 @@ export function Sidebar() {
       icon: Home,
       label: "Início",
       onClick: () => {
-        router.push("intern/feed")
+        router.push("/intern/feed")
         setIsOpen(false)
       },
       disabled: false,
@@ -47,7 +47,7 @@ export function Sidebar() {
       icon: User,
       label: "Perfil",
       onClick: () => {
-        router.push("intern/profile")
+        router.push("/intern/profile")
         setIsOpen(false)
       },
       disabled: false,

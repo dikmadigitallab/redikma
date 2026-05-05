@@ -72,7 +72,7 @@ async function handleSubmit() {
       }
 
       toast.success("Post criado com sucesso!")
-      router.push("/feed")
+      router.push("/intern/feed")
     } catch {
       toast.error("Erro ao criar postagem")
     } finally {

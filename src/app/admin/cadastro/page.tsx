@@ -298,7 +298,7 @@ export default function CadastroPage() {
                 A planilha deve conter as colunas: <strong>Nome</strong>, <strong>Admissão</strong>, <strong>Título Reduzido (Cargo)</strong>, <strong>Nascimento</strong>, <strong>CPF</strong>
               </p>
               <p className="text-xs mt-2" style={{ color: "var(--gray)" }}>
-                Formato: arquivo .txt com tabulação entre colunas, ou exporte do Excel como "Texto (Tabulação)"
+                Formato: arquivo .txt com tabulação entre colunas, ou exporte do Excel como Texto (Tabulação)
               </p>
             </div>
 

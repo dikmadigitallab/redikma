@@ -13,7 +13,7 @@ export function proxy(req: NextRequest) {
 
   // ✅ já logado → evita voltar pro login
   if (session && isLoginPage) {
-    return NextResponse.redirect(new URL("/feed", req.url))
+    return NextResponse.redirect(new URL("/intern/feed", req.url))
   }
 
   return NextResponse.next()
@@ -21,7 +21,7 @@ export function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/feed/:path*",
+    "/intern/feed/:path*",
     "/login",
   ],
 }
