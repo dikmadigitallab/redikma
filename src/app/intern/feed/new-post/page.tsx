@@ -60,7 +60,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
     setStream(null)
   }
 
-  function handleFile(e: any) {
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     setImage(file)
@@ -98,13 +98,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
     setPosition({ x: 0, y: 0 })
   }
 
-  function handleZoom(e: any) {
+  function handleZoom(e: React.WheelEvent<HTMLDivElement>) {
     e.preventDefault()
     setIsInteracting(true)
     setZoom(prev => Math.min(Math.max(prev + e.deltaY * -0.001, 1), 3))
   }
 
-  function startDrag(e: any) {
+  function startDrag(e: React.MouseEvent<HTMLDivElement>) {
     setDragging(true)
     setIsInteracting(true)
     dragStart.current = {
@@ -113,7 +113,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
     }
   }
 
-  function onDrag(e: any) {
+  function onDrag(e: React.MouseEvent<HTMLDivElement>) {
     if (!dragging) return
     setPosition({
       x: e.clientX - dragStart.current.x,
@@ -137,7 +137,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
       formData.append("label", text)
       formData.append("authorId", user.id)
       formData.append("duration", isFixed ? "" : duration)
-      // @ts-ignore
+    
       formData.append("postador", user.username)
 
       if (image) formData.append("image", image)
