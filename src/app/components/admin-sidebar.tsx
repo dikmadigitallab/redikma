@@ -1,16 +1,16 @@
 "use client"
 
 import { Users, UserPlus, LogOut } from "lucide-react"
+import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { UserCard } from "./cardUser"
+
 
 export function AdminSidebar() {
   const router = useRouter()
 
-  async function handleLogout() {
-    await fetch("/api/autenticar/logout", { method: "POST" })
-    router.push("/login")
-  }
+async function handleLogout() {
+  await signOut({ callbackUrl: "/login" })
+}
 
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-[var(--border)] flex flex-col gap-6 p-4 z-40">

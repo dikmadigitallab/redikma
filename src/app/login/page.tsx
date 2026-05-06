@@ -1,21 +1,17 @@
 "use client"
 
-import { useState,useEffect } from "react"
+import { useState, useEffect } from "react"
 import { ShieldCheck, Lock, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { toast } from "sonner"
-import { useSession } from "next-auth/react"
 
 export default function LoginCPF() {
   const [cpf, setCpf] = useState("")
   const [senha, setSenha] = useState("")
   const [showSenha, setShowSenha] = useState(false)
   const [loading, setLoading] = useState(false)
-  const route = useRouter()
-  
-
 
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -25,15 +21,10 @@ export default function LoginCPF() {
 
     if (session?.user) {
       router.replace("/intern/feed")
-    }else{
-      router.replace('/login')
     }
+    // Removi o router.replace('/login') no else para evitar loop infinito 
+    // já que este é o próprio componente de login.
   }, [session, status, router])
-
-
-
-
-  
 
   function formatCPF(value: string) {
     return value
@@ -67,7 +58,7 @@ export default function LoginCPF() {
       }
 
       toast.success("Login realizado com sucesso!")
-      route.push("/intern/feed")
+      router.push("/intern/feed")
     } catch {
       toast.error("Erro de conexão")
     } finally {
@@ -76,146 +67,207 @@ export default function LoginCPF() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 md:px-6" style={{ backgroundColor: 'var(--background)' }}>
+    <main className="min-h-screen flex w-full font-sans" style={{ backgroundColor: 'var(--background)' }}>
 
-      <header
-  className="fixed top-0 w-full z-50 h-16 backdrop-blur-md"
-  style={{
-    backgroundColor: "rgba(255,255,255,0.7)",
-    borderBottom: "1px solid var(--border)",
-  }}
->
-  <nav className="max-w-6xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
-    
-    <div className="flex items-center gap-3 cursor-pointer">
-      <div
-        className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm"
-        style={{ backgroundColor: "var(--primary-dark)" }}
-      >
-        <img
-          src="/icons/redikma_logo.png"
-          alt="Logo"
-          className="w-5 h-5 object-contain"
+      {/* LADO ESQUERDO: Contexto Social e Pessoas (Oculto no Mobile) */}
+      <div className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden">
+        {/* Imagem de fundo focada em pessoas colaborando */}
+        <div
+          className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
         />
-      </div>
+        {/* Camada translúcida estilo glassmorphism puxando para o verde da marca */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/80 to-[#047857]/90 mix-blend-multiply" />
 
-      <div className="hidden sm:flex flex-col leading-tight">
-        <span
-          className="font-bold text-base"
-          style={{ color: "var(--primary-dark)" }}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="relative z-10 p-12 text-white max-w-xl text-center flex flex-col items-center"
         >
-          ReDikma
-        </span>
-        <span
-          className="text-[10px]"
-          style={{ color: "var(--gray)" }}
-        >
-          Comunicando cultura
-        </span>
-      </div>
-    </div>
-
-    <div className="flex items-center gap-3">
-
-      <button
-        onClick={() => route.push("/login")}
-        className="px-5 py-2 rounded-xl text-sm font-medium transition shadow-sm hover:scale-[1.03]"
-        style={{
-          backgroundColor: "var(--primary-dark)",
-          color: "var(--white)",
-        }}
-      >
-        Login
-      </button>
-    </div>
-
-  </nav>
-</header>
-
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1529336953121-ad5a0d43d0d2')] bg-cover bg-center opacity-10" />
-      <div className="absolute inset-0 backdrop-blur-sm" />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-        className="relative w-full max-w-sm md:max-w-md rounded-lg md:rounded-2xl shadow-lg p-6 md:p-8 space-y-5 md:space-y-6"
-        style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)' }}
-      >
-
-        <div className="flex items-center gap-2 md:gap-3 pb-3 md:pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
-          <div className="w-8 md:w-10 h-8 md:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-lg" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
-          <span className="font-semibold text-base md:text-lg" style={{ color: 'var(--black)' }}>Dikma</span>
-        </div>
-
-        <div className="space-y-1 md:space-y-2">
-          <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--black)' }}>
-            Bem-vindo de volta
-          </h1>
-          <p style={{ color: 'var(--gray)' }} className="text-xs md:text-sm">
-            Faça login com seu CPF e senha para acessar
+          <h2 className="text-4xl font-bold mb-4 leading-tight">
+            Conecte-se com quem faz a <span className="text-green-400">Dikma</span> acontecer.
+          </h2>
+          <p className="text-lg text-gray-200 mb-8">
+            Nossa rede corporativa. Compartilhe ideias, celebre conquistas e interaja com pessoas incríveis todos os dias.
           </p>
-        </div>
 
-        <div className="space-y-4 md:space-y-5">
-          <div>
-            <label className="block text-xs md:text-sm font-medium mb-2" style={{ color: 'var(--black)' }}>CPF</label>
-            <div className="flex items-center px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl transition" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
-              <ShieldCheck size={16} className="md:w-[18px] md:h-[18px]" style={{ color: 'var(--secondary)' }} />
-              <input
-                type="text"
-                placeholder="000.000.000-00"
-                value={cpf}
-                onChange={handleChangeCpf}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleLogin()
-                  }
-                }}
-                className="w-full bg-transparent outline-none ml-2 md:ml-3 text-sm"
-                style={{ color: 'var(--black)' }}
-              />
+          {/* Elemento de Prova Social / Avatares */}
+          <div className="flex -space-x-4 justify-center">
+            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=68" alt="Usuário 1" />
+            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=47" alt="Usuário 2" />
+            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=33" alt="Usuário 3" />
+            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=12" alt="Usuário 4" />
+            <div className="w-12 h-12 rounded-full border-2 border-green-900 bg-gray-800 flex items-center justify-center text-xs font-medium text-white shadow-lg">
+              +99
             </div>
           </div>
+        </motion.div>
+      </div>
 
-          <div>
-            <label className="block text-xs md:text-sm font-medium mb-2" style={{ color: 'var(--black)' }}>Senha</label>
-            <div className="flex items-center px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl transition" style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)` }}>
-              <Lock size={16} className="md:w-[18px] md:h-[18px]" style={{ color: 'var(--secondary)' }} />
-              <input
-                type={showSenha ? "text" : "password"}
-                placeholder="Digite sua senha"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleLogin()
-                  }
-                }}
-                className="w-full bg-transparent outline-none ml-2 md:ml-3 text-sm"
-                style={{ color: 'var(--black)' }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowSenha(!showSenha)}
-                className="ml-2"
+
+
+     {/* LADO DIREITO: Formulário de Login (Responsivo) */}
+      <div 
+        className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 relative overflow-hidden"
+        style={{ backgroundColor: '#0A4554' }} // Fundo CHAPADO com Azul Corporativo
+      >
+        
+        {/* --- DECORAÇÕES GEOMÉTRICAS E LINHAS INFORMES --- */}
+        
+        {/* Linha Informe 1: Forma orgânica com borda grossa e rotação */}
+        <div 
+          className="absolute border-[3px] pointer-events-none"
+          style={{ 
+            borderColor: '#4FC3D9', 
+            opacity: 0.15,
+            width: '600px', 
+            height: '600px',
+            top: '-15%',
+            right: '-20%',
+            borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%', // Cria a forma "informe/orgânica"
+            transform: 'rotate(25deg)'
+          }} 
+        />
+
+        {/* Linha Informe 2: Forma orgânica sobreposta, mais fina e com outra opacidade */}
+        <div 
+          className="absolute border-[1px] pointer-events-none"
+          style={{ 
+            borderColor: '#4FC3D9', 
+            opacity: 0.3,
+            width: '450px', 
+            height: '450px',
+            top: '5%',
+            right: '-10%',
+            borderRadius: '60% 40% 30% 70% / 50% 40% 60% 50%',
+            transform: 'rotate(-15deg)'
+          }} 
+        />
+
+        {/* Forma Geométrica 1: Círculo Perfeito no fundo esquerdo */}
+        <div 
+          className="absolute rounded-full border-[4px] pointer-events-none"
+          style={{ 
+            borderColor: '#4FC3D9', 
+            opacity: 0.08,
+            width: '400px', 
+            height: '400px',
+            bottom: '-10%',
+            left: '-15%'
+          }} 
+        />
+
+        {/* Forma Geométrica 2: Quadrado Rotacionado (Losango) flutuando */}
+        <div 
+          className="absolute border-[2px] pointer-events-none"
+          style={{ 
+            borderColor: '#FDE205', // Toque sutil do Accent (Amarelo Forte)
+            opacity: 0.1,
+            width: '180px', 
+            height: '180px',
+            bottom: '15%',
+            right: '10%',
+            transform: 'rotate(45deg)'
+          }} 
+        />
+
+        {/* --- CARD DE LOGIN --- */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="relative w-full max-w-md rounded-2xl shadow-2xl p-8 md:p-10 space-y-8 z-10"
+          style={{ backgroundColor: '#FFFFFF' }} // Card branco para contrastar com o fundo escuro
+        >
+          {/* Cabeçalho */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 mb-6 pb-6" style={{ borderBottom: '1px solid #E0E0E0' }}>
+              <div 
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm" 
+                style={{ backgroundColor: '#0A4554' }} // Logo em Azul Corporativo
               >
-                {showSenha ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+                D
+              </div>
+              <span className="font-bold text-2xl tracking-tight" style={{ color: '#1A1A1A' }}>Dikma</span>
             </div>
+
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: '#1A1A1A' }}>
+              Bem-vindo de volta
+            </h1>
+            <p className="text-sm md:text-base" style={{ color: '#757575' }}>
+              Faça login com seu CPF e senha para acessar
+            </p>
           </div>
 
-          <button
-            onClick={handleLogin}
-            disabled={loading || cpf.replace(/\D/g, "").length !== 11 || !senha}
-            className="w-full py-2.5 md:py-3 rounded-lg md:rounded-xl text-white font-medium text-sm md:text-base transition hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: loading || cpf.replace(/\D/g, "").length !== 11 || !senha ? 'var(--gray)' : 'var(--primary-dark)' }}
-          >
-            {loading ? "Entrando..." : "Entrar"}
-          </button>
-        </div>
+          {/* Campos */}
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#1A1A1A' }}>CPF</label>
+              <div 
+                className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent" 
+                style={{ backgroundColor: '#F5F5F5', border: '1px solid #E0E0E0' }} // Fundo de input levemente cinza
+                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
+                onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+              >
+                <ShieldCheck size={20} style={{ color: '#4FC3D9' }} />
+                <input
+                  type="text"
+                  placeholder="000.000.000-00"
+                  value={cpf}
+                  onChange={handleChangeCpf}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleLogin()
+                  }}
+                  className="w-full bg-transparent outline-none ml-3 text-base placeholder-[#757575]"
+                  style={{ color: '#1A1A1A' }}
+                />
+              </div>
+            </div>
 
-      </motion.div>
+            <div>
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#1A1A1A' }}>Senha</label>
+              <div 
+                className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent" 
+                style={{ backgroundColor: '#F5F5F5', border: '1px solid #E0E0E0' }}
+                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
+                onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+              >
+                <Lock size={20} style={{ color: '#4FC3D9' }} />
+                <input
+                  type={showSenha ? "text" : "password"}
+                  placeholder="Digite sua senha"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleLogin()
+                  }}
+                  className="w-full bg-transparent outline-none ml-3 text-base placeholder-[#757575]"
+                  style={{ color: '#1A1A1A' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSenha(!showSenha)}
+                  className="ml-2 hover:opacity-70 transition-opacity"
+                  style={{ color: '#757575' }}
+                >
+                  {showSenha ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Ação de Login */}
+            <button
+              onClick={handleLogin}
+              disabled={loading || cpf.replace(/\D/g, "").length !== 11 || !senha}
+              className="w-full py-3.5 rounded-xl text-white font-semibold text-base transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none mt-4"
+              // Botão acompanhando o Primary Dark para manter elegância, mudando no hover (usando style inline pra ficar fixo, mas vc pode por hover via tailwind se tiver configurado as cores lá)
+              style={{ backgroundColor: loading || cpf.replace(/\D/g, "").length !== 11 || !senha ? '#757575' : '#0A4554' }}
+            >
+              {loading ? "Entrando..." : "Entrar na Plataforma"}
+            </button>
+          </div>
+        </motion.div>
+      </div>
     </main>
   )
 }

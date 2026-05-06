@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
 import * as XLSX from "xlsx"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 function gerarSenhaPadrao(cpf: string) {
   return cpf.replace(/\D/g, "").slice(0, 6)
@@ -102,6 +104,14 @@ function normalizeCPF(cpf: unknown): string {
 }
 
 export async function POST(req: Request) {
+
+  const session = await getServerSession(authOptions)
+
+  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
+
   try {
     const formData = await req.formData()
     const file = formData.get("file") as File

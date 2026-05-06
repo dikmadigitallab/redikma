@@ -4,18 +4,16 @@ import { Home, Search, Video, User, LogOut, Menu, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { UserCard } from "./cardUser"
 import { useState } from "react"
+import { signOut } from "next-auth/react"
 
 export function Sidebar() {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
 
-  async function handleLogout() {
-    await fetch("/api/autenticar/logout", {
-      method: "POST",
-    })
+async function handleLogout() {
+  await signOut({ callbackUrl: "/login" })
+}
 
-    router.push("/login")
-  }
 
   function aviso() {
     alert('Recurso estará disponivel em breve')

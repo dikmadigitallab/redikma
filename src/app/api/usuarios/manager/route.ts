@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../../auth/[...nextauth]/route"
 
 export async function GET(req: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
+
   try {
     const { searchParams } = new URL(req.url)
-    const id = searchParams.get("id")
+ //pegar o id do usuario logado
+    const id  = searchParams.get("id")
 
     if (id) {
       const user = await prisma.user.findUnique({
@@ -66,9 +76,17 @@ export async function GET(req: Request) {
 }
 
 export async function PUT(req: Request) {
+
+    const session = await getServerSession(authOptions)
+
+  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
+
   try {
     const body = await req.json()
-    const { id, nome, cargo, role, foto, senhaAtual, novaSenha } = body
+    const { id, nome, cargo, role, foto, novaSenha } = body
 
     if (!id) {
       return NextResponse.json({ error: "ID do usuário é obrigatório" }, { status: 400 })
@@ -105,18 +123,12 @@ export async function PUT(req: Request) {
     if (foto !== undefined) updateData.foto = foto || null
 
     if (novaSenha) {
-      if (!senhaAtual) {
-        return NextResponse.json({ error: "Senha atual é obrigatória para alterar a senha" }, { status: 400 })
-      }
-
-      const { compare } = await import("bcryptjs")
-      const senhaValida = await compare(senhaAtual, user.senha_hash || "")
-
-      if (!senhaValida) {
-        return NextResponse.json({ error: "Senha atual incorreta" }, { status: 401 })
-      }
-
       const senhaPadrao = novaSenha.replace(/\D/g, "").slice(0, 6)
+
+      if (!senhaPadrao) {
+        return NextResponse.json({ error: "Nova senha inválida" }, { status: 400 })
+      }
+
       updateData.senha_hash = await hash(senhaPadrao, 10)
     }
 
@@ -146,7 +158,15 @@ export async function PUT(req: Request) {
   }
 }
 
+//
 export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
+
   try {
     const { searchParams } = new URL(req.url)
     const id = searchParams.get("id")
@@ -163,9 +183,20 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
     }
 
-    await prisma.user.delete({
-      where: { id },
-    })
+    await prisma.$transaction([
+      prisma.like.deleteMany({
+        where: { userId: id },
+      }),
+      prisma.comentario.deleteMany({
+        where: { authorId: id },
+      }),
+      prisma.postagem.deleteMany({
+        where: { authorId: id },
+      }),
+      prisma.user.delete({
+        where: { id },
+      }),
+    ])
 
     return NextResponse.json({
       message: "Usuário deletado com sucesso",
