@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -244,8 +245,9 @@ export default function UsuariosPage() {
                             className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium"
                             style={{ backgroundColor: "var(--primary-dark)" }}
                           >
+                           
                             <img
-                              src={usuario.foto}
+                              src={usuario.foto||"https://i.pravatar.cc/100?img=2"}
                               alt={usuario.nome}
                               className="w-full h-full object-cover"
                             />

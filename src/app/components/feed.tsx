@@ -414,6 +414,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
         <CommentsBox
           postId={post.id}
+          postAuthorId={post.author.id}
         />
           </div>
   )
