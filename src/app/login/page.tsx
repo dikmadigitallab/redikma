@@ -1,19 +1,39 @@
 "use client"
 
-import { useState } from "react"
+import { useState,useEffect } from "react"
 import { ShieldCheck, Lock, Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
+import { useSession } from "next-auth/react"
 
 export default function LoginCPF() {
   const [cpf, setCpf] = useState("")
   const [senha, setSenha] = useState("")
   const [showSenha, setShowSenha] = useState(false)
   const [loading, setLoading] = useState(false)
-
   const route = useRouter()
+  
+
+
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === "loading") return
+
+    if (session?.user) {
+      router.replace("/intern/feed")
+    }else{
+      router.replace('/login')
+    }
+  }, [session, status, router])
+
+
+
+
+  
 
   function formatCPF(value: string) {
     return value

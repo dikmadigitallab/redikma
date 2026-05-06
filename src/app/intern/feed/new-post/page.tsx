@@ -27,6 +27,72 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const [aspectRatio, setAspectRatio] = useState("1/1")
 
   const dragStart = useRef({ x: 0, y: 0 })
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  function getLimits(img: HTMLImageElement, container: DOMRect, scale: number) {
+    const imgRatio = img.width / img.height
+    const containerRatio = container.width / container.height
+
+    let baseWidth = container.width
+    let baseHeight = container.height
+
+    if (imgRatio > containerRatio) {
+      baseHeight = container.height
+      baseWidth = baseHeight * imgRatio
+    } else {
+      baseWidth = container.width
+      baseHeight = baseWidth / imgRatio
+    }
+
+    const scaledWidth = baseWidth * scale
+    const scaledHeight = baseHeight * scale
+
+    const limitX = Math.max(0, (scaledWidth - container.width) / 2)
+    const limitY = Math.max(0, (scaledHeight - container.height) / 2)
+
+    return { limitX, limitY }
+  }
+
+  function clampPosition(x: number, y: number) {
+    const container = containerRef.current
+    if (!container || !preview) return { x, y }
+
+    const img = new Image()
+    img.src = preview
+
+    const rect = container.getBoundingClientRect()
+    const { limitX, limitY } = getLimits(img, rect, zoom)
+
+    return {
+      x: Math.min(limitX, Math.max(-limitX, x)),
+      y: Math.min(limitY, Math.max(-limitY, y)),
+    }
+  }
+
+  useEffect(() => {
+    function handleMove(e: MouseEvent) {
+      if (!dragging) return
+
+      const newPos = {
+        x: e.clientX - dragStart.current.x,
+        y: e.clientY - dragStart.current.y,
+      }
+
+      setPosition(clampPosition(newPos.x, newPos.y))
+    }
+
+    function handleUp() {
+      setDragging(false)
+    }
+
+    window.addEventListener("mousemove", handleMove)
+    window.addEventListener("mouseup", handleUp)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMove)
+      window.removeEventListener("mouseup", handleUp)
+    }
+  }, [dragging, zoom, preview])
 
   const { data: session } = useSession()
   const router = useRouter()
@@ -101,29 +167,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
   function handleZoom(e: React.WheelEvent<HTMLDivElement>) {
     e.preventDefault()
     setIsInteracting(true)
-    setZoom(prev => Math.min(Math.max(prev + e.deltaY * -0.001, 1), 3))
-  }
 
-  function startDrag(e: React.MouseEvent<HTMLDivElement>) {
-    setDragging(true)
-    setIsInteracting(true)
-    dragStart.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
-    }
-  }
-
-  function onDrag(e: React.MouseEvent<HTMLDivElement>) {
-    if (!dragging) return
-    setPosition({
-      x: e.clientX - dragStart.current.x,
-      y: e.clientY - dragStart.current.y
-    })
-  }
-
-  function endDrag() {
-    setDragging(false)
-    setTimeout(() => setIsInteracting(false), 300)
+    const newZoom = Math.min(Math.max(zoom + e.deltaY * -0.001, 1), 3)
+    setZoom(newZoom)
+    setPosition(prev => clampPosition(prev.x, prev.y))
   }
 
   async function handleSubmit() {
@@ -139,7 +186,52 @@ export default function CreatePostPage({ onRefresh }: Props) {
       formData.append("duration", isFixed ? "" : duration)
       formData.append("postador", user.username)
 
-      if (image) formData.append("image", image)
+      if (preview) {
+        const img = new Image()
+        img.src = preview
+
+        await new Promise(resolve => {
+          img.onload = resolve
+        })
+
+        const canvas = document.createElement("canvas")
+        const ctx = canvas.getContext("2d")!
+
+        const width = 1080
+        const height = 1080
+
+        canvas.width = width
+        canvas.height = height
+
+        const imgRatio = img.width / img.height
+        const containerRatio = width / height
+
+        let baseWidth = width
+        let baseHeight = height
+
+        if (imgRatio > containerRatio) {
+          baseHeight = height
+          baseWidth = baseHeight * imgRatio
+        } else {
+          baseWidth = width
+          baseHeight = baseWidth / imgRatio
+        }
+
+        const scaledWidth = baseWidth * zoom
+        const scaledHeight = baseHeight * zoom
+
+        const drawX = (width - scaledWidth) / 2 + position.x
+        const drawY = (height - scaledHeight) / 2 + position.y
+
+        ctx.drawImage(img, drawX, drawY, scaledWidth, scaledHeight)
+
+        const blob: Blob = await new Promise(resolve =>
+          canvas.toBlob(b => resolve(b as Blob), "image/jpeg", 0.9)
+        )
+
+        const finalFile = new File([blob], "post.jpg", { type: "image/jpeg" })
+        formData.append("image", finalFile)
+      }
 
       const res = await fetch("/api/posts", {
         method: "POST",
@@ -163,7 +255,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
   return (
     <main className="min-h-screen bg-[#F5F5F7] text-black flex flex-col">
 
-      {/* HEADER */}
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
         <button className="text-sm text-neutral-500 hover:text-black transition">Voltar</button>
         <h1 className="text-sm font-semibold tracking-wide">Nova postagem</h1>
@@ -172,17 +263,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
       <section className="flex-1 w-full max-w-lg mx-auto px-5 py-8 space-y-8">
 
-        {/* TEXTO */}
-        <div className="rounded-3xl bg-white border border-neutral-200 p-5 shadow-sm focus-within:border-neutral-400 transition">
+        <div className="rounded-3xl bg-white border border-neutral-200 p-5 shadow-sm">
           <textarea
             placeholder="Compartilhe algo..."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full bg-transparent outline-none text-sm placeholder:text-neutral-400 resize-none h-24"
+            className="w-full bg-transparent outline-none text-sm resize-none h-24"
           />
         </div>
 
-        {/* MIDIA */}
         <div className="rounded-3xl bg-white border border-neutral-200 p-4 shadow-sm space-y-4">
 
           {!preview && (
@@ -192,44 +281,43 @@ export default function CreatePostPage({ onRefresh }: Props) {
               </div>
 
               <div className="flex gap-3">
-                <button
-                  onClick={takePhoto}
-                  className="flex-1 py-3 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 active:scale-[0.97] transition"
-                >
+                <button onClick={takePhoto} className="flex-1 py-3 rounded-2xl bg-black text-white text-sm">
                   Tirar foto
                 </button>
 
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-3 rounded-2xl border border-neutral-300 text-sm font-medium hover:bg-neutral-100 transition"
-                >
+                <button onClick={() => fileInputRef.current?.click()} className="flex-1 py-3 rounded-2xl border text-sm">
                   Galeria
                 </button>
               </div>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFile}
-                className="hidden"
-              />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
             </>
           )}
 
           {preview && (
             <>
-              <div className="relative rounded-3xl overflow-hidden bg-black border" style={{ aspectRatio }}>
+              <div
+                ref={containerRef}
+                className="relative rounded-3xl overflow-hidden bg-black border select-none"
+                style={{ aspectRatio }}
+                onWheel={handleZoom}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  setDragging(true)
+                  setIsInteracting(true)
+
+                  dragStart.current = {
+                    x: e.clientX - position.x,
+                    y: e.clientY - position.y,
+                  }
+                }}
+              >
                 <img
                   src={preview}
-                  onWheel={handleZoom}
-                  onMouseDown={startDrag}
-                  onMouseMove={onDrag}
-                  onMouseUp={endDrag}
-                  onMouseLeave={endDrag}
-                  className="absolute w-full h-full object-cover cursor-grab active:cursor-grabbing"
+                  draggable={false}
+                  className="absolute top-0 left-0 w-full h-full object-cover cursor-grab active:cursor-grabbing pointer-events-none"
                   style={{
-                    transform: `scale(${zoom}) translate(${position.x}px, ${position.y}px)`
+                    transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
                   }}
                 />
 
@@ -242,30 +330,18 @@ export default function CreatePostPage({ onRefresh }: Props) {
                 )}
               </div>
 
-              <div className="flex gap-2">
-                {["1/1", "4/5", "16/9"].map(r => (
-                  <button
-                    key={r}
-                    onClick={() => setAspectRatio(r)}
-                    className={`flex-1 py-2 rounded-xl text-xs font-medium transition ${
-                      aspectRatio === r
-                        ? "bg-black text-white"
-                        : "bg-neutral-100 text-neutral-500"
-                    }`}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-
               <input
                 type="range"
                 min={1}
                 max={3}
                 step={0.01}
                 value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                className="w-full accent-black"
+                onChange={(e) => {
+                  const newZoom = Number(e.target.value)
+                  setZoom(newZoom)
+                  setPosition(prev => clampPosition(prev.x, prev.y))
+                }}
+                className="w-full"
               />
 
               <button onClick={resetPhoto} className="text-xs text-red-500">
@@ -277,47 +353,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
           <canvas ref={canvasRef} className="hidden" />
         </div>
 
-        {/* CONFIG */}
-        <div className="rounded-3xl bg-white border border-neutral-200 p-4 shadow-sm space-y-4 text-sm">
-          <div className="flex justify-between items-center">
-            <span className="text-neutral-500">Post recorrente</span>
-            <input type="checkbox" checked={isRecurring} onChange={(e) => setIsRecurring(e.target.checked)} />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className="text-neutral-500">Post fixo</span>
-            <input type="checkbox" checked={isFixed} onChange={(e) => setIsFixed(e.target.checked)} />
-          </div>
-
-          {!isFixed && (
-            <select
-              value={duration}
-              onChange={(e) => setDuration(e.target.value as DurationType)}
-              className="w-full bg-neutral-100 border border-neutral-300 rounded-xl p-2 text-sm"
-            >
-              <option value="1h">1 hora</option>
-              <option value="24h">24 horas</option>
-              <option value="7d">7 dias</option>
-            </select>
-          )}
-        </div>
-
       </section>
 
-      {/* FOOTER */}
-      <footer className="sticky bottom-0 bg-white/80 backdrop-blur-xl border-t border-neutral-200 p-4 flex gap-3">
-        <button
-          onClick={() => window.history.back()}
-          className="flex-1 py-3 rounded-2xl border border-neutral-300 text-sm hover:bg-neutral-100 transition"
-        >
+      <footer className="sticky bottom-0 bg-white border-t p-4 flex gap-3">
+        <button onClick={() => window.history.back()} className="flex-1 py-3 border rounded-2xl text-sm">
           Cancelar
         </button>
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="flex-1 py-3 rounded-2xl bg-black text-white text-sm font-semibold disabled:opacity-50 hover:opacity-90 active:scale-[0.97] transition"
-        >
+        <button onClick={handleSubmit} disabled={loading} className="flex-1 py-3 bg-black text-white rounded-2xl text-sm">
           {loading ? "Publicando..." : "Publicar"}
         </button>
       </footer>

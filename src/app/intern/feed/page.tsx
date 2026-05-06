@@ -139,7 +139,7 @@ export default function Feed() {
       setOpenModal(true)
       return
     }
-    router.push("intern/feed/new-post")
+    router.push("/intern/feed/new-post")
   }}
 >
   <Plus 

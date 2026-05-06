@@ -50,7 +50,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
       }
     }
     loadPosts()
-  
+
   }, [pathname, refreshKey])
 
 
@@ -166,25 +166,25 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
 
   //comentar
- // 1. Mova a lógica de carregar contagem para uma função fora do useEffect para que possa ser reutilizada
-async function loadCommentsCount() {
-  try {
-    const counts: Record<string, number> = {}
-    await Promise.all(
-      posts.map(async (post) => {
-        const res = await fetch(`/api/posts/posts-comments?postId=${post.id}`)
-        if (!res.ok) return
-        const data = await res.json()
-        counts[post.id] = data.length || 0
-      })
-    )
-    setCommentsCount(counts)
-  } catch (error) {
-    console.error(error)
+  // 1. Mova a lógica de carregar contagem para uma função fora do useEffect para que possa ser reutilizada
+  async function loadCommentsCount() {
+    try {
+      const counts: Record<string, number> = {}
+      await Promise.all(
+        posts.map(async (post) => {
+          const res = await fetch(`/api/posts/posts-comments?postId=${post.id}`)
+          if (!res.ok) return
+          const data = await res.json()
+          counts[post.id] = data.length || 0
+        })
+      )
+      setCommentsCount(counts)
+    } catch (error) {
+      console.error(error)
+    }
   }
-}
 
-// 2. Chame a função dentro do seu método de comentar
+  // 2. Chame a função dentro do seu método de comentar
   async function comentar(postId: string) {
     if (!user) return
     const texto = comments[postId]?.trim()
@@ -201,31 +201,31 @@ async function loadCommentsCount() {
 
       setComments((prev) => ({ ...prev, [postId]: "" }))
       toast.success("Comentário postado!")
-      
-      loadCommentsCount() 
-      
+
+      loadCommentsCount()
+
     } catch {
       toast.error("Erro ao postar comentário")
     }
   }
 
-// 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
-useEffect(() => {
-  if (!posts.length) return
+  // 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
+  useEffect(() => {
+    if (!posts.length) return
 
-  const run = () => {
-    loadCommentsCount()
-  }
+    const run = () => {
+      loadCommentsCount()
+    }
 
-  const timeout = setTimeout(run, 0)
-  const interval = setInterval(run, 30000)
+    const timeout = setTimeout(run, 0)
+    const interval = setInterval(run, 30000)
 
-  return () => {
-    clearTimeout(timeout)
-    clearInterval(interval)
-  }
-}, [posts])
-  
+    return () => {
+      clearTimeout(timeout)
+      clearInterval(interval)
+    }
+  }, [posts])
+
 
 
 
@@ -234,7 +234,7 @@ useEffect(() => {
   return (
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
 
-    
+
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
 
@@ -292,133 +292,132 @@ useEffect(() => {
               {post.label}
             </p>
 
-              {post.image && (
-            <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
-                 {/* trocar por Image do next */}
-              <img
-                
+            {post.image && (
+              <div className="w-full bg-black">
+                <img
                   src={post.image}
-                  className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl"
                   alt="Post image"
+                  className="w-full h-[300px] md:h-[500px] object-cover"
                 />
-            </div>
-              )}
-            <div
-              className="flex items-center justify-between text-xs md:text-sm gap-3"
-              style={{
-                color: "var(--gray)",
-                paddingTop: "0.75rem",
-                borderTop: "1px solid var(--border)",
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/icons/like.png"
-                  alt="likes"
-                  width={16}
-                  height={16}
-                  className="opacity-60"
-                />
-                <span className="font-medium" style={{ color: "var(--black)" }}>
-                  {likesCount[post.id] || 0}
-                </span>
               </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => curtir(post.id)}
-                  className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
-                >
-                  <Image
-                    src="/icons/like.png"
-                    alt="reação"
-                    width={20}
-                    height={20}
-                    className={`transition-all duration-300 w-4 h-4 md:w-5 md:h-5 ${liked ? "opacity-100 scale-110" : "opacity-50"
-                      }`}
-                  />
-                  <span
-                    className={`transition-all duration-300 ${liked ? "font-semibold" : ""
-                      }`}
-                    style={{ color: liked ? "var(--warning)" : "var(--gray)" }}
-                  >
-                    {liked ? "curtido" : "curtir"}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
-                >
-                  <Image
-                    src="/icons/coments.png"
-                    alt="comentários"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5 md:w-6 md:h-6 opacity-70"
-                  />
-                  <span className="hidden sm:inline">{commentsCount[post.id || 0]} comentários</span>
-                  <span className="inline-flex items-center justify-center bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full sm:hidden">
-                    {commentsCount[post.id] || 0}
-                  </span>
-                </button>
-              </div>
-            </div>
+            )}
+           
             <div
-              className="flex items-center gap-2 rounded-lg md:rounded-full px-3 py-2 relative"
-              style={{
-                backgroundColor: "var(--background)",
-                border: `1px solid var(--border)`,
-              }}
-            >
-
-                 {/* trocar por Image do next */}
-              <img
-                src={user?.foto || "https://i.pravatar.cc/100?img=1"}
-                className="w-6 h-6 md:w-7 md:h-7 rounded-full object-cover object-center flex-shrink-0"
-                alt={user?.username || "comentador"}
-              />
-
-              <input
-                value={comments[post.id] || ""}
-                maxLength={50}
-                onChange={(e) =>
-                  setComments((prev) => ({
-                    ...prev,
-                    [post.id]: e.target.value,
-                  }))
-                }
-                onKeyDown={(e) => {
-                  const value = comments[post.id] || ""
-                  if (e.key === "Enter" && !e.shiftKey && value.trim() !== "") {
-                    comentar(post.id)
-                  }
-                }}
-                placeholder="Comentar..."
-                className="bg-transparent outline-none text-xs md:text-sm w-full pr-10"
-                style={{ color: "var(--black)" }}
-              />
-
-              {(comments[post.id] || "").trim() !== "" && (
-                <button
-                  className="absolute right-2 p-2 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: "var(--primary)" }}
-                  onClick={() => comentar(post.id)}
-                >
-                     {/* trocar por Image do next */}
-                  <img src="/icons/enviar.png" alt="enviar" className="w-5 h-5" />
-                </button>
-              )}
-
-            </div>
-
-            <CommentsBox
-              postId={post.id}
+          className="flex items-center justify-between text-xs md:text-sm gap-3"
+          style={{
+            color: "var(--gray)",
+            paddingTop: "0.75rem",
+            borderTop: "1px solid var(--border)",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <Image
+              src="/icons/like.png"
+              alt="likes"
+              width={16}
+              height={16}
+              className="opacity-60"
             />
+            <span className="font-medium" style={{ color: "var(--black)" }}>
+              {likesCount[post.id] || 0}
+            </span>
           </div>
-        )
-      })}
-    </section>
+
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => curtir(post.id)}
+              className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
+            >
+              <Image
+                src="/icons/like.png"
+                alt="reação"
+                width={20}
+                height={20}
+                className={`transition-all duration-300 w-4 h-4 md:w-5 md:h-5 ${liked ? "opacity-100 scale-110" : "opacity-50"
+                  }`}
+              />
+              <span
+                className={`transition-all duration-300 ${liked ? "font-semibold" : ""
+                  }`}
+                style={{ color: liked ? "var(--warning)" : "var(--gray)" }}
+              >
+                {liked ? "curtido" : "curtir"}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
+            >
+              <Image
+                src="/icons/coments.png"
+                alt="comentários"
+                width={20}
+                height={20}
+                className="w-5 h-5 md:w-6 md:h-6 opacity-70"
+              />
+              <span className="hidden sm:inline">{commentsCount[post.id || 0]} comentários</span>
+              <span className="inline-flex items-center justify-center bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full sm:hidden">
+                {commentsCount[post.id] || 0}
+              </span>
+            </button>
+          </div>
+        </div>
+        <div
+          className="flex items-center gap-2 rounded-lg md:rounded-full px-3 py-2 relative"
+          style={{
+            backgroundColor: "var(--background)",
+            border: `1px solid var(--border)`,
+          }}
+        >
+
+          {/* trocar por Image do next */}
+          <img
+            src={user?.foto || "https://i.pravatar.cc/100?img=1"}
+            className="w-6 h-6 md:w-7 md:h-7 rounded-full object-cover object-center flex-shrink-0"
+            alt={user?.username || "comentador"}
+          />
+
+          <input
+            value={comments[post.id] || ""}
+            maxLength={50}
+            onChange={(e) =>
+              setComments((prev) => ({
+                ...prev,
+                [post.id]: e.target.value,
+              }))
+            }
+            onKeyDown={(e) => {
+              const value = comments[post.id] || ""
+              if (e.key === "Enter" && !e.shiftKey && value.trim() !== "") {
+                comentar(post.id)
+              }
+            }}
+            placeholder="Comentar..."
+            className="bg-transparent outline-none text-xs md:text-sm w-full pr-10"
+            style={{ color: "var(--black)" }}
+          />
+
+          {(comments[post.id] || "").trim() !== "" && (
+            <button
+              className="absolute right-2 p-2 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "var(--primary)" }}
+              onClick={() => comentar(post.id)}
+            >
+              {/* trocar por Image do next */}
+              <img src="/icons/enviar.png" alt="enviar" className="w-5 h-5" />
+            </button>
+          )}
+
+        </div>
+
+        <CommentsBox
+          postId={post.id}
+        />
+          </div>
+  )
+})}
+    </section >
   )
 }

@@ -5,24 +5,23 @@ import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { Sidebar } from "@/app/components/sidebar"
 
-
-interface UpdateProfilePayload {
-  email?: string
-  telefone?: string
-  foto?: string
-  senha?: string
-}
-
 export default function PerfilPage() {
   const { update } = useSession()
   const [user, setUser] = useState<User | null>(null)
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    senha: string
+    email: string
+    telefone: string
+    foto: string | File
+  }>({
     senha: "",
     email: "",
     telefone: "",
     foto: "",
   })
+
+  const [preview, setPreview] = useState("")
 
   useEffect(() => {
     async function fetchUser() {
@@ -37,7 +36,7 @@ export default function PerfilPage() {
           telefone: data.user.telefone ?? "",
           foto: data.user.foto ?? "",
         })
-        console.log(data.user)
+        setPreview(data.user.foto ?? "")
       }
     }
 
@@ -48,48 +47,55 @@ export default function PerfilPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const preview = URL.createObjectURL(file)
+    const previewUrl = URL.createObjectURL(file)
+
+    setPreview(previewUrl)
 
     setForm((prev) => ({
       ...prev,
-      foto: preview,
+      foto: file,
     }))
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    const payload: UpdateProfilePayload = {}
+    const formData = new FormData()
 
-    if (form.email) payload.email = form.email
-    if (form.telefone) payload.telefone = form.telefone
-    if (form.foto) payload.foto = form.foto
-    if (form.senha) payload.senha = form.senha
+    if (form.email) formData.append("email", form.email)
+    if (form.telefone) formData.append("telefone", form.telefone)
+    if (form.senha) formData.append("senha", form.senha)
+
+    if (form.foto instanceof File) {
+      formData.append("foto", form.foto)
+    }
 
     try {
       const res = await fetch("/api/users/profile", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       })
 
       const data = await res.json()
 
       if (!res.ok) {
         console.error(data)
+        toast.error("Erro ao atualizar perfil")
         return
       }
+
+      setPreview(data.user.foto)
+
       await update({
-        email: payload.email,
-        telefone: payload.telefone,
-        foto: payload.foto,
+        email: form.email,
+        telefone: form.telefone,
+        foto: data.user.foto,
       })
 
-      console.log("Atualizado:", data)
+      toast.success("Perfil atualizado com sucesso")
     } catch (err) {
       console.error(err)
+      toast.error("Erro de conexão")
     }
   }
 
@@ -105,9 +111,7 @@ export default function PerfilPage() {
       className="min-h-screen flex justify-center items-start py-10 px-4"
       style={{ backgroundColor: "var(--background)" }}
     >
-   
-<Sidebar/>
-
+      <Sidebar />
 
       <div
         className="w-full max-w-3xl rounded-2xl shadow-md p-6 space-y-6"
@@ -115,7 +119,7 @@ export default function PerfilPage() {
       >
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           <img
-            src={user.foto || "/photoProfile/default.jpeg"}
+            src={preview || "/photoProfile/default.jpeg"}
             alt="foto"
             className="w-20 h-20 rounded-full object-cover"
           />
@@ -158,19 +162,13 @@ export default function PerfilPage() {
               Foto de Perfil
             </label>
 
-            <div
-              className="relative"
-              onClick={() => {
-                toast.warning("Ainda não é possivel substituir foto de perfil!")
-              }}
-            >
+            <div className="relative">
               <input
                 type="file"
                 id="upload-foto"
                 accept="image/*"
                 onChange={handleFile}
                 className="hidden"
-                disabled
               />
 
               <label

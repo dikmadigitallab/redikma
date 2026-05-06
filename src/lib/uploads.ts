@@ -45,3 +45,45 @@ export async function uploadImage(
 
   return data.publicUrl
 }
+
+
+
+// função específica para upload de imagem de perfil, que remove a imagem anterior (se existir) para evitar acúmulo de arquivos
+export async function uploadProfileImage(
+  file: File,
+  userId: string,
+  bucket: string
+): Promise<string> {
+  const extension = file.name.split(".").pop() || "png"
+  const filePath = `profile/${userId}.${extension}`
+
+  // remove qualquer arquivo anterior (independente da extensão)
+  const { data: files } = await supabase.storage
+    .from(bucket)
+    .list("profile")
+
+  if (files) {
+    const toDelete = files
+      .filter((f) => f.name.startsWith(userId + "."))
+      .map((f) => `profile/${f.name}`)
+
+    if (toDelete.length > 0) {
+      await supabase.storage.from(bucket).remove(toDelete)
+    }
+  }
+
+  // faz upload sobrescrevendo
+  const { error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file, {
+      upsert: true,
+    })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath)
+
+  return data.publicUrl
+}
