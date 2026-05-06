@@ -3,8 +3,10 @@ import type { NextRequest } from "next/server"
 
 export function proxy(req: NextRequest) {
   const session = req.cookies.get("session")
-
   const isLoginPage = req.nextUrl.pathname.startsWith("/login")
+  const role = req.cookies.get("role")?.value
+
+
 
   // ❌ não logado → manda pro login
   if (!session && !isLoginPage) {
@@ -16,7 +18,6 @@ export function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/intern/feed", req.url))
   }
 
-  return NextResponse.next()
 }
 
 export const config = {
