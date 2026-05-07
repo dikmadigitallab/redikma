@@ -22,10 +22,11 @@ export default function Feed() {
 
 
   return (
-<div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)', }}>
+/* Adicione dvh (dynamic viewport height) se possível para mobile, ou h-screen fixo */
+<div className="h-screen w-full flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
 
-{/* Header - Sticky */}
-<header className="h-14 md:h-16 flex-shrink-0 shadow-sm z-40" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
+{/* Header - h-fixo e flex-shrink-0 para não amassar */}
+<header className="h-14 md:h-16 flex-shrink-0 z-40" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
   <div className="h-full px-4 md:px-[10%] flex items-center justify-between">
     <div className="flex items-center gap-2 md:gap-3">
       <div className="w-8 md:w-10 h-8 md:h-10 rounded-full flex items-center justify-center font-bold text-sm md:text-lg text-white" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
@@ -34,6 +35,7 @@ export default function Feed() {
         <p className="text-xs" style={{ color: 'var(--gray)' }}>Comunicando cultura</p>
       </div>
     </div>
+
     <div className="flex items-center gap-3 md:gap-6">
       <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}>
         <Search size={16} style={{ color: 'var(--gray)' }} />
@@ -49,113 +51,65 @@ export default function Feed() {
         <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: 'var(--warning)' }}>3</span>
       </div>
 
-
-
-<div className="relative">
-  {user?.foto && (
-    <img
-      src={user?.foto}
-      alt="user"
-      onClick={() => setOpen(!open)}
-      className="w-9 h-9 rounded-full object-cover object-center cursor-pointer border-2 border-transparent hover:border-gray-300 transition"
-    />
-  )}
-
-  {open && (
-    <div
-      className="absolute right-0 mt-2 w-40 rounded-xl shadow-lg py-1 z-50"
-      style={{
-        backgroundColor: "var(--white)",
-        border: "1px solid var(--border)"
-      }}
-    >
-      <button
-        onClick={() => router.push("/intern/profile")}
-        className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
-      >
-       Meu perfil
-      </button>
-      <button
-        onClick={() => router.push("/intern/feed")}
-        className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
-      >
-       Feed
-      </button>
-      <button
-        onClick={() => signOut({ callbackUrl: "/login" })}
-        className="w-full text-left px-4 py-2 text-sm rounded-lg transition hover:bg-red-500 hover:text-white active:bg-red-500 active:text-white"
-      >
-        Sair
-      </button>
-    </div>
-  )}
-</div>
-
-      
-   
+      <div className="relative">
+        {user?.foto && (
+          <img
+            src={user?.foto}
+            alt="user"
+            onClick={() => setOpen(!open)}
+            className="w-9 h-9 rounded-full object-cover cursor-pointer border-2 border-transparent hover:border-gray-300 transition"
+          />
+        )}
+        {open && (
+          <div className="absolute right-0 mt-2 w-40 rounded-xl shadow-lg py-1 z-50" style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}>
+            <button onClick={() => router.push("/intern/profile")} className="w-full text-left px-4 py-2 text-sm transition hover:bg-red-500 hover:text-white">Meu perfil</button>
+            <button onClick={() => router.push("/intern/feed")} className="w-full text-left px-4 py-2 text-sm transition hover:bg-red-500 hover:text-white">Feed</button>
+            <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full text-left px-4 py-2 text-sm transition hover:bg-red-500 hover:text-white">Sair</button>
+          </div>
+        )}
+      </div>
     </div>
   </div>
 </header>
 
-
-
-{/* Main Content Area */}
+{/* Main Content Area - flex-1 garante que ocupa o resto da tela abaixo do header */}
 <div className="flex-1 flex overflow-hidden relative">
 
+  {/* Container do Centro - overflow-hidden aqui é vital */}
+  <div className="flex-1 flex px-4 md:px-[5%] lg:px-[5%] py-4 md:py-6 gap-4 md:gap-6 overflow-hidden">
 
-{/* 
-  <aside className="hidden lg:flex lg:w-96 mx-6 flex-shrink-0 p-4 lg:p-6 border-r overflow-hidden" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--white)' }}>
-    <Sidebar />
-  </aside>
-
- */}
-
-  {/* Centro - Responsivo */}
-  <div className="flex-1  flex px-4  md:px-[5%] lg:px-[5%] py-4 md:py-6 gap-4 md:gap-6 overflow-hidden">
-
-    {/* Feed - Padding bottom aumentado no mobile para não cobrir comentários pelo botão central */}
-<main className="flex-1  overflow-y-auto pb-24 mx-auto w-full md:pb-6">
+    {/* Feed Principal - overflow-y-auto faz a rolagem ficar SÓ aqui */}
+    <main className="flex-1 h-full overflow-y-auto pb-24 md:pb-6 scrollbar-hide">
       <FeedNoticias onRefresh={() => setRefreshFeed(k => k + 1)} />
     </main>
 
-    {/* Stories - Desktop only */}
-    <aside className="hidden lg:flex lg:flex-col lg:w-[30%] p-4 mx-0 flex-shrink-0 overflow-y-auto" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '0.75rem' }}>
-      <div className="p-6">
+    {/* Sidebar Direita - h-full e overflow-y-auto para rolar independente */}
+    <aside className="hidden lg:flex lg:flex-col lg:w-[350px] h-full flex-shrink-0 overflow-y-auto" style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '0.75rem' }}>
+      <div className="p-4">
         <RightSidebar />
       </div>
     </aside>
-
   </div>
 
-  {/* Botão de nova postagem - Ajustado posicionamento para evitar obstrução central excessiva */}
+  {/* Botão Flutuante Mobile */}
   <div
-  className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full flex items-center justify-center cursor-pointer shadow-lg active:scale-90 transition-all z-50"
-  style={{
-    background: 'linear-gradient(135deg, #60a5fa 0%, #34d399 50%, #facc15 100%)',
-    border: '2px solid var(--white)'
-  }}
-  onClick={() => {
-    if (window.innerWidth >= 1024) {
-      setOpenModal(true)
-      return
-    }
-    router.push("/intern/feed/new-post")
-  }}
->
-  <Plus 
-    size={22} 
-    strokeWidth={2.5} 
-    className="text-white relative z-10" 
-  />
+    className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full flex items-center justify-center cursor-pointer shadow-xl active:scale-90 transition-all z-50"
+    style={{
+      background: 'linear-gradient(135deg, #60a5fa 0%, #34d399 50%, #facc15 100%)',
+      border: '2px solid var(--white)'
+    }}
+    onClick={() => {
+      if (window.innerWidth >= 1024) { setOpenModal(true); return; }
+      router.push("/intern/feed/new-post")
+    }}
+  >
+    <Plus size={28} strokeWidth={2.5} className="text-white" />
+  </div>
 </div>
 
-</div>
-
-
-
-{/* Footer - Desktop only */}
-<Footer />
-
+{/* Footer - Se o footer for importante, ele deve estar aqui ou dentro do Sidebar */}
+{/* <Footer /> */}
+<Footer/>
 <CreatNewPost
   open={openModal}
   onClose={() => setOpenModal(false)}

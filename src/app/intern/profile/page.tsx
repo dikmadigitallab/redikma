@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { Sidebar } from "@/app/components/sidebar"
+import { Editor } from "@/app/components/photo-editor"
 
 export default function PerfilPage() {
   const { update } = useSession()
@@ -13,7 +14,7 @@ export default function PerfilPage() {
     senha: string
     email: string
     telefone: string
-    foto: string | File
+    foto: string | File | Blob // Alterado para aceitar Blob do editor
   }>({
     senha: "",
     email: "",
@@ -22,6 +23,8 @@ export default function PerfilPage() {
   })
 
   const [preview, setPreview] = useState("")
+  const [tempFile, setTempFile] = useState<File | null>(null) // Arquivo bruto para o editor
+  const [showEditor, setShowEditor] = useState(false)
 
   useEffect(() => {
     async function fetchUser() {
@@ -43,31 +46,38 @@ export default function PerfilPage() {
     fetchUser()
   }, [])
 
+  // 1. Quando seleciona o arquivo, abre o editor em vez de salvar direto
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const previewUrl = URL.createObjectURL(file)
+    setTempFile(file)
+    setShowEditor(true)
+  }
 
+  // 2. Recebe o resultado do Editor
+  function handleSaveEditedImage(blob: Blob) {
+    const previewUrl = URL.createObjectURL(blob)
     setPreview(previewUrl)
-
+    
     setForm((prev) => ({
       ...prev,
-      foto: file,
+      foto: blob, // Guardamos o Blob editado
     }))
+    setShowEditor(false)
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-
     const formData = new FormData()
 
     if (form.email) formData.append("email", form.email)
     if (form.telefone) formData.append("telefone", form.telefone)
     if (form.senha) formData.append("senha", form.senha)
 
-    if (form.foto instanceof File) {
-      formData.append("foto", form.foto)
+    // Se a foto for um File ou Blob (resultado do editor)
+    if (form.foto instanceof File || form.foto instanceof Blob) {
+      formData.append("foto", form.foto, "profile.jpg")
     }
 
     try {
@@ -79,7 +89,6 @@ export default function PerfilPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        console.error(data)
         toast.error("Erro ao atualizar perfil")
         return
       }
@@ -94,7 +103,6 @@ export default function PerfilPage() {
 
       toast.success("Perfil atualizado com sucesso")
     } catch (err) {
-      console.error(err)
       toast.error("Erro de conexão")
     }
   }
@@ -117,11 +125,26 @@ export default function PerfilPage() {
         className="w-full max-w-3xl rounded-2xl shadow-md p-6 space-y-6"
         style={{ backgroundColor: "var(--white)" }}
       >
+        {/* Modal do Editor */}
+        {showEditor && tempFile && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+            <div className="bg-white p-6 rounded-3xl max-w-md w-full shadow-2xl">
+              <h2 className="text-lg font-bold mb-4 text-center">Editar Foto de Perfil</h2>
+              <Editor
+                imageFile={tempFile}
+                aspectRatio="1/1"
+                onSave={handleSaveEditedImage}
+                onCancel={() => setShowEditor(false)}
+              />
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           <img
             src={preview || "/photoProfile/default.jpeg"}
             alt="foto"
-            className="w-20 h-20 rounded-full object-cover"
+            className="w-20 h-20 rounded-full object-cover border-2 border-primary-dark"
           />
           <div>
             <h1 className="text-xl font-semibold" style={{ color: "var(--black)" }}>
@@ -180,15 +203,13 @@ export default function PerfilPage() {
                   color: "var(--primary-dark)",
                 }}
               >
-                Escolher nova foto...
+                Escolher e editar nova foto...
               </label>
             </div>
           </div>
 
           <div>
-            <label className="text-sm" style={{ color: "var(--gray)" }}>
-              Email
-            </label>
+            <label className="text-sm" style={{ color: "var(--gray)" }}>Email</label>
             <input
               type="email"
               name="email"
@@ -204,9 +225,7 @@ export default function PerfilPage() {
           </div>
 
           <div>
-            <label className="text-sm" style={{ color: "var(--gray)" }}>
-              Telefone
-            </label>
+            <label className="text-sm" style={{ color: "var(--gray)" }}>Telefone</label>
             <input
               type="text"
               name="telefone"
@@ -222,9 +241,7 @@ export default function PerfilPage() {
           </div>
 
           <div>
-            <label className="text-sm" style={{ color: "var(--gray)" }}>
-              Nova senha
-            </label>
+            <label className="text-sm" style={{ color: "var(--gray)" }}>Nova senha</label>
             <input
               type="password"
               name="senha"
@@ -241,7 +258,7 @@ export default function PerfilPage() {
 
           <button
             type="submit"
-            className="w-full py-2 rounded-lg font-medium hover:opacity-90"
+            className="w-full py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
             style={{ backgroundColor: "var(--primary-dark)", color: "var(--white)" }}
           >
             Salvar alterações

@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { RiImageEditFill } from "react-icons/ri"
+import { RiImageEditFill, RiImageAddLine, RiCloseLine } from "react-icons/ri"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
+import { Editor } from "./photo-editor"
 
 type Props = {
   onCreated?: () => void
@@ -14,84 +15,56 @@ export function PostBar({ onCreated, onRefresh }: Props) {
   const [open, setOpen] = useState(false)
   const [text, setText] = useState("")
   const [image, setImage] = useState<File | null>(null)
+  const [finalBlob, setFinalBlob] = useState<Blob | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const [showEditor, setShowEditor] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const { data: session } = useSession()
   const user = session?.user
 
-  const boxRef = useRef<HTMLDivElement | null>(null)
+  // Foca no textarea automaticamente ao abrir
+  useEffect(() => {
+    if (open) textareaRef.current?.focus()
+  }, [open])
 
-  function handleImage(file: File | null) {
-    setImage(file)
-
+  function handleImageSelection(file: File | null) {
     if (file) {
-      setPreview(URL.createObjectURL(file))
-    } else {
-      setPreview(null)
+      setImage(file)
+      setShowEditor(true)
     }
   }
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (!boxRef.current) return
-
-      if (!boxRef.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
-    }
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [open])
+  function handleSaveEditedImage(blob: Blob) {
+    setFinalBlob(blob)
+    setPreview(URL.createObjectURL(blob))
+    setShowEditor(false)
+  }
 
   async function handleSubmit() {
-    if (!user?.id) {
-      toast.error("Usuário não identificado")
-      return
-    }
-
-    if (!text.trim() && !image) {
-      toast.warning("Escreva algo ou adicione uma imagem")
-      return
-    }
+    if (!user?.id) return toast.error("Usuário não identificado")
+    if (!text.trim() && !finalBlob) return toast.warning("Escreva algo ou adicione uma imagem")
 
     setLoading(true)
-
     try {
       const formData = new FormData()
-
       formData.append("label", text)
       formData.append("authorId", user.id)
       formData.append("postador", user.username)
       formData.append("duration", "")
 
-      if (image) {
-        formData.append("image", image)
+      if (finalBlob) {
+        const file = new File([finalBlob], "post.jpg", { type: "image/jpeg" })
+        formData.append("image", file)
       }
 
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        body: formData,
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        toast.error(data.error || "Erro ao criar post")
-        return
-      }
+      const res = await fetch("/api/posts", { method: "POST", body: formData })
+      if (!res.ok) throw new Error()
 
       toast.success("Post criado com sucesso!")
-      setText("")
-      setImage(null)
-      setPreview(null)
-      setOpen(false)
-
+      resetForm()
       onCreated?.()
       onRefresh?.()
     } catch {
@@ -101,83 +74,127 @@ export function PostBar({ onCreated, onRefresh }: Props) {
     }
   }
 
+  function resetForm() {
+    setText("")
+    setImage(null)
+    setFinalBlob(null)
+    setPreview(null)
+    setOpen(false)
+  }
+
   return (
-<div className="relative hidden md:block">
-  <div
-    onClick={() => setOpen((v) => !v)}
-    className="flex items-center gap-2 md:gap-3 rounded-lg md:rounded-xl shadow-sm p-3 md:p-4 cursor-pointer"
-    style={{
-      backgroundColor: "var(--white)",
-      border: "1px solid var(--border)",
-    }}
-  >
-    <RiImageEditFill
-      className="w-5 md:w-6 h-5 md:h-6 flex-shrink-0"
-      style={{ color: "var(--secondary)" }}
-    />
-
-    <div className="text-sm" style={{ color: "var(--gray)" }}>
-      No que você está pensando?
-    </div>
-  </div>
-
-  {open && (
-    <div
-      ref={boxRef}
-      className="absolute z-50 mt-2 w-full rounded-xl shadow-lg p-4 space-y-3"
-      style={{
-        backgroundColor: "var(--white)",
-        border: "1px solid var(--border)",
-      }}
-    >
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Escreva seu post..."
-        className="w-full min-h-24 resize-none outline-none text-sm p-2 rounded-lg"
-        style={{
-          backgroundColor: "var(--background)",
-          color: "var(--gray)",
-        }}
-      />
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => handleImage(e.target.files?.[0] || null)}
-      />
-
-      {preview && (
-        <img
-          src={preview}
-          className="w-full max-h-56 object-cover rounded-lg"
-          alt="preview"
-        />
+    <div className="w-full hidden md:block transition-all duration-300">
+      {/* Overlay do Editor */}
+      {showEditor && image && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-lg font-bold mb-4 text-center">Editar Imagem</h3>
+            <Editor
+              imageFile={image}
+              onSave={handleSaveEditedImage}
+              onCancel={() => {
+                setShowEditor(false)
+                setImage(null)
+              }}
+              aspectRatio="1/1"
+            />
+          </div>
+        </div>
       )}
 
-      <div className="flex justify-end gap-2">
-        <button
-          onClick={() => setOpen(false)}
-          className="px-3 py-1 text-sm rounded-lg"
-          style={{ background: "var(--background)" }}
-        >
-          cancelar
-        </button>
+      <div 
+        className="rounded-2xl border transition-all duration-200 overflow-hidden"
+        style={{ 
+          backgroundColor: "var(--white)", 
+          borderColor: open ? "var(--secondary)" : "var(--border)",
+          boxShadow: open ? "0 4px 20px rgba(0,0,0,0.05)" : "none"
+        }}
+      >
+        {/* ESTADO FECHADO: Apenas a barra simples */}
+        {!open ? (
+          <div
+            onClick={() => setOpen(true)}
+            className="flex items-center gap-3 p-4 cursor-pointer hover:bg-neutral-50/50 transition"
+          >
+            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
+              <RiImageEditFill className="w-5 h-5" style={{ color: "var(--secondary)" }} />
+            </div>
+            <div className="text-sm font-medium" style={{ color: "var(--gray)" }}>
+              No que você está pensando, {user?.nome?.split(' ')[0]}?
+            </div>
+          </div>
+        ) : (
+          /* ESTADO ABERTO: Formulário completo expandido no lugar */
+          <div className="p-4 space-y-4">
+            <div className="flex items-start gap-3">
+              <img 
+                src={session?.user?.foto || "/photoProfile/default.jpeg"} 
+                className="w-10 h-10 rounded-full object-cover" 
+                alt="Me"
+              />
+              <textarea
+                ref={textareaRef}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="No que você está pensando?"
+                className="w-full min-h-[120px] resize-none outline-none text-base py-2"
+                style={{ backgroundColor: "transparent", color: "var(--black)" }}
+              />
+            </div>
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="px-3 py-1 text-sm rounded-lg text-white"
-          style={{
-            backgroundColor: "#2563eb",
-            color: "#fff",
-          }}
-        >
-          {loading ? "enviando..." : "publicar"}
-        </button>
+            {/* Preview da Imagem Editada */}
+            {preview && (
+              <div className="relative ml-13 rounded-xl overflow-hidden border group">
+                <img src={preview} className="w-full max-h-[350px] object-cover" alt="preview" />
+                <button
+                  onClick={() => { setPreview(null); setFinalBlob(null); }}
+                  className="absolute top-2 right-2 bg-black/50 hover:bg-red-500 text-white p-1.5 rounded-full transition"
+                >
+                  <RiCloseLine className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-3 border-t">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-neutral-100 transition text-sm font-medium"
+                  style={{ color: "var(--secondary)" }}
+                >
+                  <RiImageAddLine className="w-5 h-5" />
+                  <span>Foto</span>
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageSelection(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={resetForm}
+                  className="px-4 py-2 text-sm font-bold rounded-full hover:bg-neutral-100 transition"
+                  style={{ color: "var(--gray)" }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading || (!text.trim() && !finalBlob)}
+                  className="px-6 py-2 text-sm font-bold rounded-full text-white transition disabled:opacity-50 shadow-md active:scale-95"
+                  style={{ backgroundColor: "var(--secondary)" }}
+                >
+                  {loading ? "Postando..." : "Publicar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
-  )}
-</div>
   )
 }
