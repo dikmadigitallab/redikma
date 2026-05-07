@@ -9,6 +9,8 @@ import { RightSidebar } from "../../components/stories"
 import { FeedNoticias } from "../../components/feed"
 import { Footer} from '../../components/footer'
 import { useSession, signOut } from "next-auth/react"
+import { Header } from "@/app/components/feedHeader"
+import { FloatButtonMobile } from "@/app/components/floatButtonMobile"
 
 export default function Feed() {
   const [openModal, setOpenModal] = useState(false)
@@ -26,51 +28,7 @@ export default function Feed() {
 <div className="h-screen w-full flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--background)' }}>
 
 {/* Header - h-fixo e flex-shrink-0 para não amassar */}
-<header className="h-14 md:h-16 flex-shrink-0 z-40" style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--border)' }}>
-  <div className="h-full px-4 md:px-[10%] flex items-center justify-between">
-    <div className="flex items-center gap-2 md:gap-3">
-      <div className="w-8 md:w-10 h-8 md:h-10 rounded-full flex items-center justify-center font-bold text-sm md:text-lg text-white" style={{ backgroundColor: 'var(--primary-dark)' }}>D</div>
-      <div className="hidden sm:block">
-        <h1 className="text-sm md:text-lg font-bold" style={{ color: 'var(--primary-dark)' }}>ReDikma</h1>
-        <p className="text-xs" style={{ color: 'var(--gray)' }}>Comunicando cultura</p>
-      </div>
-    </div>
-
-    <div className="flex items-center gap-3 md:gap-6">
-      <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}>
-        <Search size={16} style={{ color: 'var(--gray)' }} />
-        <input
-          type="text"
-          placeholder="Pesquisar..."
-          className="bg-transparent outline-none text-sm w-32 lg:w-40"
-          style={{ color: 'var(--black)' }}
-        />
-      </div>
-      <div className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition">
-        <Bell size={18} style={{ color: 'var(--gray)' }} />
-        <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full text-white" style={{ backgroundColor: 'var(--warning)' }}>3</span>
-      </div>
-
-      <div className="relative">
-        {user?.foto && (
-          <img
-            src={user?.foto}
-            alt="user"
-            onClick={() => setOpen(!open)}
-            className="w-9 h-9 rounded-full object-cover cursor-pointer border-2 border-transparent hover:border-gray-300 transition"
-          />
-        )}
-        {open && (
-          <div className="absolute right-0 mt-2 w-40 rounded-xl shadow-lg py-1 z-50" style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}>
-            <button onClick={() => router.push("/intern/profile")} className="w-full text-left px-4 py-2 text-sm transition hover:bg-red-500 hover:text-white">Meu perfil</button>
-            <button onClick={() => router.push("/intern/feed")} className="w-full text-left px-4 py-2 text-sm transition hover:bg-red-500 hover:text-white">Feed</button>
-            <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full text-left px-4 py-2 text-sm transition hover:bg-red-500 hover:text-white">Sair</button>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-</header>
+<Header/>
 
 {/* Main Content Area - flex-1 garante que ocupa o resto da tela abaixo do header */}
 <div className="flex-1 flex overflow-hidden relative">
@@ -92,24 +50,13 @@ export default function Feed() {
   </div>
 
   {/* Botão Flutuante Mobile */}
-  <div
-    className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full flex items-center justify-center cursor-pointer shadow-xl active:scale-90 transition-all z-50"
-    style={{
-      background: 'linear-gradient(135deg, #60a5fa 0%, #34d399 50%, #facc15 100%)',
-      border: '2px solid var(--white)'
-    }}
-    onClick={() => {
-      if (window.innerWidth >= 1024) { setOpenModal(true); return; }
-      router.push("/intern/feed/new-post")
-    }}
-  >
-    <Plus size={28} strokeWidth={2.5} className="text-white" />
-  </div>
+<FloatButtonMobile callback={setOpenModal} />
 </div>
 
 {/* Footer - Se o footer for importante, ele deve estar aqui ou dentro do Sidebar */}
 {/* <Footer /> */}
 <Footer/>
+{/* modal de criação de posts */}
 <CreatNewPost
   open={openModal}
   onClose={() => setOpenModal(false)}

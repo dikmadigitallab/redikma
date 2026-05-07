@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo } from "react"
 import { toast } from "sonner"
 
 interface EditorProps {
@@ -19,7 +19,10 @@ type Settings = {
 };
 
 export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: EditorProps) {
-  const [preview, setPreview] = useState<string | null>(null)
+  const preview = useMemo(() => {
+    if (!imageFile) return ''
+    return URL.createObjectURL(imageFile)
+  }, [imageFile])
   const [zoom, setZoom] = useState(1)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
@@ -39,12 +42,10 @@ export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: Edi
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (imageFile) {
-      const url = URL.createObjectURL(imageFile)
-      setPreview(url)
-      return () => URL.revokeObjectURL(url)
+    return () => {
+      if (preview) URL.revokeObjectURL(preview)
     }
-  }, [imageFile])
+  }, [preview])
 
   // Lógica de limites e movimento (mantida do seu código original)
   function getLimits(img: HTMLImageElement, container: DOMRect, scale: number) {

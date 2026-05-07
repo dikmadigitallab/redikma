@@ -1,14 +1,15 @@
 "use client"
 
-import { useRouter, usePathname } from "next/navigation"
+import {  usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { RiImageEditFill } from "react-icons/ri"
+
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { ImageModal } from "./modal-view-photo"
+import { PostOptions } from "./postDelete"
 
 type Post = {
   id: string
@@ -242,8 +243,46 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }, [posts])
 
 
+//deletar post
+async function handleDeletePost(postId: string) {
+  // Verifica se o usuário está logado antes de tentar deletar
+  if (!session?.user?.id) {
+    return toast.error("Você precisa estar logado para excluir um post");
+  }
 
+  // Confirmação simples para evitar exclusões acidentais
+  if (!confirm("Tem certeza que deseja excluir esta postagem?")) return;
 
+  try {
+    // Ajuste da URL para usar Query Params conforme esperado pelo seu DELETE:
+    // /api/posts?postId=XXX&userId=YYY
+    const res = await fetch(`/api/posts?postId=${postId}`, {
+      method: "DELETE",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      // Usa a mensagem de erro vinda do servidor (ex: "Sem permissão")
+      throw new Error(data.error || "Erro ao deletar post");
+    }
+
+    toast.success("Postagem excluída com sucesso!");
+    await handleRefresh();
+     
+    
+    // Atualiza o feed após a exclusão
+   
+    // ou handleRefresh(), dependendo de como está nomeado no seu componente
+    
+  } catch (error: any) {
+    toast.error(error.message || "Erro de conexão ao excluir post");
+  }
+}
+//editar post
+async function handleEditPost(postId: string) {
+  toast.info('Em desenvolvimento')
+}
 
 
   return (
@@ -268,6 +307,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
             className="rounded-lg md:rounded-xl shadow-sm p-3 md:p-4 space-y-3"
             style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}
           >
+        <PostOptions postId={post.id} onDelete={handleDeletePost} onEdit={handleEditPost} />
             <div
               className="flex items-center gap-2 md:gap-3"
               style={{ paddingBottom: "0.75rem", borderBottom: "1px solid var(--border)" }}

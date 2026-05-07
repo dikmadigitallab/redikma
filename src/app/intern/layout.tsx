@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <div
-      className="min-h-screen w-full"
+      className="fixed min-h-screen w-full"
       style={{ backgroundColor: "var(--background)" }}
     >
       <Sidebar />
