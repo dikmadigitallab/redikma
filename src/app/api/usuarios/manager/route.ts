@@ -7,10 +7,10 @@ import { authOptions } from "../../auth/[...nextauth]/route"
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
 
-  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  if (!(session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM")) {
+    console.log("regra de usuario: ", session?.user.role)
   return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
-
 
   try {
     const { searchParams } = new URL(req.url)
@@ -79,7 +79,8 @@ export async function PUT(req: Request) {
 
     const session = await getServerSession(authOptions)
 
-  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  if (!(session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM")) {
+    console.log("regra de usuario: ", session?.user.role)
   return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 
@@ -162,10 +163,10 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   const session = await getServerSession(authOptions)
 
-  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  if (!(session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM")) {
+    console.log("regra de usuario: ", session?.user.role)
   return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
-
 
   try {
     const { searchParams } = new URL(req.url)

@@ -5,7 +5,7 @@ import { useEffect } from "react"
 type Props = {
   image: string | null
   open: boolean
-  onClose: () => void
+  onClose: () => void 
 }
 
 export function ImageModal({ image, open, onClose }: Props) {

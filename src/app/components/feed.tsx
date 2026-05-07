@@ -1,7 +1,8 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { RiImageEditFill } from "react-icons/ri"
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
@@ -36,6 +37,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [refreshKey, setRefreshKey] = useState(0)
   const pathname = usePathname()
 
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [openModal, setOpenModal] = useState(false)
 
@@ -48,8 +50,6 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
     setOpenModal(false)
     setSelectedImage(null)
   }
-
-
 
   useEffect(() => {
     async function loadPosts() {
@@ -317,6 +317,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 />
               </div>
             )}
+
             <div
               className="flex items-center justify-between text-xs md:text-sm gap-3"
               style={{
@@ -429,17 +430,19 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
             <CommentsBox
               postId={post.id}
+              postAuthorId={post.author.id}
             />
           </div>
         )
       })}
-      <ImageModal
-  image={selectedImage}
-  open={openModal}
-  onClose={handleCloseImage}
-/>
-    </section>
 
-    
+
+
+      <ImageModal
+        image={selectedImage}
+        open={openModal}
+        onClose={handleCloseImage}
+      />
+    </section >
   )
 }

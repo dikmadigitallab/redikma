@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { Editor } from "@/app/components/photo-editor"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -13,20 +14,13 @@ type Props = {
 
 export default function CreatePostPage({ onRefresh }: Props) {
   const [text, setText] = useState("")
-  const [image, setImage] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [isRecurring, setIsRecurring] = useState(false)
+  const [image, setImage] = useState<File | null>(null) // Arquivo original
+  const [finalBlob, setFinalBlob] = useState<Blob | null>(null) // Resultado do Editor
+  const [showEditor, setShowEditor] = useState(false)
+  
   const [isFixed, setIsFixed] = useState(false)
   const [duration, setDuration] = useState<DurationType>("24h")
   const [loading, setLoading] = useState(false)
-
-  const [zoom, setZoom] = useState(1)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [dragging, setDragging] = useState(false)
-  const [isInteracting, setIsInteracting] = useState(false)
-  const [aspectRatio, setAspectRatio] = useState("1/1")
-
-  const dragStart = useRef({ x: 0, y: 0 })
 
   const { data: session } = useSession()
   const router = useRouter()
@@ -37,10 +31,11 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
 
+  // Gerenciamento da Câmera
   useEffect(() => {
-    if (!preview) startCamera()
+    if (!finalBlob && !showEditor) startCamera()
     return () => stopCamera()
-  }, [preview])
+  }, [finalBlob, showEditor])
 
   async function startCamera() {
     try {
@@ -60,99 +55,66 @@ export default function CreatePostPage({ onRefresh }: Props) {
     setStream(null)
   }
 
+  // Handlers de imagem
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     setImage(file)
-    setPreview(URL.createObjectURL(file))
+    setShowEditor(true)
     stopCamera()
   }
 
   function takePhoto() {
     if (!videoRef.current || !canvasRef.current) return
-
     const video = videoRef.current
     const canvas = canvasRef.current
-
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
-
     const ctx = canvas.getContext("2d")
     if (!ctx) return
-
     ctx.drawImage(video, 0, 0)
 
     canvas.toBlob(blob => {
       if (!blob) return
       const file = new File([blob], "photo.jpg", { type: "image/jpeg" })
       setImage(file)
-      setPreview(URL.createObjectURL(blob))
+      setShowEditor(true)
       stopCamera()
     }, "image/jpeg")
   }
 
   function resetPhoto() {
     setImage(null)
-    setPreview(null)
-    setZoom(1)
-    setPosition({ x: 0, y: 0 })
-  }
-
-  function handleZoom(e: React.WheelEvent<HTMLDivElement>) {
-    e.preventDefault()
-    setIsInteracting(true)
-    setZoom(prev => Math.min(Math.max(prev + e.deltaY * -0.001, 1), 3))
-  }
-
-  function startDrag(e: React.MouseEvent<HTMLDivElement>) {
-    setDragging(true)
-    setIsInteracting(true)
-    dragStart.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
-    }
-  }
-
-  function onDrag(e: React.MouseEvent<HTMLDivElement>) {
-    if (!dragging) return
-    setPosition({
-      x: e.clientX - dragStart.current.x,
-      y: e.clientY - dragStart.current.y
-    })
-  }
-
-  function endDrag() {
-    setDragging(false)
-    setTimeout(() => setIsInteracting(false), 300)
+    setFinalBlob(null)
+    setShowEditor(false)
   }
 
   async function handleSubmit() {
     if (!user?.id) return toast.error("Usuário não identificado")
-    if (!text && !image) return toast.warning("Adicione conteúdo")
+    if (!text && !finalBlob) return toast.warning("Adicione conteúdo")
 
     setLoading(true)
-
     try {
       const formData = new FormData()
       formData.append("label", text)
       formData.append("authorId", user.id)
       formData.append("duration", isFixed ? "" : duration)
-    
-      formData.append("postador", user.username)
+      formData.append("postador", user?.nome || user?.email || "anonimo")
 
-      if (image) formData.append("image", image)
+      if (finalBlob) {
+        const finalFile = new File([finalBlob], "post.jpg", { type: "image/jpeg" })
+        formData.append("image", finalFile)
+      }
 
       const res = await fetch("/api/posts", {
         method: "POST",
         body: formData
       })
 
-      if (!res.ok) {
-        const data = await res.json()
-        return toast.error(data.error || "Erro")
-      }
+      if (!res.ok) throw new Error()
 
-      toast.success("Post criado com sucesso!")
+      toast.success("Post criado com sucesso")
+      if (onRefresh) onRefresh()
       router.push("/intern/feed")
     } catch {
       toast.error("Erro ao publicar")
@@ -162,169 +124,97 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white flex flex-col">
-      
-      {/* HEADER */}
-      <header className="sticky top-0 z-10 backdrop-blur-xl bg-neutral-950/70 border-b border-neutral-800 px-6 py-4 flex items-center justify-between">
-        <button onClick={() => window.history.back()} className="text-sm text-neutral-400 hover:text-white transition">
-          Voltar
-        </button>
-        <h1 className="text-sm font-medium tracking-wide">Nova postagem</h1>
+    <main className="min-h-screen bg-[#F5F5F7] text-black flex flex-col">
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
+        <button onClick={() => window.history.back()} className="text-sm text-neutral-500 hover:text-black transition">Voltar</button>
+        <h1 className="text-sm font-semibold tracking-wide">Nova postagem</h1>
         <div className="w-10" />
       </header>
 
-      <section className="flex-1 w-full max-w-xl mx-auto px-4 py-6 space-y-6">
-
-        {/* INPUT TEXTO */}
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 focus-within:border-neutral-600 transition">
+      <section className="flex-1 w-full max-w-lg mx-auto px-5 py-8 space-y-8">
+        {/* Texto do Post */}
+        <div className="rounded-3xl bg-white border border-neutral-200 p-5 shadow-sm">
           <textarea
             placeholder="Compartilhe algo..."
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full bg-transparent outline-none text-sm placeholder:text-neutral-500 resize-none h-24"
+            className="w-full bg-transparent outline-none text-sm resize-none h-24"
           />
         </div>
 
-        {/* MIDIA */}
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 space-y-4">
+        {/* Área de Imagem / Editor */}
+        <div className="rounded-3xl bg-white border border-neutral-200 p-4 shadow-sm space-y-4">
+          
+          {/* 1. Modo Editor Aberto */}
+          {showEditor && image && (
+            <Editor 
+              imageFile={image}
+              onSave={(blob) => {
+                setFinalBlob(blob)
+                setShowEditor(false)
+              }}
+              onCancel={() => {
+                setShowEditor(false)
+                setImage(null)
+              }}
+            />
+          )}
 
-          {!preview && (
+          {/* 2. Modo Câmera (Nada selecionado) */}
+          {!showEditor && !finalBlob && (
             <>
-              <div className="rounded-2xl overflow-hidden bg-black border border-neutral-800">
+              <div className="rounded-3xl overflow-hidden bg-black border">
                 <video ref={videoRef} autoPlay playsInline className="w-full h-72 object-cover" />
               </div>
-
               <div className="flex gap-3">
-                <button
-                  onClick={takePhoto}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-medium hover:opacity-90 active:scale-[0.98] transition"
-                >
+                <button onClick={takePhoto} className="flex-1 py-3 rounded-2xl bg-black text-white text-sm font-medium">
                   Tirar foto
                 </button>
-
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 py-3 rounded-xl border border-neutral-700 text-sm font-medium hover:bg-neutral-800 transition"
-                >
+                <button onClick={() => fileInputRef.current?.click()} className="flex-1 py-3 rounded-2xl border text-sm font-medium">
                   Galeria
                 </button>
               </div>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFile}
-                className="hidden"
-              />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
             </>
           )}
 
-          {preview && (
-            <>
-              <div className="relative rounded-2xl overflow-hidden bg-black border border-neutral-800" style={{ aspectRatio }}>
-                <img
-                  src={preview}
-                  onWheel={handleZoom}
-                  onMouseDown={startDrag}
-                  onMouseMove={onDrag}
-                  onMouseUp={endDrag}
-                  onMouseLeave={endDrag}
-                  className="absolute w-full h-full object-cover cursor-grab active:cursor-grabbing"
-                  style={{
-                    transform: `scale(${zoom}) translate(${position.x}px, ${position.y}px)`
-                  }}
+          {/* 3. Modo Preview (Imagem já editada) */}
+          {!showEditor && finalBlob && (
+            <div className="space-y-4">
+              <div className="rounded-3xl overflow-hidden border bg-neutral-100">
+                <img 
+                  src={URL.createObjectURL(finalBlob)} 
+                  alt="Final" 
+                  className="w-full aspect-square object-cover"
                 />
-
-                {isInteracting && (
-                  <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
-                    {Array.from({ length: 9 }).map((_, i) => (
-                      <div key={i} className="border border-white/20" />
-                    ))}
-                  </div>
-                )}
               </div>
-
-              <div className="flex gap-2">
-                {["1/1", "4/5", "16/9"].map(r => (
-                  <button
-                    key={r}
-                    onClick={() => setAspectRatio(r)}
-                    className={`flex-1 py-2 rounded-lg text-xs transition ${
-                      aspectRatio === r
-                        ? "bg-white text-black"
-                        : "bg-neutral-800 text-neutral-400"
-                    }`}
-                  >
-                    {r}
-                  </button>
-                ))}
+              <div className="flex justify-between items-center px-2">
+                <button onClick={() => setShowEditor(true)} className="text-xs font-medium text-blue-600">
+                  Editar novamente
+                </button>
+                <button onClick={resetPhoto} className="text-xs font-medium text-red-500">
+                  Remover imagem
+                </button>
               </div>
-
-              <input
-                type="range"
-                min={1}
-                max={3}
-                step={0.01}
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                className="w-full accent-white"
-              />
-
-              <button onClick={resetPhoto} className="text-xs text-red-400">
-                Remover imagem
-              </button>
-            </>
+            </div>
           )}
 
           <canvas ref={canvasRef} className="hidden" />
         </div>
-
-        {/* CONFIG */}
-        <div className="rounded-2xl bg-neutral-900 border border-neutral-800 p-4 space-y-4 text-sm">
-          <div className="flex justify-between">
-            <span className="text-neutral-400">Post recorrente</span>
-            <input type="checkbox" checked={isRecurring} onChange={(e) => setIsRecurring(e.target.checked)} />
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-neutral-400">Post fixo</span>
-            <input type="checkbox" checked={isFixed} onChange={(e) => setIsFixed(e.target.checked)} />
-          </div>
-
-          {!isFixed && (
-            <select
-              value={duration}
-              onChange={(e) => setDuration(e.target.value as DurationType)}
-              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg p-2 text-sm"
-            >
-              <option value="1h">1 hora</option>
-              <option value="24h">24 horas</option>
-              <option value="7d">7 dias</option>
-            </select>
-          )}
-        </div>
-
       </section>
 
-      {/* FOOTER */}
-      <footer className="sticky bottom-0 backdrop-blur-xl bg-neutral-950/80 border-t border-neutral-800 p-4 flex gap-3">
-        <button
-          onClick={() => window.history.back()}
-          className="flex-1 py-3 rounded-xl border border-neutral-700 text-sm hover:bg-neutral-800 transition"
-        >
+      <footer className="sticky bottom-0 bg-white border-t p-4 flex gap-3">
+        <button onClick={() => window.history.back()} className="flex-1 py-3 border rounded-2xl text-sm font-medium">
           Cancelar
         </button>
-
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-medium disabled:opacity-50 active:scale-[0.98] transition"
+        <button 
+          onClick={handleSubmit} 
+          disabled={loading || (!text && !finalBlob)} 
+          className="flex-1 py-3 bg-black text-white rounded-2xl text-sm font-medium disabled:opacity-30"
         >
           {loading ? "Publicando..." : "Publicar"}
         </button>
       </footer>
-
     </main>
   )
 }

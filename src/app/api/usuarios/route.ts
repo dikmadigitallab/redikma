@@ -6,7 +6,8 @@ import { getServerSession } from "next-auth"
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
 
-  if (session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM") {
+  if (!(session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM")) {
+    console.log("regra de usuario: ", session?.user.role)
   return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 

@@ -1,0 +1,727 @@
+[33mcommit ef2fed85afb32b135800720f528ae2456c0fefd8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmerge[m[33m, [m[1;31morigin/merge[m[33m)[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed May 6 14:12:54 2026 -0300
+
+    fix: ajustes antes de homologação
+
+[33mcommit 8fb2f9aa428fb4f8675ebde66174fe9f3aaeea61[m
+Merge: 9e8835a 1702e0a
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed May 6 13:14:42 2026 -0300
+
+    Merge branch 'andre' of https://github.com/dikmadigitallab/redikma into merge
+
+[33mcommit 9e8835a012da3e4ae8ab668f3c1018aa23214400[m[33m ([m[1;31morigin/oscar[m[33m)[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed May 6 13:13:51 2026 -0300
+
+    fix: correção de bugs descoberto em testes
+
+[33mcommit 1702e0a76a9110dd2d117a3a606f6ef873643394[m
+Merge: 3be0829 5e6aa49
+Author: andre <dedefelipe586@gmail.com>
+Date:   Wed May 6 11:31:49 2026 -0300
+
+    atualização: new post
+
+[33mcommit 5e6aa491ff4d0ee59cbf7110fbdfbcc7a44f1775[m[33m ([m[1;32moscar[m[33m)[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 17:54:25 2026 -0300
+
+    fix atualizações de sprint
+
+[33mcommit 0eb3b3ed2769a5e33e508649e0db145399256db2[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 14:21:17 2026 -0300
+
+    time in session extended for 7 days
+
+[33mcommit 3be0829c09f80718ecfd3dbf5c7bcacb0f3b5afa[m
+Author: andre <dedefelipe586@gmail.com>
+Date:   Tue May 5 11:54:13 2026 -0300
+
+    atualização: teste
+
+[33mcommit cd8791dcdda55feeec5f84ff037c85ce44d48739[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 11:11:17 2026 -0300
+
+    testes
+
+[33mcommit 204f4a9e9b7c82873bfc2e11930040b4248234ed[m
+Merge: 6da9d9a e6f0b86
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 10:59:22 2026 -0300
+
+    merging: complete in andre and oscar
+
+[33mcommit 6da9d9ad71fd1a8b0cca0fd68c250e52ec582ce8[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 10:55:42 2026 -0300
+
+    solutions andre
+
+[33mcommit 5c96257d6e5dca91fa619674546446d9a695c648[m
+Merge: 1efa8c1 c90f57d
+Author: andre <dedefelipe586@gmail.com>
+Date:   Tue May 5 10:48:46 2026 -0300
+
+    atualização:new post
+
+[33mcommit e6f0b8678666bff18f25b820ee78faf436545c5c[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 10:45:56 2026 -0300
+
+    fix: opções menu na foto
+
+[33mcommit c90f57d35377cfbd1067575b9a059ee52d75ae35[m
+Merge: 6ee514f 75444aa
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 08:19:24 2026 -0300
+
+    atualizações
+
+[33mcommit 6ee514f55fa7a19c89619721c4a7e37cca8aaa92[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue May 5 08:05:18 2026 -0300
+
+    testes
+
+[33mcommit 75444aadee56486fd95bce5250857f939ab8e140[m[33m ([m[1;31morigin/melhorar-layout-da-aplicacao[m[33m)[m
+Author: v0 <v0[bot]@users.noreply.github.com>
+Date:   Tue May 5 10:59:55 2026 +0000
+
+    feat: enhance responsive sidebar and layout optimization
+    
+    Improved sidebar with full responsiveness, menu hamburger, fixed desktop sidebar, and better proportions. Optimized layouts with responsive structures and improved components.
+    
+    Co-authored-by: Dikma Digital <217921311+dikmadigitallab@users.noreply.github.com>
+
+[33mcommit 75db579bdc376f56a717c2d18be4c3c7dc5ac2a0[m[33m ([m[1;31morigin/v0/dikmadigitallab-836762bf[m[33m)[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Mon May 4 17:49:42 2026 -0300
+
+    vamos fazer mudanças radicais
+
+[33mcommit 1219899cb9690a3a8f80acc0294a9fecb6277268[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Mon May 4 12:10:58 2026 -0300
+
+    tentando atualização automatica 1
+
+[33mcommit f6ecc2794eb0d76a416f9c6eae0b8b664236f622[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Mon May 4 11:48:48 2026 -0300
+
+    ajuste package json
+
+[33mcommit d16a8f49a7328376608a3ab379cc8792c44e31a4[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Thu Apr 30 17:53:41 2026 -0300
+
+    atualizações futuras
+
+[33mcommit fe592c3434d40aad795950fa0aaf423f0a437708[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Thu Apr 30 15:35:21 2026 -0300
+
+    hotfix:atualizações importantes
+
+[33mcommit ad9cb5b98e046acd182a978129d5cba86897bbde[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Thu Apr 30 14:22:35 2026 -0300
+
+    hotfix: atualizações urgentes na main
+
+[33mcommit e6572cacdaf503a3e93129cc97c05e241cb16f37[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Thu Apr 30 13:05:32 2026 -0300
+
+    hotfix:resolvendo problema na branch main
+
+[33mcommit bdf531893ff00f3e75badb3a16ddb1cbdb6f59d6[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Thu Apr 30 12:40:38 2026 -0300
+
+    hot fix: ajustes na main
+
+[33mcommit 1efa8c1701dcbe8e05f04dc824b3aa5fec1b8fa9[m
+Merge: 624d1f7 dac7113
+Author: andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 30 08:27:58 2026 -0300
+
+    Merge branch 'oscar' of https://github.com/dikmadigitallab/redikma into andre
+
+[33mcommit dac711322bf59591254bae28899de27979d55e83[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed Apr 29 08:47:49 2026 -0300
+
+    tentando solucionar problema no codigo
+
+[33mcommit 624d1f729bca0b5a5e297eb6515b759b5866e8fb[m
+Merge: 4c84f3e 36d4fc3
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue Apr 28 15:21:38 2026 -0300
+
+    Merge branch 'oscar' of https://github.com/dikmadigitallab/redikma into dev
+
+[33mcommit 36d4fc37a50cdaf7591e656bf41d6bac76c075e2[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue Apr 28 15:19:18 2026 -0300
+
+    teste
+
+[33mcommit 4c84f3ea431e860bf5dd042e708b108e4fbaacc9[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Tue Apr 28 13:57:17 2026 -0300
+
+    asdf1
+
+[33mcommit 3f5da4524f8048b4fd00dced39af9b16e7c14e2b[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Mon Apr 27 17:35:23 2026 -0300
+
+    atualizações futuras
+
+[33mcommit cd41ec3fbb430802d69e4fb45582d2d5ea496aad[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Mon Apr 27 13:56:44 2026 -0300
+
+    feat: auth configurado com sucesso!
+
+[33mcommit 6cfcb7e057b8123ab2e81c018e83da9e42b91a50[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Mon Apr 27 10:22:13 2026 -0300
+
+    teste
+
+[33mcommit 78d3a248d44fb9f84587b3605aca7d038090c051[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Mon Apr 27 10:16:02 2026 -0300
+
+    teste
+
+[33mcommit f4de9775a6801c8b5e60129763af04482032eb8a[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Mon Apr 27 10:10:34 2026 -0300
+
+    feat: version test
+
+[33mcommit a9b0682a06913a15e9c06cfe92a5299b1096c525[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 13:37:43 2026 -0300
+
+    atualização
+
+[33mcommit 7e3222626cce5e6b7387bc5b887b64d49ce1f7fd[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 12:54:45 2026 -0300
+
+    teste
+
+[33mcommit b24ecb4cf148d1068dc1c43e0b602de830cb6bc1[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 12:53:43 2026 -0300
+
+    melhorando layout mobile
+
+[33mcommit d7fa89040543bc21b13b2f744e0f54d8f8bb4d08[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 12:37:47 2026 -0300
+
+    test
+
+[33mcommit c6748b57122b6c291c330039826b5935cbb87ab7[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 11:46:44 2026 -0300
+
+    atualização
+
+[33mcommit 8407a69b0a884e8086615db8e7e8bea784b7035e[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 11:26:16 2026 -0300
+
+    ajuste
+
+[33mcommit bfdecea2341e1429e56521cfdbddeebf7e104070[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 11:14:42 2026 -0300
+
+    fix:mostrar comentarios no mobile
+
+[33mcommit 46fc9ad93ff71c0ef03619180ba04b54a3cf5f44[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 10:48:23 2026 -0300
+
+    trigger deploy
+
+[33mcommit 3cf67f78df4d2c77e0c050036d95d6fe782ab863[m
+Author: Oscar Notebook <oskharm12@gmail.com>
+Date:   Sun Apr 26 10:31:19 2026 -0300
+
+    fix:implementado apagamento de comentarios
+
+[33mcommit eb800f51a2c95529a323df90583531bbea3df38d[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Fri Apr 24 15:28:11 2026 -0300
+
+    finalizando atualizações do sistema
+
+[33mcommit 9bdb3786fa947b3306ac04d58470dfa886d00cf8[m
+Merge: 1cd080d d1ae9b5
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Fri Apr 24 14:36:41 2026 -0300
+
+    Merge branch 'andre' of https://github.com/dikmadigitallab/redikma into oscar
+
+[33mcommit 1cd080d116d05a8210360742fda164cb6524bd8d[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Fri Apr 24 14:36:10 2026 -0300
+
+    creted comments count
+
+[33mcommit d1ae9b5b3a45096b8635e1cdd00dd10491abed51[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Fri Apr 24 11:51:16 2026 -0300
+
+    atualização: teste
+
+[33mcommit d0b1af91cf1fffce042bb1e56669e2a9938c01e6[m
+Merge: 4a95bd5 de1424f
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Fri Apr 24 11:38:56 2026 -0300
+
+    Merge branch 'andre' of https://github.com/dikmadigitallab/redikma into merge
+
+[33mcommit de1424f50d7aa959c2c90c88b21982e37b672427[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Fri Apr 24 11:27:20 2026 -0300
+
+    atualização: teste
+
+[33mcommit 4a95bd5c257d50165ab5560b713e932a14492050[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Fri Apr 24 11:27:20 2026 -0300
+
+    fix:add image in post
+
+[33mcommit 39f20ca3d85babfe9b3b18f7f4750e28686c84ef[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Fri Apr 24 11:08:58 2026 -0300
+
+    atualização: teste
+
+[33mcommit ff807a8e06931131641d4c94e7e3421e78444638[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Fri Apr 24 09:45:41 2026 -0300
+
+    atualização: teste
+
+[33mcommit 677756e55f3ef58626070016f93416cfff9ad40e[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 16:53:53 2026 -0300
+
+    atualizando front total
+
+[33mcommit 4135c6a02069b88453cbe60b6661d1e27dd0fe15[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 16:44:58 2026 -0300
+
+    atualização oscar
+
+[33mcommit 062918dc4f4bee2e50dc443c0cd680f01ded530b[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 16:05:55 2026 -0300
+
+    fix: melhoria na qualidade das fotos
+
+[33mcommit fee2919f2853edd2f9d107e18df071266f72be2c[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 15:19:09 2026 -0300
+
+    teste
+
+[33mcommit 834036f03abf49b03e819ee706ed1a5746fcf5e0[m
+Merge: 1f764d2 f7ec850
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 15:16:25 2026 -0300
+
+    Merge branch 'merge' of https://github.com/dikmadigitallab/redikma
+
+[33mcommit f7ec85019a5c68b9fa725f491a347dd83d73f582[m
+Merge: 0dfa498 dd8bdfe
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 15:15:46 2026 -0300
+
+    resolved
+
+[33mcommit dd8bdfe3c204f9f352764d2eb8c90e98c41a35c2[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:58:18 2026 -0300
+
+    teste v0
+
+[33mcommit 0dfa49818fa87317fbec232ec55375f49a264657[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:54:18 2026 -0300
+
+    teste
+
+[33mcommit e34b812f3ee07eabd173459fa6713ab5e77af742[m
+Merge: 770b5c2 986146d
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:42:32 2026 -0300
+
+    Merge branch 'v0/dikmadigitallab-28eda50b' of https://github.com/dikmadigitallab/redikma into merge
+
+[33mcommit 770b5c2b94ddd95d24815c436525e7cfb67692ad[m
+Merge: aee6d8c 14853f3
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:39:10 2026 -0300
+
+    Merge branch 'oscar' of https://github.com/dikmadigitallab/redikma into merge
+
+[33mcommit aee6d8c804866ab39c2706123abc9f08e097864c[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:38:52 2026 -0300
+
+    teste
+
+[33mcommit 1f764d284449fea2b012c287af7192a93f19902a[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:33:11 2026 -0300
+
+    testes
+
+[33mcommit 7a96a650f0d013dcf2f6422930daa0a22c4b9ca3[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:27:14 2026 -0300
+
+    testes
+
+[33mcommit ce04e0f2ded1da4ae2e2ee028e710f0e3ce0016c[m
+Merge: 262bcfe 14853f3
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:13:32 2026 -0300
+
+    teste
+
+[33mcommit 262bcfe184c6abcb5151c3182e51fe5eb19f8689[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 14:11:21 2026 -0300
+
+    teste
+
+[33mcommit 986146d3845b42e0c576d71bda4dfc5e707f96b2[m
+Author: v0 <v0[bot]@users.noreply.github.com>
+Date:   Thu Apr 23 17:02:49 2026 +0000
+
+    feat: implement full mobile responsiveness
+    
+    Update multiple pages and components for mobile responsiveness
+    Add documentation on implemented responsiveness.
+    
+    Co-authored-by: Dikma Digital <217921311+dikmadigitallab@users.noreply.github.com>
+
+[33mcommit de300f420da0f54af5d2754510e090a1f5a9a919[m
+Author: v0 <v0[bot]@users.noreply.github.com>
+Date:   Thu Apr 23 17:02:20 2026 +0000
+
+    📱 Implementação completa de responsividade móvel
+    
+    Páginas atualizadas:
+    - Feed page: Sidebar e stories ocultos em mobile, feed 100%, footer oculto em mobile
+    - Landing page: Layout mobile-first com fontes responsivas
+    - Login page: Card responsivo com padding adaptativo
+    - New-post page: Textarea e inputs responsivos
+    
+    Componentes ajustados:
+    - FeedNoticias: Espaçamento adaptativo, text truncation, imagens responsivas
+    - Icons redimensionados por breakpoint
+    - Botões com min-height 40px para mobile
+    - Gap e padding ajustados para telas pequenas
+    
+    Breakpoints utilizados:
+    - Mobile: padrão (< 640px)
+    - Tablet: sm (640px), md (768px)
+    - Desktop: lg (1024px)
+    
+    Navegação móvel:
+    - Bottom nav flutuante mantido
+    - Header simplificado em mobile
+    - Labels ocultas em mobile quando necessário
+
+[33mcommit 0d93bf8b4eaadc5ade9543ff6ad35a8b54067bbf[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 13:55:56 2026 -0300
+
+    testes
+
+[33mcommit 1f9dcf975eab5acce5bf394ae1c4e641d086b389[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 13:53:53 2026 -0300
+
+    alteração title
+
+[33mcommit 14853f3e1429f6bf4c73b1c1aa39c6940ce4d1db[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 13:45:30 2026 -0300
+
+    testes
+
+[33mcommit 8b6f01ccfbb5b0aeb9da12aba61d5300127d302c[m
+Author: v0 <v0[bot]@users.noreply.github.com>
+Date:   Thu Apr 23 16:04:20 2026 +0000
+
+    🎯 Reestruturação completa do layout da página feed
+    
+    - Implementado header fixo com logo, busca e notificações
+    - Footer fixo com 4 colunas de informações e links fictícios
+    - Margem 10% nas laterais (esquerda e direita)
+    - Sidebar esquerda com largura 256px, não rola
+    - Feed central com scroll próprio (overflow-y-auto)
+    - Stories (sidebar direita) com 384px, scroll próprio quando necessário
+    - Apenas o feed rola durante navegação
+    - Ajustado componente FeedNoticias para max-w-3xl
+    - Sidebar com flex-1 para melhor distribuição
+    - Stories com height full e flex layout para melhor preenchimento
+    - Todos os componentes seguem paleta de cores oficial
+
+[33mcommit 1080c4690280d014524ec9529f2b0d03e97c69b6[m
+Author: v0 <v0[bot]@users.noreply.github.com>
+Date:   Thu Apr 23 15:52:26 2026 +0000
+
+    🎨 Implementar novo layout com header/footer sticky e scroll independente
+    
+    - Header sticky no topo com logo e notificações
+    - Sidebar esquerda fixa com navegação e logout
+    - Feed central com scroll independente
+    - Stories direita fixa com scroll interno
+    - Footer sticky na base com links
+    - Layout com 5% de margem lateral (10% total)
+    - Container de 3 colunas com alturas controladas
+    - Bottom nav mobile mantido para responsividade
+
+[33mcommit 66e2162e9d6e288e21adbc1b76d338a18038f54c[m
+Author: v0 <v0[bot]@users.noreply.github.com>
+Date:   Thu Apr 23 15:28:05 2026 +0000
+
+    🎨 Redesign completo da interface frontend com paleta de cores profissional
+    
+    - Implementada paleta de 9 cores como custom properties CSS
+    - Atualizadas todas as páginas com novo design
+    - Redesenhados componentes mantendo funcionalidade intacta
+    - Aplicado novo branding com primary dark (#0A4554)
+    - Melhorado contraste e acessibilidade visual
+    - Criada documentação de cores (COLOR_PALETTE.md)
+    - Sem alterações na lógica de programação
+
+[33mcommit 65fbb358d1e0cf21a8cac301a961cefb9f61e5d5[m
+Merge: 080af6e 91148b7
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 12:02:34 2026 -0300
+
+    Merge branch 'andre' of https://github.com/dikmadigitallab/redikma into oscar
+
+[33mcommit 080af6ecddf8d25966c60dcce0d2f9bdb888ae29[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 11:47:27 2026 -0300
+
+    testes
+
+[33mcommit 91148b7aea1f5f5b2547edd1f4cb26216e4d8f84[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 23 11:37:28 2026 -0300
+
+    teste: atualização
+
+[33mcommit c2e19fa587101b7850fa975fea751857ddcec8ae[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 23 10:55:53 2026 -0300
+
+    teste: reações
+
+[33mcommit 47a4cf1a5ebfe2f4f28cdf9c7711a42fde842721[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 10:26:52 2026 -0300
+
+    testes
+
+[33mcommit b4ccb968394bce960cdfc1aec81a030f3456b4f0[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 23 10:23:53 2026 -0300
+
+    teste:atualização
+
+[33mcommit 1eb8129e9c9cde14fbd341436f620d17e1f6be22[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 09:09:19 2026 -0300
+
+    save teste
+
+[33mcommit def710fa4c82cb8e8275a05885b163288291c20f[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Thu Apr 23 08:47:42 2026 -0300
+
+    prima acertado
+
+[33mcommit de7d24cf89f9729aa356741300d48a8a0083fbf7[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 17:54:49 2026 -0300
+
+    build vercel
+
+[33mcommit 116d54177b0cd668d657e7dd1f8e1f7f65f89576[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 17:46:00 2026 -0300
+
+    teste
+
+[33mcommit 7571b83c950d41abcc3f89a11b45cc6de1638b11[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 17:22:18 2026 -0300
+
+    fix: possibilidade de postagens funcionando
+
+[33mcommit 08d39ac87973118cb38c9da26b98e8df4427f20e[m
+Merge: eee3203 e133fde
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 14:37:25 2026 -0300
+
+    Merge branch 'andre' of https://github.com/dikmadigitallab/redikma into oscar
+
+[33mcommit eee3203f24191766d4822fc4bac81cd4ef23ccec[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 14:36:56 2026 -0300
+
+    testes
+
+[33mcommit e133fde749f8b0466e5f3dbac16ae1180aa85f7c[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Wed Apr 22 11:46:53 2026 -0300
+
+    atualização: teste
+
+[33mcommit 7ffa68dbd9a702d23592126b12dd6e56c1c229d9[m
+Merge: bab0206 d25311a
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 11:15:05 2026 -0300
+
+    fix: create new components
+
+[33mcommit bab0206fde1f2e710aa55be7e98f91ca41307eca[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 10:37:53 2026 -0300
+
+    tesxtes
+
+[33mcommit d25311ac0be6be5b63e8b4077307f20e1ef08829[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Wed Apr 22 10:34:48 2026 -0300
+
+    atualização: feed
+
+[33mcommit 6ef489d59d1388ca5a39a3a67c0bc9b148ed0b4c[m
+Merge: e9fe741 a423b0e
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 09:30:39 2026 -0300
+
+    erge branch 'andre' of https://github.com/dikmadigitallab/redikma into oscar
+
+[33mcommit a423b0efc701e4b7396b201b91388fdf232cc41e[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Wed Apr 22 09:30:23 2026 -0300
+
+    atualização: pagina de feed
+
+[33mcommit e9fe741928fed63e2c6ae443b6c70a8d758c0fab[m
+Merge: 2f3e9ef 0ff67f6
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 09:29:56 2026 -0300
+
+    teste
+
+[33mcommit 2f3e9efa688ddc3a7afe6eb722be7f59b2b36959[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Wed Apr 22 08:55:18 2026 -0300
+
+    alteração no prisma
+
+[33mcommit 0ff67f6d8b8707f612bd6cc2f091cd9b728db8d3[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Fri Apr 17 11:52:19 2026 -0300
+
+    teste: atualização
+
+[33mcommit 1fbd5c1a18e07bd753c178b369a8fed41f6dc58c[m
+Merge: 0d0510a fd2a11b
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Fri Apr 17 11:42:47 2026 -0300
+
+    Merge branch 'main' of https://github.com/dikmadigitallab/redikma
+
+[33mcommit 0d0510aa2e5bb6c936550be778a98564b7ef5005[m
+Author: Oscar Rodrigues <dikma.digital@grupodikma.com.br>
+Date:   Fri Apr 17 11:29:31 2026 -0300
+
+    addd oscar
+
+[33mcommit fd2a11be4e4e3ec1e1e41581bdc9a50f5c198eb8[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Fri Apr 17 10:20:02 2026 -0300
+
+    atualização: feed e modal new post
+
+[33mcommit 4a3bb717cc1db3b769cf33a3809a445b1878d9af[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 16 16:02:31 2026 -0300
+
+    fix:ajuste do teclado mobile
+
+[33mcommit 2413c60447325e85f90be13954b14b9b4940182a[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 16 15:28:03 2026 -0300
+
+    fix: created prototype screem, login and feed
+
+[33mcommit be0218c13623572df05848d3656516ac95ce8122[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 16 15:05:14 2026 -0300
+
+    teste
+
+[33mcommit e739d0d4adc977790ab8e527ad24c5603228154f[m
+Author: Andre <dedefelipe586@gmail.com>
+Date:   Thu Apr 16 11:35:42 2026 -0300
+
+    teste: atualização
+
+[33mcommit 3abedc17730924bc5ea6d7c04cee4b895f2fbbbd[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Thu Apr 16 09:57:16 2026 -0300
+
+    asdf
+
+[33mcommit ae442c0fcf02d9a83c98070bb3c41320802ad86e[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed Apr 15 10:38:29 2026 -0300
+
+    hot fix: configurated prisma in project
+
+[33mcommit 005ab10368e0f05657ac804a9384ca28565d5b2a[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed Apr 15 10:02:12 2026 -0300
+
+    first commit
+
+[33mcommit e1d85e6ed39e696801bd0ce40c8fed9a08d1630e[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed Apr 15 10:01:51 2026 -0300
+
+    first commit
+
+[33mcommit 05f9156925e4ffe37bfac3dd0d9d4a128ca86e0e[m
+Author: Oscar <oscardikma@gmail.com>
+Date:   Wed Apr 15 09:22:51 2026 -0300
+
+    Initial commit from Create Next App
