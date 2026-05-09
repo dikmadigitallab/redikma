@@ -281,11 +281,11 @@ export default function CreatePostPage({ onRefresh }: Props) {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={takePhoto} className="flex-1 py-3 rounded-2xl bg-black text-white text-sm">
+                <button id='btn_photo' onClick={takePhoto} className="flex-1 py-3 rounded-2xl bg-black text-white text-sm">
                   Tirar foto
                 </button>
 
-                <button onClick={() => fileInputRef.current?.click()} className="flex-1 py-3 rounded-2xl border text-sm">
+                <button id = 'btn_gal' onClick={() => fileInputRef.current?.click()} className="flex-1 py-3 rounded-2xl border text-sm">
                   Galeria
                 </button>
               </div>
