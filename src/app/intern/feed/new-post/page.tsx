@@ -290,7 +290,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                 </button>
               </div>
 
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} @change=“takePhoto”  className="hidden" />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile}  capture="environment"  className="hidden" />
             </>
           )}
 
