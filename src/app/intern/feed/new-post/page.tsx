@@ -281,7 +281,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={takePhoto} @change=“takePhoto” className="flex-1 py-3 rounded-2xl bg-black text-white text-sm">
+                <button onClick={takePhoto} className="flex-1 py-3 rounded-2xl bg-black text-white text-sm">
                   Tirar foto
                 </button>
 
@@ -290,7 +290,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                 </button>
               </div>
 
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} @change=“takePhoto”  className="hidden" />
             </>
           )}
 
