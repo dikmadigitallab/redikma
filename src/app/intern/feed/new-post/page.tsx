@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Editor } from "@/app/components/photo-editor"
+import { clear } from "console"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -124,38 +125,38 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   return (
-  <main className="h-screen bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
-  <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between safe-top flex-shrink-0">
+
+<main className="h-[100dvh] bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
+  {/* Header: flex-shrink-0 impede que ele diminua */}
+  <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 py-3 safe-top flex items-center justify-between">
     <button
       onClick={() => window.history.back()}
-      className="text-sm text-neutral-500 hover:text-black transition min-w-[56px] text-left"
+      className="text-sm text-neutral-500 hover:text-black transition min-w-14 text-left"
     >
       Voltar
     </button>
-
     <h1 className="text-sm sm:text-base font-semibold tracking-wide text-center flex-1">
       Nova postagem
     </h1>
-
-    <div className="min-w-[56px]" />
+    <div className="min-w-14" />
   </header>
 
-  {/* Área rolável */}
-  <section className="flex-1 overflow-y-auto overscroll-contain">
-    <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 sm:py-8 space-y-4 sm:space-y-8 pb-6">
+  {/* Área rolável: flex-1 ocupa o espaço restante entre header e footer */}
+  <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit">
+    <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
+      
       {/* Texto do Post */}
-      <div className="rounded-2xl sm:rounded-3xl bg-white border border-neutral-200 p-4 sm:p-5 shadow-sm">
+      <div className="rounded-2xl bg-white border border-neutral-200 p-4 shadow-sm">
         <textarea
           placeholder="Compartilhe algo..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-24 sm:h-28 leading-relaxed"
+          className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-20 leading-relaxed"
         />
       </div>
 
       {/* Área de Imagem / Editor */}
-      <div className="rounded-2xl sm:rounded-3xl bg-white border border-neutral-200 p-3 sm:p-4 shadow-sm space-y-4">
-        {/* 1. Modo Editor Aberto */}
+      <div className="rounded-2xl bg-white border border-neutral-200 p-3 shadow-sm space-y-4">
         {showEditor && image && (
           <div className="w-full overflow-hidden rounded-2xl">
             <Editor
@@ -172,90 +173,66 @@ export default function CreatePostPage({ onRefresh }: Props) {
           </div>
         )}
 
-        {/* 2. Modo Câmera (Nada selecionado) */}
         {!showEditor && !finalBlob && (
           <>
-            <div className="rounded-2xl sm:rounded-3xl overflow-hidden bg-black border border-neutral-200">
+            <div className="rounded-2xl overflow-hidden bg-black border border-neutral-200">
+              {/* Ajustado max-h para não empurrar o layout no mobile */}
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-                className="w-full aspect-[3/4] max-h-[60vh] object-cover"
+                className="w-full aspect-[3/4] max-h-[40vh] sm:max-h-[60vh] object-cover"
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={takePhoto}
-                className="w-full py-3.5 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
+                className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
               >
                 Tirar foto
               </button>
-
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-3.5 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
+                className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
               >
                 Galeria
               </button>
             </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFile}
-              className="hidden"
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
           </>
         )}
 
-        {/* 3. Modo Preview */}
         {!showEditor && finalBlob && (
           <div className="space-y-4">
-            <div className="rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-200 bg-neutral-100">
+            <div className="rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-100">
               <img
                 src={URL.createObjectURL(finalBlob)}
                 alt="Final"
-                className="w-full aspect-square object-cover"
+                className="w-full aspect-square max-h-[40vh] object-cover"
               />
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between sm:items-center">
-              <button
-                type="button"
-                onClick={() => setShowEditor(true)}
-                className="text-sm font-medium text-blue-600 text-left"
-              >
-                Editar novamente
+            <div className="flex justify-between items-center px-1">
+              <button onClick={() => setShowEditor(true)} className="text-sm font-medium text-blue-600">
+                Editar
               </button>
-
-              <button
-                type="button"
-                onClick={resetPhoto}
-                className="text-sm font-medium text-red-500 text-left sm:text-right"
-              >
-                Remover imagem
+              <button onClick={resetPhoto} className="text-sm font-medium text-red-500">
+                Remover
               </button>
             </div>
           </div>
         )}
-
         <canvas ref={canvasRef} className="hidden" />
       </div>
     </div>
-  </section>
-
-  {/* Rodapé fixo sempre visível */}
-  <footer className="flex-shrink-0 bg-white/98 backdrop-blur-xl border-t border-neutral-200 p-3 sm:p-4 safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-    <div className="w-full max-w-lg mx-auto flex flex-col sm:flex-row gap-3">
+        <div className="w-full max-w-lg mx-auto flex gap-3">
       <button
         type="button"
         onClick={() => window.history.back()}
-        className="w-full py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
+        className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98]"
       >
         Cancelar
       </button>
@@ -264,14 +241,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
         type="button"
         onClick={handleSubmit}
         disabled={loading || (!text && !finalBlob)}
-        className="w-full py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] transition disabled:opacity-30 disabled:cursor-not-allowed"
+        className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30"
       >
-        {loading ? "Publicando..." : "Publicar"}
+        {loading ? "..." : "Publicar"}
       </button>
     </div>
-  </footer>
-</main>
+  </section>
 
+
+</main>
     
   )
 }
