@@ -124,9 +124,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   return (
-  
-<main className="min-h-screen bg-[#F5F5F7] text-black flex flex-col">
-  <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between safe-top">
+  <main className="h-screen bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
+  <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between safe-top flex-shrink-0">
     <button
       onClick={() => window.history.back()}
       className="text-sm text-neutral-500 hover:text-black transition min-w-[56px] text-left"
@@ -142,8 +141,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
   </header>
 
   {/* Área rolável */}
-  <section className="flex-1 overflow-y-auto">
-    <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 sm:py-8 space-y-4 sm:space-y-8 pb-32">
+  <section className="flex-1 overflow-y-auto overscroll-contain">
+    <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 sm:py-8 space-y-4 sm:space-y-8 pb-6">
       {/* Texto do Post */}
       <div className="rounded-2xl sm:rounded-3xl bg-white border border-neutral-200 p-4 sm:p-5 shadow-sm">
         <textarea
@@ -188,6 +187,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
+                type="button"
                 onClick={takePhoto}
                 className="w-full py-3.5 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
               >
@@ -195,6 +195,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
               </button>
 
               <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full py-3.5 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
               >
@@ -225,6 +226,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between sm:items-center">
               <button
+                type="button"
                 onClick={() => setShowEditor(true)}
                 className="text-sm font-medium text-blue-600 text-left"
               >
@@ -232,6 +234,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
               </button>
 
               <button
+                type="button"
                 onClick={resetPhoto}
                 className="text-sm font-medium text-red-500 text-left sm:text-right"
               >
@@ -247,9 +250,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
   </section>
 
   {/* Rodapé fixo sempre visível */}
-  <footer className="sticky bottom-0 z-30 bg-white/98 backdrop-blur-xl border-t border-neutral-200 p-3 sm:p-4 safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+  <footer className="flex-shrink-0 bg-white/98 backdrop-blur-xl border-t border-neutral-200 p-3 sm:p-4 safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
     <div className="w-full max-w-lg mx-auto flex flex-col sm:flex-row gap-3">
       <button
+        type="button"
         onClick={() => window.history.back()}
         className="w-full py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
       >
@@ -257,6 +261,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
       </button>
 
       <button
+        type="button"
         onClick={handleSubmit}
         disabled={loading || (!text && !finalBlob)}
         className="w-full py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] transition disabled:opacity-30 disabled:cursor-not-allowed"
@@ -266,6 +271,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
     </div>
   </footer>
 </main>
+
     
   )
 }
