@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react"
 import { toast } from "sonner"
+import { GrPowerReset } from "react-icons/gr";
 
 interface EditorProps {
   imageFile: File | null;
@@ -19,6 +20,10 @@ type Settings = {
 };
 
 export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: EditorProps) {
+
+
+
+
   const preview = useMemo(() => {
     if (!imageFile) return ''
     return URL.createObjectURL(imageFile)
@@ -41,6 +46,51 @@ export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: Edi
   const dragStart = useRef({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
 
+
+
+
+  // Adicione este estado junto com os demais useState
+  const [cameraFacing, setCameraFacing] = useState<"user" | "environment">("environment")
+
+  // Adicione esta função dentro do componente
+  const toggleCamera = () => {
+    setCameraFacing((prev) =>
+      prev === "environment" ? "user" : "environment"
+    )
+  }
+
+  // Adicione este useEffect para reiniciar a câmera quando o modo mudar
+  useEffect(() => {
+    let stream: MediaStream | null = null
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: cameraFacing },
+          },
+          audio: false,
+        })
+
+        const video = document.querySelector("video") as HTMLVideoElement | null
+        if (video) {
+          video.srcObject = stream
+          await video.play()
+        }
+      } catch (error) {
+        console.error("Erro ao acessar câmera:", error)
+        toast.error("Não foi possível acessar a câmera")
+      }
+    }
+
+    startCamera()
+
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop())
+      }
+    }
+  }, [cameraFacing])
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview)
@@ -182,24 +232,29 @@ export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: Edi
           dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y }
         }}
       >
-        <div style={{ 
-            width: '100%', height: '100%', 
-            filter: getFilterString(),
-            position: 'relative'
+
+  
+
+
+
+        <div style={{
+          width: '100%', height: '100%',
+          filter: getFilterString(),
+          position: 'relative'
         }}>
-            <img
-                src={preview||""}
-                className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none"
-                style={{
-                    transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
-                    transition: dragging ? "none" : "transform 0.1s ease-out"
-                }}
-            />
-            {/* Overlay de temperatura visual */}
-            <div className="absolute inset-0 pointer-events-none" style={{
-                backgroundColor: settings.temperature > 0 ? `rgba(255, 165, 0, ${Math.abs(settings.temperature) / 200})` : `rgba(0, 150, 255, ${Math.abs(settings.temperature) / 200})`,
-                mixBlendMode: settings.temperature > 0 ? 'overlay' : 'soft-light'
-            }} />
+          <img
+            src={preview || ""}
+            className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none"
+            style={{
+              transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
+              transition: dragging ? "none" : "transform 0.1s ease-out"
+            }}
+          />
+          {/* Overlay de temperatura visual */}
+          <div className="absolute inset-0 pointer-events-none" style={{
+            backgroundColor: settings.temperature > 0 ? `rgba(255, 165, 0, ${Math.abs(settings.temperature) / 200})` : `rgba(0, 150, 255, ${Math.abs(settings.temperature) / 200})`,
+            mixBlendMode: settings.temperature > 0 ? 'overlay' : 'soft-light'
+          }} />
         </div>
 
         {isInteracting && (
@@ -216,7 +271,7 @@ export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: Edi
             <span>Zoom</span>
             <span>{zoom.toFixed(1)}x</span>
           </div>
-          <input type="range" min={1} max={3} step={0.01} value={zoom} 
+          <input type="range" min={1} max={3} step={0.01} value={zoom}
             onChange={(e) => { setZoom(Number(e.target.value)); setPosition(prev => clampPosition(prev.x, prev.y)) }}
             className="w-full h-1.5 bg-neutral-100 rounded-lg appearance-none cursor-pointer accent-black"
           />
@@ -225,14 +280,14 @@ export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: Edi
         {/* Dynamic Controls */}
         {controls.map((ctrl) => (
           <div key={ctrl.key} className="flex flex-col gap-1">
-             <div className="flex justify-between text-[10px] font-bold uppercase text-neutral-400">
-                <span>{ctrl.label}</span>
-                <span>{settings[ctrl.key as keyof Settings]}</span>
+            <div className="flex justify-between text-[10px] font-bold uppercase text-neutral-400">
+              <span>{ctrl.label}</span>
+              <span>{settings[ctrl.key as keyof Settings]}</span>
             </div>
-            <input 
-              type="range" 
-              min={ctrl.min} 
-              max={ctrl.max} 
+            <input
+              type="range"
+              min={ctrl.min}
+              max={ctrl.max}
               value={settings[ctrl.key as keyof Settings]}
               onChange={(e) => setSettings(prev => ({ ...prev, [ctrl.key]: Number(e.target.value) }))}
               className="w-full h-1.5 bg-neutral-100 rounded-lg appearance-none cursor-pointer accent-black"
@@ -241,6 +296,19 @@ export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: Edi
         ))}
       </div>
 
+{/*       
+         <button
+          type="button"
+          onClick={toggleCamera}
+          className="w-full py-3 text-sm font-bold border rounded-2xl hover:bg-neutral-50 transition"
+        >
+          {cameraFacing === "environment"
+            ? "Usar câmera frontal"
+            : "Usar câmera traseira"}
+        </button>
+
+
+ */}
       <div className="flex gap-2 pt-2">
         <button onClick={onCancel} className="flex-1 py-3 text-sm font-bold border rounded-2xl hover:bg-neutral-50 transition">
           Cancelar
@@ -248,6 +316,8 @@ export function Editor({ imageFile, onSave, onCancel, aspectRatio = "1/1" }: Edi
         <button onClick={generateResult} disabled={loading} className="flex-1 py-3 text-sm font-bold bg-black text-white rounded-2xl disabled:opacity-50 transition">
           {loading ? "Salvando..." : "Confirmar"}
         </button>
+
+       
       </div>
     </div>
   )
