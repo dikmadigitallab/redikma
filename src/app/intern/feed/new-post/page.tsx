@@ -124,97 +124,144 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-[#F5F5F7] text-black flex flex-col">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
-        <button onClick={() => window.history.back()} className="text-sm text-neutral-500 hover:text-black transition">Voltar</button>
-        <h1 className="text-sm font-semibold tracking-wide">Nova postagem</h1>
-        <div className="w-10" />
-      </header>
+  
+<main className="h-screen overflow-y-auto bg-[#F5F5F7] text-black flex flex-col">
+  <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between safe-top flex-shrink-0">
+    <button
+      onClick={() => window.history.back()}
+      className="text-sm text-neutral-500 hover:text-black transition min-w-[56px] text-left"
+    >
+      Voltar
+    </button>
 
-      <section className="flex-1 w-full max-w-lg mx-auto px-5 py-8 space-y-8">
-        {/* Texto do Post */}
-        <div className="rounded-3xl bg-white border border-neutral-200 p-5 shadow-sm">
-          <textarea
-            placeholder="Compartilhe algo..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="w-full bg-transparent outline-none text-sm resize-none h-24"
+    <h1 className="text-sm sm:text-base font-semibold tracking-wide text-center flex-1">
+      Nova postagem
+    </h1>
+
+    <div className="min-w-[56px]" />
+  </header>
+
+  <section className="flex-1 w-full max-w-lg mx-auto px-3 sm:px-5 py-4 sm:py-8 space-y-4 sm:space-y-8 pb-6">
+    {/* Texto do Post */}
+    <div className="rounded-2xl sm:rounded-3xl bg-white border border-neutral-200 p-4 sm:p-5 shadow-sm">
+      <textarea
+        placeholder="Compartilhe algo..."
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-24 sm:h-28 leading-relaxed"
+      />
+    </div>
+
+    {/* Área de Imagem / Editor */}
+    <div className="rounded-2xl sm:rounded-3xl bg-white border border-neutral-200 p-3 sm:p-4 shadow-sm space-y-4">
+      {/* 1. Modo Editor Aberto */}
+      {showEditor && image && (
+        <div className="w-full overflow-hidden rounded-2xl">
+          <Editor
+            imageFile={image}
+            onSave={(blob) => {
+              setFinalBlob(blob)
+              setShowEditor(false)
+            }}
+            onCancel={() => {
+              setShowEditor(false)
+              setImage(null)
+            }}
           />
         </div>
+      )}
 
-        {/* Área de Imagem / Editor */}
-        <div className="rounded-3xl bg-white border border-neutral-200 p-4 shadow-sm space-y-4">
-          
-          {/* 1. Modo Editor Aberto */}
-          {showEditor && image && (
-            <Editor 
-              imageFile={image}
-              onSave={(blob) => {
-                setFinalBlob(blob)
-                setShowEditor(false)
-              }}
-              onCancel={() => {
-                setShowEditor(false)
-                setImage(null)
-              }}
+      {/* 2. Modo Câmera (Nada selecionado) */}
+      {!showEditor && !finalBlob && (
+        <>
+          <div className="rounded-2xl sm:rounded-3xl overflow-hidden bg-black border border-neutral-200">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full aspect-[3/4] max-h-[60vh] object-cover"
             />
-          )}
+          </div>
 
-          {/* 2. Modo Câmera (Nada selecionado) */}
-          {!showEditor && !finalBlob && (
-            <>
-              <div className="rounded-3xl overflow-hidden bg-black border">
-                <video ref={videoRef} autoPlay playsInline className="w-full h-72 object-cover" />
-              </div>
-              <div className="flex gap-3">
-                <button onClick={takePhoto} className="flex-1 py-3 rounded-2xl bg-black text-white text-sm font-medium">
-                  Tirar foto
-                </button>
-                <button onClick={() => fileInputRef.current?.click()} className="flex-1 py-3 rounded-2xl border text-sm font-medium">
-                  Galeria
-                </button>
-              </div>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
-            </>
-          )}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={takePhoto}
+              className="w-full py-3.5 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
+            >
+              Tirar foto
+            </button>
 
-          {/* 3. Modo Preview (Imagem já editada) */}
-          {!showEditor && finalBlob && (
-            <div className="space-y-4">
-              <div className="rounded-3xl overflow-hidden border bg-neutral-100">
-                <img 
-                  src={URL.createObjectURL(finalBlob)} 
-                  alt="Final" 
-                  className="w-full aspect-square object-cover"
-                />
-              </div>
-              <div className="flex justify-between items-center px-2">
-                <button onClick={() => setShowEditor(true)} className="text-xs font-medium text-blue-600">
-                  Editar novamente
-                </button>
-                <button onClick={resetPhoto} className="text-xs font-medium text-red-500">
-                  Remover imagem
-                </button>
-              </div>
-            </div>
-          )}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full py-3.5 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
+            >
+              Galeria
+            </button>
+          </div>
 
-          <canvas ref={canvasRef} className="hidden" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFile}
+            className="hidden"
+          />
+        </>
+      )}
+
+      {/* 3. Modo Preview (Imagem já editada) */}
+      {!showEditor && finalBlob && (
+        <div className="space-y-4">
+          <div className="rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-200 bg-neutral-100">
+            <img
+              src={URL.createObjectURL(finalBlob)}
+              alt="Final"
+              className="w-full aspect-square object-cover"
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between sm:items-center">
+            <button
+              onClick={() => setShowEditor(true)}
+              className="text-sm font-medium text-blue-600 text-left"
+            >
+              Editar novamente
+            </button>
+
+            <button
+              onClick={resetPhoto}
+              className="text-sm font-medium text-red-500 text-left sm:text-right"
+            >
+              Remover imagem
+            </button>
+          </div>
         </div>
-      </section>
+      )}
 
-      <footer className="sticky bottom-0 bg-white border-t p-4 flex gap-3">
-        <button onClick={() => window.history.back()} className="flex-1 py-3 border rounded-2xl text-sm font-medium">
-          Cancelar
-        </button>
-        <button 
-          onClick={handleSubmit} 
-          disabled={loading || (!text && !finalBlob)} 
-          className="flex-1 py-3 bg-black text-white rounded-2xl text-sm font-medium disabled:opacity-30"
-        >
-          {loading ? "Publicando..." : "Publicar"}
-        </button>
-      </footer>
-    </main>
+      <canvas ref={canvasRef} className="hidden" />
+    </div>
+  </section>
+
+  <footer className="sticky bottom-0 z-10 bg-white/95 backdrop-blur-xl border-t border-neutral-200 p-3 sm:p-4 safe-bottom flex-shrink-0">
+    <div className="w-full max-w-lg mx-auto flex flex-col sm:flex-row gap-3">
+      <button
+        onClick={() => window.history.back()}
+        className="w-full py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
+      >
+        Cancelar
+      </button>
+
+      <button
+        onClick={handleSubmit}
+        disabled={loading || (!text && !finalBlob)}
+        className="w-full py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] transition disabled:opacity-30 disabled:active:scale-100"
+      >
+        {loading ? "Publicando..." : "Publicar"}
+      </button>
+    </div>
+  </footer>
+</main>
+    
   )
 }
