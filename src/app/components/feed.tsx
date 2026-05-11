@@ -11,6 +11,7 @@ import { toast } from "sonner"
 import { ImageModal } from "./modal-view-photo"
 import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view" 
+import { containsBadWords } from "@/lib/ofensivas"
 
 type Post = {
   id: string
@@ -211,23 +212,42 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   // 2. Chame a função dentro do seu método de comentar
   async function comentar(postId: string) {
     if (!user) return
+  
     const texto = comments[postId]?.trim()
+  
     if (!texto) return
-
+  
+    if (containsBadWords(texto)) {
+      setComments((prev) => ({
+        ...prev,
+        [postId]: "",
+      }))
+  
+      toast.error("Comentário ofensivo não pode ser enviado")
+      return
+    }
+  
     try {
       const res = await fetch("/api/posts/posts-comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto, postId, authorId: user.id }),
+        body: JSON.stringify({
+          texto,
+          postId,
+          authorId: user.id,
+        }),
       })
-
+  
       if (!res.ok) throw new Error("Erro ao comentar")
-
-      setComments((prev) => ({ ...prev, [postId]: "" }))
+  
+      setComments((prev) => ({
+        ...prev,
+        [postId]: "",
+      }))
+  
       toast.success("Comentário postado!")
-
+  
       loadCommentsCount()
-
     } catch {
       toast.error("Erro ao postar comentário")
     }
