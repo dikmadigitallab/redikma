@@ -5,6 +5,7 @@ import { FaTrash } from "react-icons/fa"
 import { Heart, Reply, Send } from "lucide-react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
+import { containsBadWords, censorBadWords } from "@/lib/ofensivas"
 
 type Comment = {
   id: string
