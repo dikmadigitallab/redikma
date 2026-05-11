@@ -141,7 +141,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   return (
+
     <main className="h-[100dvh] bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
+      {/* HEADER FIXO */}
       <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 py-3 safe-top flex items-center justify-between">
         <button
           onClick={() => window.history.back()}
@@ -155,7 +157,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
         <div className="min-w-14" />
       </header>
 
-      <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit">
+      {/* MEIO ROLÁVEL (Note o pb-10 para não esconder o final da tela) */}
+      <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-10">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
           
           <div className="rounded-2xl bg-white border border-neutral-200 p-4 shadow-sm">
@@ -247,12 +250,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
             <canvas ref={canvasRef} className="hidden" />
           </div>
         </div>
+      </section>
 
-        <div className="w-full max-w-lg mx-auto flex gap-3 px-3 sm:px-5 pb-8">
+      {/* RODAPÉ FIXO */}
+      <footer className="flex-shrink-0 bg-white border-t border-neutral-200 p-4 pb-6 sm:pb-4 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]">
+        <div className="w-full max-w-lg mx-auto flex gap-3">
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98]"
+            className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
           >
             Cancelar
           </button>
@@ -261,12 +267,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
             type="button"
             onClick={handleSubmit}
             disabled={loading || (!text && !finalBlob)}
-            className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30"
+            className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
           >
             {loading ? "..." : "Publicar"}
           </button>
         </div>
-      </section>
+      </footer>
     </main>
+  
   )
 }
