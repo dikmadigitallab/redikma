@@ -39,7 +39,7 @@ model Postagem {
   publicado   Boolean      @default(false)
   image       String?
   video       String?
-  author      User         @relation(fields: [authorId], references: [id])
+  author     User         @relation(fields: [authorId], references: [id])
   postador    String
   comentarios Comentario[]
   likes       Like[]
