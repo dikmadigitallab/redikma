@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Editor } from "@/app/components/photo-editor"
+import { Editor } from "@/app/components/photo-editor-mobile"
 // Importe um ícone de troca se tiver (ex: lucide-react) ou use texto
 import { RefreshCw } from "lucide-react" 
 import { clear } from "console"

@@ -30,7 +30,6 @@ model autoPost {
   imagem    String?
   video     String?
 }
-
 model Postagem {
   id          String       @id @default(uuid())
   label       String
@@ -39,7 +38,7 @@ model Postagem {
   publicado   Boolean      @default(false)
   image       String?
   video       String?
-  author     User         @relation(fields: [authorId], references: [id])
+  author      User         @relation(fields: [authorId], references: [id])
   postador    String
   comentarios Comentario[]
   likes       Like[]
@@ -48,13 +47,19 @@ model Postagem {
 
 model Like {
   id           String      @id @default(uuid())
-  postId       String
-  post         Postagem    @relation(fields: [postId], references: [id])
+  // Relacionamento com postagem
+  postId       String?
+  post         Postagem?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  // Relacionamento com comentário (opcional)
   comentarioId String?
-  comentario   Comentario? @relation(fields: [comentarioId], references: [id])
+  comentario   Comentario? @relation(fields: [comentarioId], references: [id], onDelete: Cascade)
+  // Usuário que curtiu
   userId       String
-  user         User        @relation(fields: [userId], references: [id])
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime    @default(now())
+  // Garante que um usuário só possa curtir uma postagem uma vez
+  @@unique([postId, userId])
+  // Garante que um usuário só possa curtir um comentário uma vez
   @@unique([comentarioId, userId])
 }
 
