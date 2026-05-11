@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { Editor } from "@/app/components/photo-editor"
 // Importe um ícone de troca se tiver (ex: lucide-react) ou use texto
 import { RefreshCw } from "lucide-react" 
+import { clear } from "console"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -140,9 +141,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
     }
   }
 
-  return (
-
-    <main className="h-[100dvh] bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
+return (
+<main className="h-[100dvh] bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
+      
       {/* HEADER FIXO */}
       <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 py-3 safe-top flex items-center justify-between">
         <button
@@ -157,10 +158,11 @@ export default function CreatePostPage({ onRefresh }: Props) {
         <div className="min-w-14" />
       </header>
 
-      {/* MEIO ROLÁVEL (Note o pb-10 para não esconder o final da tela) */}
-      <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-10">
+      {/* ÁREA ROLÁVEL COM ESPAÇAMENTO MÁXIMO (pb-24) */}
+      <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-24">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
           
+          {/* TEXTAREA */}
           <div className="rounded-2xl bg-white border border-neutral-200 p-4 shadow-sm">
             <textarea
               placeholder="Compartilhe algo..."
@@ -170,7 +172,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
             />
           </div>
 
+          {/* ÁREA DE MÍDIA (CÂMERA / PREVIEW / EDITOR) */}
           <div className="rounded-2xl bg-white border border-neutral-200 p-3 shadow-sm space-y-4">
+            
             {showEditor && image && (
               <div className="w-full overflow-hidden rounded-2xl">
                 <Editor
@@ -249,31 +253,29 @@ export default function CreatePostPage({ onRefresh }: Props) {
             )}
             <canvas ref={canvasRef} className="hidden" />
           </div>
+
+          {/* BOTÕES DE AÇÃO - Adicionado mb-10 para desgrudar do fundo */}
+          <div className="w-full flex gap-3 pt-4 mb-10">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={loading || (!text && !finalBlob)}
+              className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
+            >
+              {loading ? "Publicando..." : "Publicar"}
+            </button>
+          </div>
+
         </div>
       </section>
-
-      {/* RODAPÉ FIXO */}
-      <footer className="flex-shrink-0 bg-white border-t border-neutral-200 p-4 pb-6 sm:pb-4 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]">
-        <div className="w-full max-w-lg mx-auto flex gap-3">
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={loading || (!text && !finalBlob)}
-            className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
-          >
-            {loading ? "..." : "Publicar"}
-          </button>
-        </div>
-      </footer>
     </main>
-  
-  )
+  );
 }
