@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
+
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
@@ -182,46 +183,49 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }, [posts, user])
 
   //realiza o curtir
-  async function curtir(postId: string) {
-    if (!user) return
+async function curtir(postId: string, autorPostId: string) {
+  if (!user) return;
 
-    const isLiked = likedPosts[postId]
+  const isLiked = likedPosts[postId];
 
-    try {
-      const res = await fetch("/api/posts/posts-likes", {
-        method: isLiked ? "DELETE" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          postId,
-          userId: user.id,
-        }),
-      })
+  try {
+    const res = await fetch("/api/posts/posts-likes", {
+      method: isLiked ? "DELETE" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        postId,
+        userId: user.id,
+      }),
+    });
 
-      if (!res.ok) {
-        const err = await res.json()
-        console.error(err)
-        throw new Error("Erro ao curtir")
-      }
-
-      // atualiza status do like
-      setLikedPosts((prev) => ({
-        ...prev,
-        [postId]: !isLiked,
-      }))
-
-      // atualiza contagem sem precisar refetch
-      setLikesCount((prev) => ({
-        ...prev,
-        [postId]: isLiked
-          ? Math.max((prev[postId] || 1) - 1, 0)
-          : (prev[postId] || 0) + 1,
-      }))
-    } catch (error) {
-      console.error(error)
+    if (!res.ok) {
+      const err = await res.json();
+      console.error(err);
+      throw new Error("Erro ao curtir");
     }
+
+    // atualiza UI
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !isLiked,
+    }));
+
+    setLikesCount((prev) => ({
+      ...prev,
+      [postId]: isLiked
+        ? Math.max((prev[postId] || 1) - 1, 0)
+        : (prev[postId] || 0) + 1,
+    }));
+
+
+  } catch (error) {
+    console.error(error);
   }
+}
+
+
 
 
   //comentar
@@ -327,6 +331,41 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
     toast.info('Em desenvolvimento')
   }
 
+  function renderTextWithLinks(text: string) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const parts = text.split(urlRegex)
+
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline break-all hover:text-blue-800"
+          >
+            {part}
+          </a>
+        )
+      }
+
+      return <span key={index}>{part}</span>
+    })
+  }
+
+
+     function toggleComments(id: string): void {
+          const commentInput = document.getElementById(`comment-input-${id}`)
+          if (commentInput instanceof HTMLInputElement) {
+            if (document.activeElement === commentInput) {
+              commentInput.blur()
+            } else {
+              commentInput.focus()
+              commentInput.scrollIntoView({ behavior: "smooth", block: "center" })
+            }
+          }
+        }
 
   return (
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
@@ -343,17 +382,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
         const postLikesCount = likesCount[post.id] || 0;
         const isTooltipOpen = activeTooltip === post.id;
 
-        function toggleComments(id: string): void {
-          const commentInput = document.getElementById(`comment-input-${id}`)
-          if (commentInput instanceof HTMLInputElement) {
-            if (document.activeElement === commentInput) {
-              commentInput.blur()
-            } else {
-              commentInput.focus()
-              commentInput.scrollIntoView({ behavior: "smooth", block: "center" })
-            }
-          }
-        }
+     
 
         return (
           <div
@@ -387,8 +416,11 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
             </div>
 
             {/* Conteúdo do Post */}
-            <p className="text-sm" style={{ color: "var(--black)" }}>
-              {post.label}
+            <p
+              className="text-sm whitespace-pre-wrap break-words"
+              style={{ color: "var(--black)" }}
+            >
+              {renderTextWithLinks(post.label)}
             </p>
 
             {post.image && (
@@ -453,7 +485,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               <div className="flex items-center gap-4">
                 <button
                   type="button"
-                  onClick={() => curtir(post.id)}
+                  onClick={() => curtir(post.id,post.authorId)}
                   className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
                 >
                   <Image

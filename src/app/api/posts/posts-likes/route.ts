@@ -1,11 +1,13 @@
 import { NextResponse, NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { addLike } from "@/lib/likes"
+import { notify } from "@/lib/notifications/notify";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
+
 
 //curtir
-
-
-
+/* 
 export async function POST(req: Request) {
   try {
     const { postId, userId } = await req.json()
@@ -20,6 +22,7 @@ export async function POST(req: Request) {
     const like = await addLike({ postId, userId })
 
     return NextResponse.json(like)
+
   } catch (error) {
     console.error(error)
 
@@ -30,8 +33,57 @@ export async function POST(req: Request) {
   }
 }
 
+ */
 
 
+export async function POST(req: Request) {
+  const sessions = await getServerSession(authOptions);
+  const nome = sessions?.user.nome
+  try {
+    const { postId, userId } = await req.json();
+
+    if (!postId || !userId) {
+      return NextResponse.json(
+        { error: "Dados obrigatórios não informados" },
+        { status: 400 }
+      );
+    }
+
+    const like = await addLike({ postId, userId });
+
+    const post = await prisma.postagem.findUnique({
+      where: { id: postId },
+      select: {
+        authorId: true,
+      },
+    });
+
+    const autorPostId = post?.authorId;
+
+    if (autorPostId && autorPostId !== userId) {
+      await notify({
+        type: "LIKE",
+        title: "Nova curtida",
+        message: `${nome} curtiu sua postagem`,
+        userIds: [autorPostId],
+        actorId: userId,
+        excludeCurrentUser: true,
+        data: {
+          postId,
+        },
+      });
+    }
+
+    return NextResponse.json(like);
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "Erro ao curtir postagem" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function GET(req: NextRequest): Promise<Response> {
   try {
@@ -96,3 +148,4 @@ export async function DELETE(req: Request) {
     )
   }
 }
+//18129187710

@@ -80,20 +80,51 @@ model Comentario {
 }
 
 model User {
-  id          String       @id @default(uuid())
+  id          String   @id @default(uuid())
   nome        String
-  username    String       @unique
-  cpf         String       @unique
+  username    String   @unique
+  cpf         String   @unique
   senha_hash  String?
   cargo       String
-  role        Roles        @default(COMMON)
+  role        Roles    @default(COMMON)
   foto        String?
   telefone    String?
-  email       String?      @unique
+  email       String?  @unique
+  aniversario DateTime
+  admissao    DateTime
   postagens   Postagem[]
   comentarios Comentario[]
   likes       Like[]
-  aniversario DateTime
-  admissao    DateTime
-
+  notifications Notification[] @relation("UserNotifications")
+  sentNotifications Notification[] @relation("NotificationActor")
 }
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  actorId   String?
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actor     User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  NEW_POST
+  REACTION
+  PROFILE_UPDATE
+  PROMOTION
+  BIRTHDAY
+  WORK_ANNIVERSARY
+}
+
