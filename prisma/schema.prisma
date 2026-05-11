@@ -30,7 +30,6 @@ model autoPost {
   imagem    String?
   video     String?
 }
-
 model Postagem {
   id          String       @id @default(uuid())
   label       String
@@ -39,7 +38,7 @@ model Postagem {
   publicado   Boolean      @default(false)
   image       String?
   video       String?
-  author     User         @relation(fields: [authorId], references: [id])
+  author      User         @relation(fields: [authorId], references: [id])
   postador    String
   comentarios Comentario[]
   likes       Like[]
@@ -48,13 +47,19 @@ model Postagem {
 
 model Like {
   id           String      @id @default(uuid())
-  postId       String
-  post         Postagem    @relation(fields: [postId], references: [id])
+  // Relacionamento com postagem
+  postId       String?
+  post         Postagem?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  // Relacionamento com comentário (opcional)
   comentarioId String?
-  comentario   Comentario? @relation(fields: [comentarioId], references: [id])
+  comentario   Comentario? @relation(fields: [comentarioId], references: [id], onDelete: Cascade)
+  // Usuário que curtiu
   userId       String
-  user         User        @relation(fields: [userId], references: [id])
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime    @default(now())
+  // Garante que um usuário só possa curtir uma postagem uma vez
+  @@unique([postId, userId])
+  // Garante que um usuário só possa curtir um comentário uma vez
   @@unique([comentarioId, userId])
 }
 
@@ -75,20 +80,51 @@ model Comentario {
 }
 
 model User {
-  id          String       @id @default(uuid())
+  id          String   @id @default(uuid())
   nome        String
-  username    String       @unique
-  cpf         String       @unique
+  username    String   @unique
+  cpf         String   @unique
   senha_hash  String?
   cargo       String
-  role        Roles        @default(COMMON)
+  role        Roles    @default(COMMON)
   foto        String?
   telefone    String?
-  email       String?      @unique
+  email       String?  @unique
+  aniversario DateTime
+  admissao    DateTime
   postagens   Postagem[]
   comentarios Comentario[]
   likes       Like[]
-  aniversario DateTime
-  admissao    DateTime
-
+  notifications Notification[] @relation("UserNotifications")
+  sentNotifications Notification[] @relation("NotificationActor")
 }
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  actorId   String?
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actor     User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  NEW_POST
+  REACTION
+  PROFILE_UPDATE
+  PROMOTION
+  BIRTHDAY
+  WORK_ANNIVERSARY
+}
+

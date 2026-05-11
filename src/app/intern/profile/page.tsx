@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { Sidebar } from "@/app/components/sidebar"
-import { Editor } from "@/app/components/photo-editor"
 
 export default function PerfilPage() {
   const { update } = useSession()
@@ -14,7 +13,7 @@ export default function PerfilPage() {
     senha: string
     email: string
     telefone: string
-    foto: string | File | Blob // Alterado para aceitar Blob do editor
+    foto: string | File | Blob
   }>({
     senha: "",
     email: "",
@@ -23,8 +22,6 @@ export default function PerfilPage() {
   })
 
   const [preview, setPreview] = useState("")
-  const [tempFile, setTempFile] = useState<File | null>(null) // Arquivo bruto para o editor
-  const [showEditor, setShowEditor] = useState(false)
 
   useEffect(() => {
     async function fetchUser() {
@@ -46,25 +43,17 @@ export default function PerfilPage() {
     fetchUser()
   }, [])
 
-  // 1. Quando seleciona o arquivo, abre o editor em vez de salvar direto
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setTempFile(file)
-    setShowEditor(true)
-  }
-
-  // 2. Recebe o resultado do Editor
-  function handleSaveEditedImage(blob: Blob) {
-    const previewUrl = URL.createObjectURL(blob)
+    const previewUrl = URL.createObjectURL(file)
     setPreview(previewUrl)
-    
+
     setForm((prev) => ({
       ...prev,
-      foto: blob, // Guardamos o Blob editado
+      foto: file,
     }))
-    setShowEditor(false)
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -75,7 +64,6 @@ export default function PerfilPage() {
     if (form.telefone) formData.append("telefone", form.telefone)
     if (form.senha) formData.append("senha", form.senha)
 
-    // Se a foto for um File ou Blob (resultado do editor)
     if (form.foto instanceof File || form.foto instanceof Blob) {
       formData.append("foto", form.foto, "profile.jpg")
     }
@@ -125,21 +113,6 @@ export default function PerfilPage() {
         className="w-full max-w-3xl rounded-2xl shadow-md p-6 space-y-6"
         style={{ backgroundColor: "var(--white)" }}
       >
-        {/* Modal do Editor */}
-        {showEditor && tempFile && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-            <div className="bg-white p-6 rounded-3xl max-w-md w-full shadow-2xl">
-              <h2 className="text-lg font-bold mb-4 text-center">Editar Foto de Perfil</h2>
-              <Editor
-                imageFile={tempFile}
-                aspectRatio="1/1"
-                onSave={handleSaveEditedImage}
-                onCancel={() => setShowEditor(false)}
-              />
-            </div>
-          </div>
-        )}
-
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           <img
             src={preview || "/photoProfile/default.jpeg"}
@@ -203,7 +176,7 @@ export default function PerfilPage() {
                   color: "var(--primary-dark)",
                 }}
               >
-                Escolher e editar nova foto...
+                Escolher nova foto...
               </label>
             </div>
           </div>

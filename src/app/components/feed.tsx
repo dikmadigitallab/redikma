@@ -1,7 +1,8 @@
 "use client"
 
-import {  usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+
 
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
@@ -10,7 +11,7 @@ import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { ImageModal } from "./modal-view-photo"
 import { PostOptions } from "./postDelete"
-import { LikeView } from "./likes-view" 
+import { LikeView } from "./likes-view"
 import { containsBadWords } from "@/lib/ofensivas"
 
 type Post = {
@@ -44,12 +45,47 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [openModal, setOpenModal] = useState(false)
-  const MOCK_LIKERS = [
-    { id: '1', nome: 'Oscar Rodrigues', foto: 'https://i.pravatar.cc/150?u=oscar' },
-    { id: '2', nome: 'Maria Silva', foto: 'https://i.pravatar.cc/150?u=maria' },
-    { id: '3', nome: 'João Souza', foto: 'https://i.pravatar.cc/150?u=joao' },
-    { id: '4', nome: 'Ana Costa', foto: 'https://i.pravatar.cc/150?u=ana' },
-  ];
+
+
+  type Liker = {
+    id: string
+    nome: string
+    foto: string
+  }
+
+  const [listOfLikes, setListOfLikes] = useState<Record<string, Liker[]>>({})
+
+  useEffect(() => {
+    async function loadLikers() {
+      try {
+        const likersMap: Record<string, Liker[]> = {}
+
+        await Promise.all(
+          posts.map(async (post) => {
+            const res = await fetch(
+              `/api/posts/list-likes?postId=${post.id}`,
+              { cache: "no-store" }
+            )
+
+            if (!res.ok) return
+
+            const data = await res.json()
+
+            // A API retorna { total, likers }
+            likersMap[post.id] = data.likers || []
+          })
+        )
+
+        setListOfLikes(likersMap)
+      } catch (error) {
+        console.error("Erro ao carregar lista de curtidas:", error)
+      }
+    }
+
+    if (posts.length > 0) {
+      loadLikers()
+    }
+  }, [posts])
 
   function handleOpenImage(image: string) {
     setSelectedImage(image)
@@ -148,46 +184,49 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }, [posts, user])
 
   //realiza o curtir
-  async function curtir(postId: string) {
-    if (!user) return
+async function curtir(postId: string, autorPostId: string) {
+  if (!user) return;
 
-    const isLiked = likedPosts[postId]
+  const isLiked = likedPosts[postId];
 
-    try {
-      const res = await fetch("/api/posts/posts-likes", {
-        method: isLiked ? "DELETE" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          postId,
-          userId: user.id,
-        }),
-      })
+  try {
+    const res = await fetch("/api/posts/posts-likes", {
+      method: isLiked ? "DELETE" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        postId,
+        userId: user.id,
+      }),
+    });
 
-      if (!res.ok) {
-        const err = await res.json()
-        console.error(err)
-        throw new Error("Erro ao curtir")
-      }
-
-      // atualiza status do like
-      setLikedPosts((prev) => ({
-        ...prev,
-        [postId]: !isLiked,
-      }))
-
-      // atualiza contagem sem precisar refetch
-      setLikesCount((prev) => ({
-        ...prev,
-        [postId]: isLiked
-          ? Math.max((prev[postId] || 1) - 1, 0)
-          : (prev[postId] || 0) + 1,
-      }))
-    } catch (error) {
-      console.error(error)
+    if (!res.ok) {
+      const err = await res.json();
+      console.error(err);
+      throw new Error("Erro ao curtir");
     }
+
+    // atualiza UI
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !isLiked,
+    }));
+
+    setLikesCount((prev) => ({
+      ...prev,
+      [postId]: isLiked
+        ? Math.max((prev[postId] || 1) - 1, 0)
+        : (prev[postId] || 0) + 1,
+    }));
+
+
+  } catch (error) {
+    console.error(error);
   }
+}
+
+
 
 
   //comentar
@@ -271,239 +310,280 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }, [posts])
 
 
-//deletar post
-async function handleDeletePost(postId: string) {
-  // Verifica se o usuário está logado antes de tentar deletar
-  if (!session?.user?.id) {
-    return toast.error("Você precisa estar logado para excluir um post");
-  }
-
-  // Confirmação simples para evitar exclusões acidentais
-  if (!confirm("Tem certeza que deseja excluir esta postagem?")) return;
-
-  try {
-    // Ajuste da URL para usar Query Params conforme esperado pelo seu DELETE:
-    // /api/posts?postId=XXX&userId=YYY
-    const res = await fetch(`/api/posts?postId=${postId}`, {
-      method: "DELETE",
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      // Usa a mensagem de erro vinda do servidor (ex: "Sem permissão")
-      throw new Error(data.error || "Erro ao deletar post");
+  //deletar post
+  async function handleDeletePost(postId: string) {
+    // Verifica se o usuário está logado antes de tentar deletar
+    if (!session?.user?.id) {
+      return toast.error("Você precisa estar logado para excluir um post");
     }
 
-    toast.success("Postagem excluída com sucesso!");
-    await handleRefresh();
-     
-    
-    // Atualiza o feed após a exclusão
-   
-    // ou handleRefresh(), dependendo de como está nomeado no seu componente
-    
-  } catch (error: any) {
-    toast.error(error.message || "Erro de conexão ao excluir post");
-  }
-}
-//editar post
-async function handleEditPost(postId: string) {
-  toast.info('Em desenvolvimento')
-}
+    // Confirmação simples para evitar exclusões acidentais
+    if (!confirm("Tem certeza que deseja excluir esta postagem?")) return;
 
+    try {
+      // Ajuste da URL para usar Query Params conforme esperado pelo seu DELETE:
+      // /api/posts?postId=XXX&userId=YYY
+      const res = await fetch(`/api/posts?postId=${postId}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Usa a mensagem de erro vinda do servidor (ex: "Sem permissão")
+        throw new Error(data.error || "Erro ao deletar post");
+      }
+
+      toast.success("Postagem excluída com sucesso!");
+      await handleRefresh();
+
+
+      // Atualiza o feed após a exclusão
+
+      // ou handleRefresh(), dependendo de como está nomeado no seu componente
+
+    } catch (error: any) {
+      toast.error(error.message || "Erro de conexão ao excluir post");
+    }
+  }
+  //editar post
+  async function handleEditPost(postId: string) {
+    toast.info('Em desenvolvimento')
+  }
+
+  function renderTextWithLinks(text: string) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const parts = text.split(urlRegex)
+
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline break-all hover:text-blue-800"
+          >
+            {part}
+          </a>
+        )
+      }
+
+      return <span key={index}>{part}</span>
+    })
+  }
+
+
+     function toggleComments(id: string): void {
+          const commentInput = document.getElementById(`comment-input-${id}`)
+          if (commentInput instanceof HTMLInputElement) {
+            if (document.activeElement === commentInput) {
+              commentInput.blur()
+            } else {
+              commentInput.focus()
+              commentInput.scrollIntoView({ behavior: "smooth", block: "center" })
+            }
+          }
+        }
 
   return (
     <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
-    <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
-  
-    {loading && (
-      <p className="text-sm" style={{ color: "var(--gray)" }}>
-        Carregando posts...
-      </p>
-    )}
-  
-    {posts.map((post) => {
-      const liked = likedPosts[post.id] || false;
-      const postLikesCount = likesCount[post.id] || 0;
-      const isTooltipOpen = activeTooltip === post.id;
-  
-      return (
-        <div
-          key={post.id}
-          className="rounded-lg md:rounded-xl shadow-sm p-3 md:p-4 space-y-3 relative"
-          style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}
-        >
-          <PostOptions postId={post.id} onDelete={handleDeletePost} onEdit={handleEditPost} />
-  
-          {/* Cabeçalho do Post */}
+      <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
+
+      {loading && (
+        <p className="text-sm" style={{ color: "var(--gray)" }}>
+          Carregando posts...
+        </p>
+      )}
+
+      {posts.map((post) => {
+        const liked = likedPosts[post.id] || false;
+        const postLikesCount = likesCount[post.id] || 0;
+        const isTooltipOpen = activeTooltip === post.id;
+
+     
+
+        return (
           <div
-            className="flex items-center gap-2 md:gap-3"
-            style={{ paddingBottom: "0.75rem", borderBottom: "1px solid var(--border)" }}
+            key={post.id}
+            className="rounded-lg md:rounded-xl shadow-sm p-3 md:p-4 space-y-3 relative"
+            style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}
           >
-            <img
-              src={post.author.foto}
-              alt="user"
-              className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover object-center flex-shrink-0 border border-gray-200"
-            />
-            <div className="min-w-0 flex flex-col leading-tight">
-              <p className="text-sm md:text-base font-semibold truncate" style={{ color: "var(--black)" }}>
-                {post.author.nome}
-              </p>
-              <p className="text-xs truncate opacity-50" style={{ color: "var(--gray)" }}>
-                {post.postador}
-              </p>
-              <p className="text-[10px] md:text-xs opacity-70" style={{ color: "var(--gray)" }}>
-                {new Date(post.createdAt).toLocaleString()}
-              </p>
-            </div>
-          </div>
-  
-          {/* Conteúdo do Post */}
-          <p className="text-sm" style={{ color: "var(--black)" }}>
-            {post.label}
-          </p>
-  
-          {post.image && (
-            <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
+            <PostOptions postId={post.id} onDelete={handleDeletePost} onEdit={handleEditPost} />
+
+            {/* Cabeçalho do Post */}
+            <div
+              className="flex items-center gap-2 md:gap-3"
+              style={{ paddingBottom: "0.75rem", borderBottom: "1px solid var(--border)" }}
+            >
               <img
-                src={post.image}
-                onClick={() => handleOpenImage(post.image)}
-                className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl cursor-pointer"
-                alt="Post image"
+                src={post.author.foto}
+                alt="user"
+                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover object-center flex-shrink-0 border border-gray-200"
               />
-            </div>
-          )}
-  
-          {/* Área de Interação e Tooltip */}
-          <div
-            className="flex items-center justify-between text-xs md:text-sm gap-3 relative"
-            style={{
-              color: "var(--gray)",
-              paddingTop: "0.75rem",
-              borderTop: "1px solid var(--border)",
-            }}
-          >
-            {/* Contador de Likes com Tooltip de Clique */}
-            <div className="relative">
-              <div 
-                className="flex items-center gap-2 cursor-pointer active:opacity-50 transition-opacity"
-                onClick={() => setActiveTooltip(isTooltipOpen ? null : post.id)}
-              >
-                <Image
-                  src="/icons/like.png"
-                  alt="likes"
-                  width={16}
-                  height={16}
-                  className="opacity-60"
-                />
-                <span className="font-medium" style={{ color: "var(--black)" }}>
-                  {postLikesCount}
-                </span>
+              <div className="min-w-0 flex flex-col leading-tight">
+                <p className="text-sm md:text-base font-semibold truncate" style={{ color: "var(--black)" }}>
+                  {post.author.nome}
+                </p>
+                <p className="text-xs truncate opacity-50" style={{ color: "var(--gray)" }}>
+                  {post.postador}
+                </p>
+                <p className="text-[10px] md:text-xs opacity-70" style={{ color: "var(--gray)" }}>
+                  {new Date(post.createdAt).toLocaleString()}
+                </p>
               </div>
-  
-              {/* Balão do Tooltip (LikeView) */}
-              {isTooltipOpen && postLikesCount > 0 && (
-                <>
-                  {/* Overlay para fechar ao clicar fora */}
-                  <div className="fixed inset-0 z-10" onClick={() => setActiveTooltip(null)} />
-                  
-                  <div className="absolute bottom-full mb-3 left-0 z-20 animate-in fade-in zoom-in-95 duration-200 origin-bottom-left">
-                    <div className="bg-white border border-neutral-200 shadow-xl rounded-2xl p-2 min-w-[180px]">
-                      <LikeView 
-                        totalLikes={postLikesCount} 
-                        likers={MOCK_LIKERS.slice(0, 3)} 
-                      />
-                      {/* Setinha do balão */}
-                      <div className="absolute top-full left-3 -translate-y-px border-8 border-transparent border-t-white" />
+            </div>
+
+            {/* Conteúdo do Post */}
+            <p
+              className="text-sm whitespace-pre-wrap break-words"
+              style={{ color: "var(--black)" }}
+            >
+              {renderTextWithLinks(post.label)}
+            </p>
+
+            {post.image && (
+              <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
+                <img
+                  src={post.image}
+                  onClick={() => handleOpenImage(post.image)}
+                  className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl cursor-pointer"
+                  alt="Post image"
+                />
+              </div>
+            )}
+
+            {/* Área de Interação e Tooltip */}
+            <div
+              className="flex items-center justify-between text-xs md:text-sm gap-3 relative"
+              style={{
+                color: "var(--gray)",
+                paddingTop: "0.75rem",
+                borderTop: "1px solid var(--border)",
+              }}
+            >
+              {/* Contador de Likes com Tooltip de Clique */}
+              <div className="relative">
+                <div
+                  className="flex items-center gap-2 cursor-pointer active:opacity-50 transition-opacity"
+                  onClick={() => setActiveTooltip(isTooltipOpen ? null : post.id)}
+                >
+                  <Image
+                    src="/icons/like.png"
+                    alt="likes"
+                    width={16}
+                    height={16}
+                    className="opacity-60"
+                  />
+                  <span className="font-medium" style={{ color: "var(--black)" }}>
+                    {postLikesCount}
+                  </span>
+                </div>
+
+                {/* Balão do Tooltip (LikeView) */}
+                {isTooltipOpen && postLikesCount > 0 && (
+                  <>
+                    {/* Overlay para fechar ao clicar fora */}
+                    <div className="fixed inset-0 z-10" onClick={() => setActiveTooltip(null)} />
+
+                    <div className="absolute bottom-full mb-3 left-0 z-20 animate-in fade-in zoom-in-95 duration-200 origin-bottom-left">
+                      <div className="bg-white border border-neutral-200 shadow-xl rounded-2xl p-2 min-w-[180px]">
+                        <LikeView
+                          totalLikes={(listOfLikes[post.id] || []).length}
+                          likers={listOfLikes[post.id] || []}
+                        />
+                        {/* Setinha do balão */}
+                        <div className="absolute top-full left-3 -translate-y-px border-8 border-transparent border-t-white" />
+                      </div>
                     </div>
-                  </div>
-                </>
+                  </>
+                )}
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => curtir(post.id,post.authorId)}
+                  className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
+                >
+                  <Image
+                    src="/icons/like.png"
+                    alt="reação"
+                    width={20}
+                    height={20}
+                    className={`transition-all duration-300 w-4 h-4 md:w-5 md:h-5 ${liked ? "opacity-100 scale-110" : "opacity-50"}`}
+                  />
+                  <span
+                    className={`transition-all duration-300 ${liked ? "font-semibold" : ""}`}
+                    style={{ color: liked ? "var(--warning)" : "var(--gray)" }}
+                  >
+                    {liked ? "curtido" : "curtir"}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => toggleComments(post.id)}
+                  className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
+                >
+                  <Image
+                    src="/icons/coments.png"
+                    alt="comentários"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 md:w-6 md:h-6 opacity-70"
+                  />
+                  <span className="hidden sm:inline">{commentsCount[post.id] || 0} comentários</span>
+                  <span className="inline-flex items-center justify-center bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full sm:hidden">
+                    {commentsCount[post.id] || 0}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Input de Comentário */}
+            <div
+              className="flex items-center gap-2 rounded-lg md:rounded-full px-3 py-2 relative"
+              style={{ backgroundColor: "var(--background)", border: `1px solid var(--border)` }}
+            >
+              <img
+                src={user?.foto || "https://i.pravatar.cc/100?img=1"}
+                className="w-6 h-6 md:w-7 md:h-7 rounded-full object-cover object-center flex-shrink-0"
+                alt="comentador"
+              />
+              <input
+                id={`comment-input-${post.id}`}
+                value={comments[post.id] || ""}
+                maxLength={50}
+                onChange={(e) => setComments((prev) => ({ ...prev, [post.id]: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey && (comments[post.id] || "").trim() !== "") {
+                    comentar(post.id);
+                  }
+                }}
+                placeholder="Comentar..."
+                className="bg-transparent outline-none text-xs md:text-sm w-full pr-10"
+                style={{ color: "var(--black)" }}
+              />
+              {(comments[post.id] || "").trim() !== "" && (
+                <button
+                  className="absolute right-2 p-2 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "var(--primary)" }}
+                  onClick={() => comentar(post.id)}
+                >
+                  <img src="/icons/enviar.png" alt="enviar" className="w-5 h-5" />
+                </button>
               )}
             </div>
-  
-            {/* Botões de Ação */}
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => curtir(post.id)}
-                className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
-              >
-                <Image
-                  src="/icons/like.png"
-                  alt="reação"
-                  width={20}
-                  height={20}
-                  className={`transition-all duration-300 w-4 h-4 md:w-5 md:h-5 ${liked ? "opacity-100 scale-110" : "opacity-50"}`}
-                />
-                <span
-                  className={`transition-all duration-300 ${liked ? "font-semibold" : ""}`}
-                  style={{ color: liked ? "var(--warning)" : "var(--gray)" }}
-                >
-                  {liked ? "curtido" : "curtir"}
-                </span>
-              </button>
-  
-              <button
-                type="button"
-                onClick={() => toggleComments(post.id)}
-                className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
-              >
-                <Image
-                  src="/icons/coments.png"
-                  alt="comentários"
-                  width={20}
-                  height={20}
-                  className="w-5 h-5 md:w-6 md:h-6 opacity-70"
-                />
-                <span className="hidden sm:inline">{commentsCount[post.id] || 0} comentários</span>
-                <span className="inline-flex items-center justify-center bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full sm:hidden">
-                  {commentsCount[post.id] || 0}
-                </span>
-              </button>
-            </div>
+
+            <CommentsBox postId={post.id} postAuthorId={post.author.id} />
           </div>
-  
-          {/* Input de Comentário */}
-          <div
-            className="flex items-center gap-2 rounded-lg md:rounded-full px-3 py-2 relative"
-            style={{ backgroundColor: "var(--background)", border: `1px solid var(--border)` }}
-          >
-            <img
-              src={user?.foto || "https://i.pravatar.cc/100?img=1"}
-              className="w-6 h-6 md:w-7 md:h-7 rounded-full object-cover object-center flex-shrink-0"
-              alt="comentador"
-            />
-            <input
-              value={comments[post.id] || ""}
-              maxLength={50}
-              onChange={(e) => setComments((prev) => ({ ...prev, [post.id]: e.target.value }))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey && (comments[post.id] || "").trim() !== "") {
-                  comentar(post.id);
-                }
-              }}
-              placeholder="Comentar..."
-              className="bg-transparent outline-none text-xs md:text-sm w-full pr-10"
-              style={{ color: "var(--black)" }}
-            />
-            {(comments[post.id] || "").trim() !== "" && (
-              <button
-                className="absolute right-2 p-2 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "var(--primary)" }}
-                onClick={() => comentar(post.id)}
-              >
-                <img src="/icons/enviar.png" alt="enviar" className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-  
-          <CommentsBox postId={post.id} postAuthorId={post.author.id} />
-        </div>
-      );
-    })}
-  
-    <ImageModal image={selectedImage} open={openModal} onClose={handleCloseImage} />
-  </section>
+        );
+      })}
+
+      <ImageModal image={selectedImage} open={openModal} onClose={handleCloseImage} />
+    </section>
   )
 }
