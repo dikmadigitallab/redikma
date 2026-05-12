@@ -33,30 +33,41 @@ export function Header() {
   const notifyRef = useRef<HTMLDivElement | null>(null)
   const avatarRef = useRef<HTMLDivElement | null>(null)
 
-  const notificationsStorageKey = userId
-    ? `notifications-last-seen-count-${userId}`
+  const lastSeenKey = userId
+    ? `notifications-last-seen-${userId}`
     : ""
 
   useEffect(() => {
-    if (!userId || !notificationsStorageKey) return
+    if (!userId || !lastSeenKey) return
 
     async function fetchNotificationCount() {
       try {
-        const res = await fetch(
-          `/api/notifications/count?userId=${userId}`
-        )
+        const res = await fetch(`/api/notifications/count?userId=${userId}`)
         const data = await res.json()
 
-        if (data.unread !== undefined) {
-          const totalUnread = Number(data.unread) || 0
+        const totalUnread = Number(data.unread) || 0
 
-          const lastSeen = Number(
-            localStorage.getItem(notificationsStorageKey) || "0"
-          )
+        const lastSeen = localStorage.getItem(lastSeenKey)
 
-          const pending = Math.max(totalUnread - lastSeen, 0)
-          setUnreadCount(pending)
+        if (!lastSeen) {
+          setUnreadCount(totalUnread)
+          return
         }
+
+        const lastSeenDate = new Date(lastSeen)
+
+        const resList = await fetch(`/api/notifications?userId=${userId}`)
+        const list = await resList.json()
+
+        const notifications = Array.isArray(list)
+          ? list
+          : list.notifications || []
+
+        const pending = notifications.filter(
+          (n: any) => new Date(n.createdAt) > lastSeenDate
+        ).length
+
+        setUnreadCount(pending)
       } catch (error) {
         console.error("Erro ao buscar contagem:", error)
       }
@@ -66,7 +77,7 @@ export function Header() {
     const interval = setInterval(fetchNotificationCount, 30000)
 
     return () => clearInterval(interval)
-  }, [userId, notificationsStorageKey])
+  }, [userId, lastSeenKey])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -94,40 +105,24 @@ export function Header() {
     const nextOpen = !openNotifications
     setOpenNotifications(nextOpen)
 
-    if (nextOpen && userId && notificationsStorageKey) {
-      try {
-        const res = await fetch(
-          `/api/notifications/count?userId=${userId}`
-        )
-        const data = await res.json()
+    if (nextOpen && userId && lastSeenKey) {
+      const now = new Date().toISOString()
 
-        const totalUnread = Number(data.unread) || 0
+      localStorage.setItem(lastSeenKey, now)
 
-        localStorage.setItem(
-          notificationsStorageKey,
-          totalUnread.toString()
-        )
-
-        setUnreadCount(0)
-      } catch (error) {
-        console.error("Erro ao salvar estado:", error)
-      }
+      setUnreadCount(0)
     }
   }
 
   return (
-<header className="sticky top-0 z-50 w-full bg-[#F5F5F5] backdrop-blur-md border-b border-neutral-200 shadow-sm">
-  <div className="h-14 px-4 w-full flex items-center justify-between max-w-7xl mx-auto">
+<header className="fixed top-0 left-0 right-0 z-50 bg-[#F5F5F5] backdrop-blur-md border-b border-[#F5F5F5] shadow-sm md:sticky md:top-0 md:left-auto md:right-auto md:w-full">
+  <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
 
-    {/* LOGO */}
     <div
       onClick={() => router.push("/intern/feed")}
       className="flex items-center gap-3 cursor-pointer shrink-0"
     >
-      <div
-        className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm"
-        style={{ backgroundColor: "var(--primary-dark)" }}
-      >
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm bg-[var(--primary-dark)]">
         <img
           src="../icons/redikma_logo.png"
           alt="logotipo ReDikma"
@@ -136,38 +131,36 @@ export function Header() {
       </div>
 
       <div className="leading-tight">
-        <h1 className="text-sm font-bold text-neutral-800">
-          ReDikma
-        </h1>
-        <p className="text-[10px] text-neutral-500 tracking-wider uppercase">
+        <h1 className="text-sm font-bold text-neutral-800">ReDikma</h1>
+        <p className="text-[10px] text-neutral-500 uppercase">
           Comunicação Interna
         </p>
       </div>
     </div>
 
-    {/* AÇÕES */}
     <div className="flex items-center gap-3 shrink-0">
 
-      {/* SEARCH */}
-      <button className="w-9 h-9 flex items-center justify-center rounded-full text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition">
+      <button className="w-9 h-9 flex items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100">
         <Search size={18} />
       </button>
 
-      {/* NOTIFICAÇÕES */}
       {user?.id && (
         <div className="relative" ref={notifyRef}>
           <button
-            onClick={() => setOpenNotifications((prev) => !prev)}
-            className={`w-9 h-9 flex items-center justify-center rounded-full transition relative ${
+            onClick={handleToggleNotifications}
+            className={`w-9 h-9 flex items-center justify-center rounded-full relative transition ${
               unreadCount > 0
-                ? "text-orange-500 bg-orange-50 hover:bg-orange-100"
+                ? "text-orange-500 bg-orange-50"
                 : "text-neutral-500 hover:bg-neutral-100"
             }`}
           >
-            <Bell
-              size={18}
-              className={unreadCount > 0 ? "fill-current" : ""}
-            />
+            <Bell size={18} className={unreadCount > 0 ? "fill-current" : ""} />
+
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
           {openNotifications && (
@@ -178,15 +171,13 @@ export function Header() {
         </div>
       )}
 
-      {/* AVATAR */}
       <div className="relative" ref={avatarRef}>
         <button
           onClick={() => setOpen(!open)}
-          className="w-9 h-9 rounded-full overflow-hidden border border-neutral-200 hover:opacity-90 transition"
+          className="w-9 h-9 rounded-full overflow-hidden border border-neutral-200"
         >
           <img
             src={user?.foto || "../photoProfile/userDefault.png"}
-            alt="Avatar do usuário"
             className="w-full h-full object-cover"
           />
         </button>
@@ -194,35 +185,28 @@ export function Header() {
         {open && (
           <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border border-neutral-200 shadow-lg overflow-hidden">
 
-            {/* MENU PRINCIPAL */}
             <div className="py-2">
-
               <button
                 onClick={() => router.push("/intern/profile")}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition"
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
               >
                 <User size={18} /> Perfil
               </button>
 
               <button
                 onClick={() => router.push("/intern/feed")}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition"
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
               >
                 <Rss size={18} /> Feed
               </button>
             </div>
 
-            {/* LINKS */}
-            <div className="border-t border-neutral-100 py-2">
-              <p className="px-4 py-2 text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">
-                Links Úteis
-              </p>
-
+            <div className="border-t py-2">
               <button
                 onClick={() =>
                   window.open("https://telemedicina.dikma.com.br", "_blank")
                 }
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition"
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
               >
                 <FaUserDoctor size={18} /> Telemedicina
               </button>
@@ -231,17 +215,16 @@ export function Header() {
                 onClick={() =>
                   window.open("https://ouvidoria.dikma.com.br", "_blank")
                 }
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition"
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
               >
                 <FaHeadset size={18} /> Ouvidoria Dikma
               </button>
             </div>
 
-            {/* SAIR */}
-            <div className="border-t border-neutral-100 py-2">
+            <div className="border-t py-2">
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition"
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-500"
               >
                 <LogOut size={18} /> Sair
               </button>

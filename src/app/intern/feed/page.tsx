@@ -19,7 +19,7 @@ export default function Feed() {
 
   return (
     <div
-      className="h-screen min-h-[100dvh] w-full  flex flex-col overflow-hidden"
+      className="h-screen min-h-[98dvh] w-full  flex flex-col overflow-hidden"
       style={{ backgroundColor: "var(--background)" }}
     >
       {/* Header */}
