@@ -18,31 +18,48 @@ export function UserCard({ size = "md" }: CardUserProps) {
   const user = session?.user
 
   return (
-<div className="flex items-center gap-3">
-  {user?.foto ? (
-    <img
-      src={user.foto}
-      alt={user?.nome || "Usuário"}
-      className={`${sizes[size]} rounded-full object-cover`}
+<div
+  className="flex items-center gap-3 p-3 rounded-2xl border shadow-sm"
+  style={{
+    backgroundColor: "var(--white)",
+    borderColor: "var(--border)",
+  }}
+>
+  {/* Avatar */}
+  <div className="relative flex-shrink-0">
+    <div
+      className="absolute -inset-1 rounded-full opacity-20"
+      style={{ backgroundColor: "var(--secondary)" }}
     />
-  ) : (
-    <img
-      src="../photoProfile/userDefault.png"
-      alt="Usuário padrão"
-      className={`${sizes[size]} rounded-full object-cover`}
-    />
-  )}
 
-  <div>
+    {user?.foto ? (
+      <img
+        src={user.foto}
+        alt={user?.nome || "Usuário"}
+        className={`relative ${sizes[size]} rounded-full object-cover border-2`}
+        style={{ borderColor: "var(--white)" }}
+      />
+    ) : (
+      <img
+        src="../photoProfile/userDefault.png"
+        alt="Usuário padrão"
+        className={`relative ${sizes[size]} rounded-full object-cover border-2`}
+        style={{ borderColor: "var(--white)" }}
+      />
+    )}
+  </div>
+
+  {/* Informações do usuário */}
+  <div className="min-w-0 flex-1">
     <p
-      className="text-sm font-semibold"
+      className="text-sm font-semibold truncate"
       style={{ color: "var(--black)" }}
     >
       {user?.nome || "Carregando..."}
     </p>
 
     <p
-      className="text-xs"
+      className="text-xs truncate mt-0.5"
       style={{ color: "var(--gray)" }}
     >
       @{user?.username || "..."}
