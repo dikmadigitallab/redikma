@@ -132,21 +132,21 @@ export function Header() {
               <div className="absolute right-0 mt-3 w-48 bg-white shadow-xl rounded-xl border py-2">
                 <button
                   onClick={() => router.push("/intern/profile")}
-                  className="w-full px-4 py-2 text-left"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
                 >
                   <User size={18} /> Perfil
                 </button>
 
                 <button
                   onClick={() => router.push("/intern/feed")}
-                  className="w-full px-4 py-2 text-left"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
                 >
                   <LayoutGrid size={18} /> Feed
                 </button>
 
                 <button
                   onClick={() => signOut({ callbackUrl: "/login" })}
-                  className="w-full px-4 py-2 text-red-500 text-left"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
                 >
                   <LogOut size={18} /> Sair
                 </button>
