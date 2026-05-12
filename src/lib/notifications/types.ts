@@ -16,6 +16,6 @@ export interface NotifyParams {
   message: string;
   userIds?: string[];
   actorId: string;
-  data?: Record<string, any>;
+  data?: Record<string, ''>;
   excludeCurrentUser?: boolean;
 }
