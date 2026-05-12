@@ -18,29 +18,36 @@ export function UserCard({ size = "md" }: CardUserProps) {
   const user = session?.user
 
   return (
-    <div className="flex items-center gap-3">
-      {user?.foto ? (
-        <img
-          src={user.foto}
-          className={`${sizes[size]} rounded-full object-cover`}
-        />
-      ) : (
-        <div
-          className={`${sizes[size]} rounded-full flex items-center justify-center text-white font-semibold`}
-          style={{ backgroundColor: 'var(--secondary)' }}
-        >
-          {user?.nome?.charAt(0) || "?"}
-        </div>
-      )}
+<div className="flex items-center gap-3">
+  {user?.foto ? (
+    <img
+      src={user.foto}
+      alt={user?.nome || "Usuário"}
+      className={`${sizes[size]} rounded-full object-cover`}
+    />
+  ) : (
+    <img
+      src="../photoProfile/userDefault.png"
+      alt="Usuário padrão"
+      className={`${sizes[size]} rounded-full object-cover`}
+    />
+  )}
 
-      <div>
-        <p className="text-sm font-semibold" style={{ color: 'var(--black)' }}>
-          {user?.nome || "Carregando..."}
-        </p>
-        <p className="text-xs" style={{ color: 'var(--gray)' }}>
-          @{user?.username || "..."}
-        </p>
-      </div>
-    </div>
+  <div>
+    <p
+      className="text-sm font-semibold"
+      style={{ color: "var(--black)" }}
+    >
+      {user?.nome || "Carregando..."}
+    </p>
+
+    <p
+      className="text-xs"
+      style={{ color: "var(--gray)" }}
+    >
+      @{user?.username || "..."}
+    </p>
+  </div>
+</div>
   )
 }

@@ -2,8 +2,6 @@
 
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-
-
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
@@ -12,7 +10,6 @@ import { toast } from "sonner"
 import { ImageModal } from "./modal-view-photo"
 import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view"
-
 import { containsBadWords } from "@/lib/ofensivas"
 
 type Post = {

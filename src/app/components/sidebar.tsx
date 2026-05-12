@@ -41,23 +41,23 @@ export function Sidebar() {
     },
     ...(isAdmin
       ? [
-          {
-            icon: UserPlus,
-            label: "Novo Usuário",
-            onClick: ()=>{
-              router.push("/admin/cadastro")
-            },
-            disabled: false,
+        {
+          icon: UserPlus,
+          label: "Novo Usuário",
+          onClick: () => {
+            router.push("/admin/cadastro")
           },
-          {
-            icon: Users,
-            label: "Todos os Usuários",
-              onClick: ()=>{
-              router.push("/admin/usuarios")
-            },
-            disabled: false,
+          disabled: false,
+        },
+        {
+          icon: Users,
+          label: "Todos os Usuários",
+          onClick: () => {
+            router.push("/admin/usuarios")
           },
-        ]
+          disabled: false,
+        },
+      ]
       : []),
     {
       icon: Video,
@@ -77,7 +77,7 @@ export function Sidebar() {
   ]
 
   const sidebarContent = (
-    <div className="flex flex-col h-full gap-4 py-4 md:py-6">
+    <div className="flex flex-col  h-full gap-4 py-4 md:py-6">
       <div className="px-4 md:px-6">
         <UserCard />
       </div>
@@ -94,11 +94,10 @@ export function Sidebar() {
           <button
             key={item.label}
             onClick={item.onClick}
-            className={`flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg transition w-full text-left ${
-              item.disabled
+            className={`flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg transition w-full text-left ${item.disabled
                 ? "opacity-40 cursor-not-allowed"
                 : "hover:bg-opacity-50 cursor-pointer"
-            }`}
+              }`}
             style={{
               color: "var(--gray)",
               backgroundColor: "transparent",
@@ -152,46 +151,6 @@ export function Sidebar() {
         {sidebarContent}
       </aside>
 
-      <div
-        className="md:hidden fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-4"
-        style={{
-          backgroundColor: "var(--white)",
-          borderBottom: "1px solid var(--border)",
-        }}
-      >
-        <div
-          className="text-lg font-bold"
-          style={{ color: "var(--primary)" }}
-        >
-          ReDikma
-        </div>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-lg transition hover:opacity-70"
-          style={{ color: "var(--gray)" }}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {isOpen && (
-        <>
-          <div
-            className="md:hidden fixed inset-0 z-30 mt-16"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-            onClick={() => setIsOpen(false)}
-          />
-          <aside
-            className="md:hidden fixed top-16 left-0 right-0 z-30 overflow-y-auto"
-            style={{
-              backgroundColor: "var(--white)",
-              maxHeight: "calc(100vh - 4rem)",
-            }}
-          >
-            {sidebarContent}
-          </aside>
-        </>
-      )}
     </>
   )
 }

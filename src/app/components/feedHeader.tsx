@@ -67,95 +67,105 @@ export function Header() {
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-neutral-100">
-      <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
+<header className="sticky top-0 z-50 w-full bg-white backdrop-blur-sm border-b border-neutral-100">
+  <div className="h-14 px-2 w-full flex items-center justify-between">
+    
+    {/* LOGO - TOTALMENTE À ESQUERDA */}
+    <div
+      onClick={() => router.push("/intern/feed")}
+      className="flex items-center gap-2 cursor-pointer shrink-0"
+    >
+      <div
+        className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-white text-sm"
+        style={{ backgroundColor: "var(--primary-dark)" }}
+      >
+        <img
+          src="../icons/redikma_logo.png"
+          alt="logotipo ReDikma"
+          className="w-full h-full object-contain"
+        />
+      </div>
+      <h1 className="text-base font-bold text-neutral-800">ReDikma</h1>
+    </div>
 
-        {/* LOGO */}
-        <div
-          onClick={() => router.push("/intern/feed")}
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-white text-sm"
-            style={{ backgroundColor: 'var(--primary-dark)' }}
+    {/* AÇÕES - TOTALMENTE À DIREITA */}
+    <div className="flex items-center gap-2 shrink-0">
+
+      {/* SEARCH */}
+      <button className="p-2 text-neutral-500 hover:bg-neutral-50 rounded-full">
+        <Search size={20} />
+      </button>
+
+      {/* NOTIFICAÇÕES */}
+      {user?.id && (
+        <div className="relative" ref={notifyRef}>
+          <button
+            onClick={() => setOpenNotifications((prev) => !prev)}
+            className={`relative p-2 rounded-full transition-colors ${
+              unreadCount > 0
+                ? "text-orange-500 bg-orange-50 hover:bg-orange-100"
+                : "text-neutral-500 hover:bg-neutral-50"
+            }`}
           >
-            D
-          </div>
-          <h1 className="text-base font-bold text-neutral-800">ReDikma</h1>
-        </div>
-
-        {/* AÇÕES */}
-        <div className="flex items-center gap-2">
-
-          {/* SEARCH */}
-          <button className="p-2 text-neutral-500 hover:bg-neutral-50 rounded-full">
-            <Search size={20} />
+            <Bell
+              size={20}
+              className={unreadCount > 0 ? "fill-current" : ""}
+            />
           </button>
 
-          {/* NOTIFICAÇÕES */}
-          {user?.id && (
-<div className="relative" ref={notifyRef}>
-              <button
-                onClick={() => setOpenNotifications((prev) => !prev)}
-                className={`relative p-2 rounded-full transition-colors ${
-                  unreadCount > 0 
-                    ? "text-orange-500 bg-orange-50 hover:bg-orange-100" 
-                    : "text-neutral-500 hover:bg-neutral-50"
-                }`}
-              >
-                {/* O 'fill-current' faz o sino ficar sólido/pintado por dentro se houver notificação */}
-                <Bell 
-                  size={20} 
-                  className={unreadCount > 0 ? "fill-current" : ""} 
-                />
-              </button>
-
-              {openNotifications && (
-                <div className="absolute right-0 mt-2 z-50">
-                  <NotificationsBox userId={user.id} />
-                </div>
-              )}
+          {openNotifications && (
+            <div className="absolute right-0 mt-2 z-50">
+              <NotificationsBox userId={user.id} />
             </div>
           )}
+        </div>
+      )}
 
-          {/* AVATAR */}
-          <div className="relative" ref={avatarRef}>
-            <button onClick={() => setOpen(!open)}>
-              {user?.foto ? (
-                <img src={user.foto} className="w-8 h-8 rounded-full" />
-              ) : (
-                <div className="w-8 h-8 bg-gray-200 rounded-full" />
-              )}
+      {/* AVATAR */}
+      <div className="relative" ref={avatarRef}>
+        <button onClick={() => setOpen(!open)}>
+          {user?.foto ? (
+            <img
+              src={user.foto}
+              alt="Avatar do usuário"
+              className="w-8 h-8 rounded-full"
+            />
+          ) : (
+             <img
+              src={'../photoProfile/userDefault.png'}
+              alt="Avatar do usuário"
+              className="w-8 h-8 rounded-full"
+            />
+          )}
+        </button>
+
+        {open && (
+          <div className="absolute right-0 mt-3 w-48 bg-white shadow-xl rounded-xl border py-2">
+            <button
+              onClick={() => router.push("/intern/profile")}
+              className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
+            >
+              <User size={18} /> Perfil
             </button>
 
-            {open && (
-              <div className="absolute right-0 mt-3 w-48 bg-white shadow-xl rounded-xl border py-2">
-                <button
-                  onClick={() => router.push("/intern/profile")}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
-                >
-                  <User size={18} /> Perfil
-                </button>
+            <button
+              onClick={() => router.push("/intern/feed")}
+              className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
+            >
+              <LayoutGrid size={18} /> Feed
+            </button>
 
-                <button
-                  onClick={() => router.push("/intern/feed")}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
-                >
-                  <LayoutGrid size={18} /> Feed
-                </button>
-
-                <button
-                  onClick={() => signOut({ callbackUrl: "/login" })}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
-                >
-                  <LogOut size={18} /> Sair
-                </button>
-              </div>
-            )}
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
+            >
+              <LogOut size={18} /> Sair
+            </button>
           </div>
-
-        </div>
+        )}
       </div>
-    </header>
+    </div>
+  </div>
+</header>
   )
 }

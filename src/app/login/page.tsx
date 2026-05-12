@@ -85,10 +85,11 @@ export default function LoginCPF() {
           className="relative z-10 p-12 text-white max-w-xl text-center flex flex-col items-center"
         >
           <h2 className="text-4xl font-bold mb-4 leading-tight">
-            Conecte-se com quem faz a <span className="text-green-400">Dikma</span> acontecer.
+            Bem-vindo à <span className="text-green-400">ReDikma</span>
           </h2>
+
           <p className="text-lg text-gray-200 mb-8">
-            Nossa rede corporativa. Compartilhe ideias, celebre conquistas e interaja com pessoas incríveis todos os dias.
+            Um espaço de conexão, acolhimento e organização, que aproxima as pessoas e fortalece a nossa cultura todos os dias.
           </p>
 
           {/* Elemento de Prova Social / Avatares */}
@@ -106,69 +107,69 @@ export default function LoginCPF() {
 
 
 
-     {/* LADO DIREITO: Formulário de Login (Responsivo) */}
-      <div 
+      {/* LADO DIREITO: Formulário de Login (Responsivo) */}
+      <div
         className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 relative overflow-hidden"
         style={{ backgroundColor: '#0A4554' }} // Fundo CHAPADO com Azul Corporativo
       >
-        
+
         {/* --- DECORAÇÕES GEOMÉTRICAS E LINHAS INFORMES --- */}
-        
+
         {/* Linha Informe 1: Forma orgânica com borda grossa e rotação */}
-        <div 
+        <div
           className="absolute border-[3px] pointer-events-none"
-          style={{ 
-            borderColor: '#4FC3D9', 
+          style={{
+            borderColor: '#4FC3D9',
             opacity: 0.15,
-            width: '600px', 
+            width: '600px',
             height: '600px',
             top: '-15%',
             right: '-20%',
             borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%', // Cria a forma "informe/orgânica"
             transform: 'rotate(25deg)'
-          }} 
+          }}
         />
 
         {/* Linha Informe 2: Forma orgânica sobreposta, mais fina e com outra opacidade */}
-        <div 
+        <div
           className="absolute border-[1px] pointer-events-none"
-          style={{ 
-            borderColor: '#4FC3D9', 
+          style={{
+            borderColor: '#4FC3D9',
             opacity: 0.3,
-            width: '450px', 
+            width: '450px',
             height: '450px',
             top: '5%',
             right: '-10%',
             borderRadius: '60% 40% 30% 70% / 50% 40% 60% 50%',
             transform: 'rotate(-15deg)'
-          }} 
+          }}
         />
 
         {/* Forma Geométrica 1: Círculo Perfeito no fundo esquerdo */}
-        <div 
+        <div
           className="absolute rounded-full border-[4px] pointer-events-none"
-          style={{ 
-            borderColor: '#4FC3D9', 
+          style={{
+            borderColor: '#4FC3D9',
             opacity: 0.08,
-            width: '400px', 
+            width: '400px',
             height: '400px',
             bottom: '-10%',
             left: '-15%'
-          }} 
+          }}
         />
 
         {/* Forma Geométrica 2: Quadrado Rotacionado (Losango) flutuando */}
-        <div 
+        <div
           className="absolute border-[2px] pointer-events-none"
-          style={{ 
+          style={{
             borderColor: '#FDE205', // Toque sutil do Accent (Amarelo Forte)
             opacity: 0.1,
-            width: '180px', 
+            width: '180px',
             height: '180px',
             bottom: '15%',
             right: '10%',
             transform: 'rotate(45deg)'
-          }} 
+          }}
         />
 
         {/* --- CARD DE LOGIN --- */}
@@ -182,8 +183,8 @@ export default function LoginCPF() {
           {/* Cabeçalho */}
           <div className="space-y-3">
             <div className="flex items-center gap-3 mb-6 pb-6" style={{ borderBottom: '1px solid #E0E0E0' }}>
-              <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm" 
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm"
                 style={{ backgroundColor: '#0A4554' }} // Logo em Azul Corporativo
               >
                 D
@@ -203,8 +204,8 @@ export default function LoginCPF() {
           <div className="space-y-5">
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: '#1A1A1A' }}>CPF</label>
-              <div 
-                className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent" 
+              <div
+                className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent"
                 style={{ backgroundColor: '#F5F5F5', border: '1px solid #E0E0E0' }} // Fundo de input levemente cinza
                 onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
                 onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
@@ -226,8 +227,8 @@ export default function LoginCPF() {
 
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: '#1A1A1A' }}>Senha</label>
-              <div 
-                className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent" 
+              <div
+                className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent"
                 style={{ backgroundColor: '#F5F5F5', border: '1px solid #E0E0E0' }}
                 onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
                 onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}

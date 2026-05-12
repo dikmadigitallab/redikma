@@ -31,7 +31,7 @@ export default function PerfilPage() {
             senha: "",
             email: data.user.email ?? "",
             telefone: data.user.telefone ?? "",
-            foto: data.user.foto ?? "",
+            foto: data.user.foto ?? "../photoProfile/userDefault.png",
           })
           setPreview(data.user.foto ?? "")
         }
@@ -103,7 +103,7 @@ export default function PerfilPage() {
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="relative group">
             <img
-              src={preview || "/photoProfile/default.jpeg"}
+              src={preview || ""}
               alt="foto"
               className="w-20 h-20 rounded-full object-cover ring-2 ring-neutral-100 shadow-sm"
             />
