@@ -140,7 +140,7 @@ export function Sidebar() {
 
                 {/* Texto */}
                 <div className="flex flex-col items-start min-w-0">
-                  <span className="text-sm md:text-[15px] font-semibold truncate">
+                  <span className="text-sm md:text-[80%] font-semibold truncate">
                     {item.label}
                   </span>
                 </div>
@@ -196,7 +196,7 @@ export function Sidebar() {
   return (
     <>
       <aside
-        className="hidden md:flex z-[9999] flex-col w-96 h-screen fixed left-0 top-0 z-50 overflow-y-auto shadow-xl"
+        className="hidden md:flex z-[9999] flex-col w-[18vw] h-screen fixed left-0 top-0 z-50 overflow-y-auto shadow-xl"
         style={{
           backgroundColor: "var(--white)",
           borderRight: "1px solid var(--border)",
@@ -245,14 +245,14 @@ export function Sidebar() {
             {/* Nome do sistema */}
             <div className="min-w-0">
               <h1
-                className="text-xl font-bold tracking-tight"
+                className="text-[100%] font-bold tracking-tight"
                 style={{ color: "var(--primary-dark)" }}
               >
                 ReDikma
               </h1>
 
               <p
-                className="text-[10px] font-semibold uppercase tracking-[0.18em] mt-0.5"
+                className="text-[15%] font-semibold uppercase tracking-[0.18em] mt-0.5"
                 style={{ color: "var(--gray)" }}
               >
                 Comunicação Interna

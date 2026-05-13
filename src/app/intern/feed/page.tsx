@@ -42,7 +42,7 @@ export default function Feed() {
 
           {/* Sidebar direita */}
           <aside
-            className="hidden lg:flex lg:flex-col lg:w-[420px] xl:w-[520px] h-full flex-shrink-0 overflow-hidden rounded-3xl border shadow-sm"
+            className="hidden lg:flex lg:flex-col lg:w-[30vw] xl:w-130 h-full shrink-0 overflow-hidden rounded-3xl border shadow-sm"
             style={{
               backgroundColor: "var(--white)",
               borderColor: "var(--border)",

@@ -16,7 +16,7 @@ export const StoriesModal = ({
   selectedStory,
   closeStory,
 }: StoriesModalProps) => {
-  if (!selectedStory) return null;
+  if (!selectedStory) return null; 
 
   return (
     <div

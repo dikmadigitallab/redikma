@@ -99,9 +99,10 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
     async function loadPosts() {
       setLoading(true)
       try {
-        const res = await fetch("/api/posts", { cache: 'no-store' })
+        const res = await fetch("/api/posts", { cache: "no-store" })
         const data = await res.json()
-        setPosts(data)
+
+        setPosts(Array.isArray(data) ? data : data?.posts ?? [])
       } catch (err) {
         console.error(err)
       } finally {
@@ -633,15 +634,15 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                         width={20}
                         height={20}
                         className={`transition-all duration-300 w-5 h-5 ${liked
-                            ? "opacity-100 scale-110"
-                            : "opacity-50"
+                          ? "opacity-100 scale-110"
+                          : "opacity-50"
                           }`}
                       />
 
                       <span
                         className={`text-sm transition-all duration-300 ${liked
-                            ? "font-semibold"
-                            : "font-medium"
+                          ? "font-semibold"
+                          : "font-medium"
                           }`}
                         style={{
                           color: liked

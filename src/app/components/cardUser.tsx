@@ -52,7 +52,7 @@ export function UserCard({ size = "md" }: CardUserProps) {
   {/* Informações do usuário */}
   <div className="min-w-0 flex-1">
     <p
-      className="text-sm font-semibold truncate"
+      className="text-[55%] font-semibold truncate"
       style={{ color: "var(--black)" }}
     >
       {user?.nome || "Carregando..."}
