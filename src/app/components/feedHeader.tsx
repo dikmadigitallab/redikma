@@ -204,7 +204,7 @@ export function Header() {
             <div className="border-t py-2">
               <button
                 onClick={() =>
-                  window.open("https://telemedicina.dikma.com.br", "_blank")
+                  window.open("https://www.saobernardosamp.com.br/servicos/telemedicina/?v=1", "_blank")
                 }
                 className="flex items-center gap-3 w-full px-4 py-2 text-sm"
               >
@@ -213,7 +213,7 @@ export function Header() {
 
               <button
                 onClick={() =>
-                  window.open("https://ouvidoria.dikma.com.br", "_blank")
+                  window.open("https://dikma.com.br/contato/#ouvidoria", "_blank")
                 }
                 className="flex items-center gap-3 w-full px-4 py-2 text-sm"
               >
