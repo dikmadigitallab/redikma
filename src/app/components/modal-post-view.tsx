@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+
+const scrollStyles = `
+  .modal-scroll::-webkit-scrollbar { width: 0; background: transparent; }
+  .modal-scroll:hover::-webkit-scrollbar { width: 6px; }
+  .modal-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+  .modal-scroll:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+  .modal-scroll::-webkit-scrollbar-track { background: transparent; }
+  .modal-scroll { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+  .modal-scroll:hover { scrollbar-color: rgba(0,0,0,0.15) transparent; }
+`;
 import { CommentsBox } from "./comentarios";
 import { ImageModal } from "./modal-view-photo";
 import { LikeView } from "./likes-view";
@@ -148,12 +158,13 @@ export function PostViewModal({ postId, onClose }: Props) {
 
   return (
     <>
+      <style>{scrollStyles}</style>
       <div
         className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
         onClick={onClose}
       >
         <div
-          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+          className="modal-scroll relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border shadow-2xl animate-in fade-in zoom-in-95 duration-200"
           style={{ backgroundColor: "var(--white)", borderColor: "var(--border)" }}
           onClick={(e) => e.stopPropagation()}
         >
