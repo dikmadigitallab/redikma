@@ -144,6 +144,12 @@ src/
 - `feed.tsx`: avatar do comentário usa `userDefault.png` em vez de pravatar
 - `admin/usuarios/page.tsx`: fallback corrigido para `userDefault.png`
 
+### 14/05/2026 - Notificações: Curtidas, Comentários e Respostas
+- `comments-likes/route.ts`: notifica autor do comentário quando alguém curte
+- `posts-comments/route.ts`: notifica autor do post quando comentam
+- `posts-comments/route.ts`: notifica autor do comentário pai quando respondem
+- `types.ts`: corrigido tipo `data` de `Record<string, ''>` para `Record<string, any>`
+
 ### Commit Inicial - 14/05/2026
 - Criação dos arquivos `memoria.md` e `checkpoints.md`
 - Branch `opencode` criada para desenvolvimento

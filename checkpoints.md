@@ -29,6 +29,7 @@ git checkout -b <nova-branch> <commit-hash>
 | 5 | 14/05/2026 | `f45c82c` | fix: foto de perfil usa userDefault.png em vez de pravatar quando usuário não tem foto | `opencode` |
 | 6 | 14/05/2026 | `9070af0` | feat: mostra foto do autor nas notificações | `opencode` |
 | 7 | 14/05/2026 | `c5950b4` | feat: formato relativo de tempo nas notificações | `opencode` |
+| 8 | 14/05/2026 | `3aeb331` | feat: notificações para curtidas em comentários, comentários em posts e respostas | `opencode` |
 
 ---
 
