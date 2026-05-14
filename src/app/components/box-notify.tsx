@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaTrash } from "react-icons/fa";
 
 function timeAgo(dateStr: string): string {
@@ -40,6 +41,7 @@ type Notification = {
   message: string;
   read: boolean;
   createdAt: string;
+  data?: Record<string, any> | null;
   actor?: {
     nome: string;
     foto: string | null;
@@ -47,6 +49,7 @@ type Notification = {
 };
 
 export function NotificationsBox({ userId }: { userId: string }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -146,39 +149,55 @@ export function NotificationsBox({ userId }: { userId: string }) {
             Nenhuma notificação por enquanto.
           </div>
         ) : (
-          notifications.map((n) => (
-            <div
-              key={n.id}
-              className="group flex items-start gap-3 p-3 border-b text-sm transition-colors hover:bg-neutral-50"
-            >
-              <img
-                src={
-                  n.actor?.foto ||
-                  "/photoProfile/userDefault.png"
-                }
-                alt={n.actor?.nome || "Usuário"}
-                className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
-              />
+          notifications.map((n) => {
+            const postId = n.data?.postId as string | undefined;
 
-              <div className="flex-1 min-w-0">
-                <div className="text-neutral-800 truncate">{n.title}</div>
-                <div className="text-neutral-500 text-xs mt-0.5 truncate">
-                  {n.message}
-                </div>
-                <div className="text-neutral-400 text-[10px] mt-1">
-                  {timeAgo(n.createdAt)}
-                </div>
-              </div>
-
-              <button
-                onClick={() => handleDelete(n.id)}
-                className="shrink-0 mt-1 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
-                title="Deletar notificação"
+            return (
+              <div
+                key={n.id}
+                className="group flex items-start gap-3 p-3 border-b text-sm transition-colors hover:bg-neutral-50"
               >
-                <FaTrash size={10} />
-              </button>
-            </div>
-          ))
+                <button
+                  onClick={() => {
+                    if (postId) {
+                      router.push(`/intern/feed?postId=${postId}`);
+                    }
+                  }}
+                  className="flex items-start gap-3 flex-1 min-w-0 text-left"
+                >
+                  <img
+                    src={
+                      n.actor?.foto ||
+                      "/photoProfile/userDefault.png"
+                    }
+                    alt={n.actor?.nome || "Usuário"}
+                    className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
+                  />
+
+                  <div className="flex-1 min-w-0">
+                    <div className="text-neutral-800 truncate">{n.title}</div>
+                    <div className="text-neutral-500 text-xs mt-0.5 truncate">
+                      {n.message}
+                    </div>
+                    <div className="text-neutral-400 text-[10px] mt-1">
+                      {timeAgo(n.createdAt)}
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(n.id);
+                  }}
+                  className="shrink-0 mt-1 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
+                  title="Deletar notificação"
+                >
+                  <FaTrash size={10} />
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
     </div>
