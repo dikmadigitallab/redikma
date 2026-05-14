@@ -28,6 +28,7 @@ git checkout -b <nova-branch> <commit-hash>
 | 4 | 14/05/2026 | `8dddefd` | feat: lixeira individual nas notificações para deletar do banco mas manter no cache local | `opencode` |
 | 5 | 14/05/2026 | `f45c82c` | fix: foto de perfil usa userDefault.png em vez de pravatar quando usuário não tem foto | `opencode` |
 | 6 | 14/05/2026 | `9070af0` | feat: mostra foto do autor nas notificações | `opencode` |
+| 7 | 14/05/2026 | `c5950b4` | feat: formato relativo de tempo nas notificações | `opencode` |
 
 ---
 
