@@ -31,6 +31,7 @@ git checkout -b <nova-branch> <commit-hash>
 | 7 | 14/05/2026 | `c5950b4` | feat: formato relativo de tempo nas notificações | `opencode` |
 | 8 | 14/05/2026 | `3aeb331` | feat: notificações para curtidas em comentários, comentários em posts e respostas | `opencode` |
 | 9 | 14/05/2026 | `80c1adc` | feat: notificação clicável leva até a postagem no feed | `opencode` |
+| 10 | 14/05/2026 | `a199ed1` | feat: modal ao clicar em notificação mostra a postagem completa | `opencode` |
 
 ---
 

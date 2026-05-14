@@ -150,6 +150,13 @@ src/
 - `posts-comments/route.ts`: notifica autor do comentário pai quando respondem
 - `types.ts`: corrigido tipo `data` de `Record<string, ''>` para `Record<string, any>`
 
+### 14/05/2026 - Modal de Postagem nas Notificações
+- `PostModalContext`: provider global com `openPost(postId)` e `closePost()`
+- `modal-post-view.tsx`: modal que busca e exibe a postagem (autor, texto, imagem, data)
+- `box-notify.tsx`: ao clicar na notificação, abre o modal com o post
+- `feed.tsx`: removido scroll-to-post (substituído pelo modal)
+- `layout.tsx`: `PostModalProvider` adicionado ao root layout
+
 ### Commit Inicial - 14/05/2026
 - Criação dos arquivos `memoria.md` e `checkpoints.md`
 - Branch `opencode` criada para desenvolvimento
