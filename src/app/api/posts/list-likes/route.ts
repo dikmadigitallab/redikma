@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
         foto:
           like.user.foto && like.user.foto.trim() !== ""
             ? like.user.foto
-            : "https://i.pravatar.cc/150?u=" + like.user.id,
+            : "/photoProfile/userDefault.png",
         createdAt: like.createdAt,
       }))
 

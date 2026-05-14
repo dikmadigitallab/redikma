@@ -139,6 +139,11 @@ src/
 - POST `/api/notifications` adicionado para suportar `NotificationProvider`
 - 7-day cleanup automático mantido para notificações não deletadas
 
+### 14/05/2026 - Foto de Perfil nos Likes
+- `list-likes/route.ts`: fallback corrigido de pravatar para `/photoProfile/userDefault.png`
+- `feed.tsx`: avatar do comentário usa `userDefault.png` em vez de pravatar
+- `admin/usuarios/page.tsx`: fallback corrigido para `userDefault.png`
+
 ### Commit Inicial - 14/05/2026
 - Criação dos arquivos `memoria.md` e `checkpoints.md`
 - Branch `opencode` criada para desenvolvimento

@@ -680,7 +680,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
             <img
               src={
                 user?.foto ||
-                "https://i.pravatar.cc/100?img=1"
+                "/photoProfile/userDefault.png"
               }
               className="w-7 h-7 rounded-full object-cover flex-shrink-0"
               alt="Comentador"

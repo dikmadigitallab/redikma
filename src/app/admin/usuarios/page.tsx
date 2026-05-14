@@ -247,7 +247,7 @@ export default function UsuariosPage() {
                           >
                            
                             <img
-                              src={usuario.foto||"https://i.pravatar.cc/100?img=2"}
+                              src={usuario.foto||"/photoProfile/userDefault.png"}
                               alt={usuario.nome}
                               className="w-full h-full object-cover"
                             />
