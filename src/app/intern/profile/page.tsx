@@ -51,6 +51,8 @@ export default function PerfilPage() {
     setForm((prev) => ({ ...prev, foto: file }))
   }
 
+
+  //edição de perfil, só envia os campos que foram alterados, se a foto for um arquivo, envia como multipart/form-data, senão envia a url atual
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData()
