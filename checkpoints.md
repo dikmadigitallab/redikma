@@ -25,6 +25,7 @@ git checkout -b <nova-branch> <commit-hash>
 | 1 | 14/05/2026 | `c0045c4` | Commit inicial: configuração do projeto e documentação | `opencode` |
 | 2 | 14/05/2026 | `d434ad5` | docs: update checkpoint with actual commit hash | `opencode` |
 | 3 | 14/05/2026 | `b1c3b09` | feat: notificações deletadas do banco ao abrir e mantidas no localStorage | `opencode` |
+| 4 | 14/05/2026 | `8dddefd` | feat: lixeira individual nas notificações para deletar do banco mas manter no cache local | `opencode` |
 
 ---
 
