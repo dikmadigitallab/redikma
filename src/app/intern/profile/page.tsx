@@ -1,12 +1,20 @@
 "use client"
+
 import { User } from "next-auth"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { Sidebar } from "@/app/components/sidebar"
+import {
+  Camera,
+  Mail,
+  Phone,
+  Lock,
+} from "lucide-react"
 
 export default function PerfilPage() {
   const { update } = useSession()
+
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -17,7 +25,7 @@ export default function PerfilPage() {
     foto: "" as string | File | Blob,
   })
 
-  const [preview, setPreview] = useState("src/app/intern/profile/page.tsx")
+  const [preview, setPreview] = useState("")
 
   useEffect(() => {
     async function fetchUser() {
@@ -27,202 +35,302 @@ export default function PerfilPage() {
 
         if (data?.user) {
           setUser(data.user)
+
           setForm({
             senha: "",
             email: data.user.email ?? "",
             telefone: data.user.telefone ?? "",
-            foto: data.user.foto ?? "../photoProfile/userDefault.png",
+            foto: data.user.foto ?? "",
           })
+
           setPreview(data.user.foto ?? "")
         }
-      } catch (err) {
+      } catch {
         toast.error("Erro ao carregar dados")
       }
     }
+
     fetchUser()
   }, [])
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFile(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
     const file = e.target.files?.[0]
+
     if (!file) return
 
     const previewUrl = URL.createObjectURL(file)
+
     setPreview(previewUrl)
-    setForm((prev) => ({ ...prev, foto: file }))
+
+    setForm((prev) => ({
+      ...prev,
+      foto: file,
+    }))
   }
 
-
-  //edição de perfil, só envia os campos que foram alterados, se a foto for um arquivo, envia como multipart/form-data, senão envia a url atual
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault()
+
+    setLoading(true)
+
     const formData = new FormData()
 
-    if (form.email) formData.append("email", form.email)
-    if (form.telefone) formData.append("telefone", form.telefone)
-    if (form.senha) formData.append("senha", form.senha)
-    if (form.foto instanceof File || form.foto instanceof Blob) {
-      formData.append("foto", form.foto, "profile.jpg")
+    if (form.email)
+      formData.append("email", form.email)
+
+    if (form.telefone)
+      formData.append(
+        "telefone",
+        form.telefone
+      )
+
+    if (form.senha)
+      formData.append("senha", form.senha)
+
+    if (
+      form.foto instanceof File ||
+      form.foto instanceof Blob
+    ) {
+      formData.append(
+        "foto",
+        form.foto,
+        "profile.jpg"
+      )
     }
 
     try {
-      const res = await fetch("/api/users/profile", {
-        method: "PUT",
-        body: formData,
-      })
+      const res = await fetch(
+        "/api/users/profile",
+        {
+          method: "PUT",
+          body: formData,
+        }
+      )
 
       const data = await res.json()
+
       if (!res.ok) throw new Error()
 
       setPreview(data.user.foto)
+
       await update({
         email: form.email,
         telefone: form.telefone,
         foto: data.user.foto,
       })
 
-      toast.success("Perfil atualizado com sucesso")
-    } catch (err) {
+      toast.success(
+        "Perfil atualizado com sucesso"
+      )
+    } catch {
       toast.error("Erro ao atualizar perfil")
+    } finally {
+      setLoading(false)
     }
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
     const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
   if (!user) return null
 
   return (
-<div className="h-screen w-full flex flex-col md:flex-row bg-neutral-50 overflow-hidden">
-  <Sidebar />
+    <div className="h-screen w-full flex bg-[#f6f7fb] overflow-hidden">
+      <Sidebar />
 
-  <main className="flex-1 h-full overflow-y-auto px-4 py-4 md:py-8 flex justify-center items-start">
-    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-sm border border-neutral-200/60 flex flex-col">
-      
-      {/* Cabeçalho Compacto com Upload Integrado */}
-      <div className="p-6 md:p-8 border-b border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          <div className="relative group">
-            <img
-              src={preview || user.foto || "../photoProfile/userDefault.png"}
-              alt="foto"
-              className="w-20 h-20 rounded-full object-cover ring-2 ring-neutral-100 shadow-sm"
-            />
+      <main className="flex-1 overflow-y-auto px-3 py-4 md:px-8 md:py-8">
+        <div className="max-w-5xl mx-auto">
 
-            <input
-              type="file"
-              id="upload-foto"
-              accept="image/*"
-              onChange={handleFile}
-              className="hidden"
-            />
+          <div className="bg-white border border-neutral-200 rounded-[28px] overflow-hidden shadow-sm">
 
-            <label
-              htmlFor="upload-foto"
-              className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity text-white text-[10px] font-bold uppercase"
+            {/* Topo */}
+            <div className="px-5 md:px-8 py-7 border-b border-neutral-100 bg-[#fafcff]">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+                {/* Perfil */}
+                <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4">
+
+                  <div className="relative group">
+                    <img
+                      src={
+                        preview ||
+                        user.foto ||
+                        "../photoProfile/userDefault.png"
+                      }
+                      alt="Foto"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-sm"
+                    />
+
+                    <input
+                      type="file"
+                      id="upload-foto"
+                      accept="image/*"
+                      onChange={handleFile}
+                      className="hidden"
+                    />
+
+                    <label
+                      htmlFor="upload-foto"
+                      className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-white border border-neutral-200 flex items-center justify-center cursor-pointer hover:bg-neutral-50 transition-all"
+                    >
+                      <Camera
+                        size={16}
+                        className="text-neutral-600"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="text-center sm:text-left">
+                    <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">
+                      {user.nome}
+                    </h1>
+
+                    <p className="text-sm text-neutral-500 mt-1">
+                      @{user.username}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Infos */}
+                <div className="flex flex-wrap justify-center lg:justify-end gap-3">
+
+                  <div className="bg-white border border-neutral-200 rounded-2xl px-4 py-3 min-w-[160px]">
+                    <p className="text-[10px] uppercase font-semibold text-neutral-400">
+                      CPF
+                    </p>
+
+                    <p className="text-sm font-semibold text-neutral-700 mt-1">
+                      {user.cpf}
+                    </p>
+                  </div>
+
+                  <div className="bg-white border border-neutral-200 rounded-2xl px-4 py-3 min-w-[160px]">
+                    <p className="text-[10px] uppercase font-semibold text-neutral-400">
+                      Cargo
+                    </p>
+
+                    <p className="text-sm font-semibold text-neutral-700 mt-1">
+                      {user.cargo}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form
+              onSubmit={handleSubmit}
+              className="p-5 md:p-8"
             >
-              Trocar
-            </label>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <div className="text-center sm:text-left">
-            <h1 className="text-xl font-black text-neutral-900 leading-tight">
-              {user.nome}
-            </h1>
-            <p className="text-sm text-neutral-500">
-              @{user.username}
-            </p>
+                {/* Email */}
+                <div>
+                  <label className="text-[11px] font-semibold uppercase text-neutral-500 ml-1">
+                    E-mail corporativo
+                  </label>
+
+                  <div className="relative mt-2">
+                    <Mail
+                      size={17}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+                    />
+
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      className="w-full h-14 rounded-2xl bg-[#f8fafc] border border-neutral-200 pl-12 pr-4 text-sm outline-none focus:border-neutral-400 transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Telefone */}
+                <div>
+                  <label className="text-[11px] font-semibold uppercase text-neutral-500 ml-1">
+                    Telefone / WhatsApp
+                  </label>
+
+                  <div className="relative mt-2">
+                    <Phone
+                      size={17}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+                    />
+
+                    <input
+                      type="text"
+                      name="telefone"
+                      value={form.telefone}
+                      onChange={handleChange}
+                      className="w-full h-14 rounded-2xl bg-[#f8fafc] border border-neutral-200 pl-12 pr-4 text-sm outline-none focus:border-neutral-400 transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Senha */}
+                <div className="md:col-span-2">
+                  <label className="text-[11px] font-semibold uppercase text-neutral-500 ml-1">
+                    Alterar senha
+                  </label>
+
+                  <div className="relative mt-2">
+                    <Lock
+                      size={17}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+                    />
+
+                    <input
+                      type="password"
+                      name="senha"
+                      placeholder="Deixe em branco para não alterar"
+                      value={form.senha}
+                      onChange={handleChange}
+                      className="w-full h-14 rounded-2xl bg-[#f8fafc] border border-neutral-200 pl-12 pr-4 text-sm outline-none focus:border-neutral-400 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-8 pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-end gap-3">
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.location.reload()
+                  }
+                  className="w-full sm:w-auto px-6 h-12 rounded-2xl text-sm font-semibold text-neutral-500 hover:bg-neutral-100 transition-all"
+                >
+                  Descartar
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full sm:w-auto px-8 h-12 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 transition-all"
+                >
+                  {loading
+                    ? "Salvando..."
+                    : "Salvar Alterações"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-
-        {/* Dados Administrativos em Badge Horizontal */}
-        <div className="flex gap-4">
-          <div className="bg-neutral-50 px-4 py-2 rounded-xl border border-neutral-100">
-            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
-              CPF
-            </p>
-            <p className="text-xs font-bold text-neutral-700">
-              {user.cpf}
-            </p>
-          </div>
-
-          <div className="bg-neutral-50 px-4 py-2 rounded-xl border border-neutral-100">
-            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
-              Cargo
-            </p>
-            <p className="text-xs font-bold text-neutral-700">
-              {user.cargo}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Formulário em Grid de Duas Colunas */}
-      <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-neutral-500 uppercase ml-1">
-              E-mail Corporativo
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none transition-all text-sm"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-neutral-500 uppercase ml-1">
-              Telefone / WhatsApp
-            </label>
-            <input
-              type="text"
-              name="telefone"
-              value={form.telefone}
-              onChange={handleChange}
-              className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none transition-all text-sm"
-            />
-          </div>
-
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="text-[11px] font-bold text-neutral-500 uppercase ml-1">
-              Alterar Senha
-            </label>
-            <input
-              type="password"
-              name="senha"
-              placeholder="Deixe em branco para não alterar"
-              value={form.senha}
-              onChange={handleChange}
-              className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none transition-all text-sm"
-            />
-          </div>
-        </div>
-
-        {/* Rodapé do Form com Ações */}
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-neutral-100">
-          <button
-            type="button"
-            className="text-sm font-bold text-neutral-400 hover:text-neutral-600 transition-colors order-2 sm:order-1"
-            onClick={() => window.location.reload()}
-          >
-            Descartar
-          </button>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full sm:w-auto px-10 py-3.5 bg-black text-white rounded-xl font-bold text-sm hover:bg-neutral-800 active:scale-[0.98] transition-all shadow-lg shadow-neutral-200 disabled:opacity-50 order-1 sm:order-2"
-          >
-            {loading ? "Salvando..." : "Salvar Alterações"}
-          </button>
-        </div>
-      </form>
+      </main>
     </div>
-  </main>
-</div>
   )
 }
