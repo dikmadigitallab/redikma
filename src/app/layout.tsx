@@ -4,6 +4,7 @@ import { Providers } from "@/components/Providers";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { NotificationProvider } from "./providers/NotificationProvider";
+import { PostModalProvider } from "./providers/PostModalContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +34,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col ">
         <Providers>
           <NotificationProvider>
+          <PostModalProvider>
 
           {children}
+          </PostModalProvider>
           </NotificationProvider>
           
           </Providers>

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { FaTrash } from "react-icons/fa";
+import { usePostModal } from "../providers/PostModalContext";
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -49,7 +49,7 @@ type Notification = {
 };
 
 export function NotificationsBox({ userId }: { userId: string }) {
-  const router = useRouter();
+  const { openPost } = usePostModal();
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -159,9 +159,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
               >
                 <button
                   onClick={() => {
-                    if (postId) {
-                      router.push(`/intern/feed?postId=${postId}`);
-                    }
+                    if (postId) openPost(postId);
                   }}
                   className="flex items-start gap-3 flex-1 min-w-0 text-left"
                 >

@@ -113,33 +113,6 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
   }, [pathname, refreshKey])
 
-  // Scroll até a postagem quando vem de uma notificação
-  useEffect(() => {
-    if (posts.length === 0) return;
-
-    const params = new URLSearchParams(window.location.search);
-    const postId = params.get("postId");
-
-    if (!postId) return;
-
-    // Pequeno delay para garantir que o DOM renderizou
-    const timer = setTimeout(() => {
-      const el = document.getElementById(`post-${postId}`);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-        el.classList.add("ring-4", "ring-cyan-400", "ring-offset-2");
-        setTimeout(() => {
-          el.classList.remove("ring-4", "ring-cyan-400", "ring-offset-2");
-        }, 3000);
-        // Limpa a query string sem recarregar
-        window.history.replaceState({}, "", "/intern/feed");
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [posts]);
-
-
   function handleRefresh() {
     setRefreshKey(k => k + 1)
     onRefresh?.()
