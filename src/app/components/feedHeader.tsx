@@ -20,6 +20,12 @@ type SessionUser = {
   foto?: string
 }
 
+type SearchPost = {
+  id: string
+  image: string
+  descricao?: string
+}
+
 export function Header() {
   const { data: session } = useSession()
   const user = session?.user as SessionUser | undefined
@@ -29,9 +35,16 @@ export function Header() {
   const [openNotifications, setOpenNotifications] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
 
+  const [openSearch, setOpenSearch] = useState(false)
+  const [search, setSearch] = useState("")
+  const [results, setResults] = useState<SearchPost[]>([])
+  const [loading, setLoading] = useState(false)
+
   const router = useRouter()
+
   const notifyRef = useRef<HTMLDivElement | null>(null)
   const avatarRef = useRef<HTMLDivElement | null>(null)
+  const searchRef = useRef<HTMLDivElement | null>(null)
 
   const lastSeenKey = userId
     ? `notifications-last-seen-${userId}`
@@ -74,6 +87,7 @@ export function Header() {
     }
 
     fetchNotificationCount()
+
     const interval = setInterval(fetchNotificationCount, 30000)
 
     return () => clearInterval(interval)
@@ -94,15 +108,56 @@ export function Header() {
       ) {
         setOpen(false)
       }
+
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setOpenSearch(false)
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
-    return () =>
+
+    return () => {
       document.removeEventListener("mousedown", handleClickOutside)
+    }
   }, [])
+
+  useEffect(() => {
+    async function fetchSearch() {
+      if (!search.trim()) {
+        setResults([])
+        return
+      }
+
+      try {
+        setLoading(true)
+
+        const res = await fetch(
+          `/api/search-posts?query=${encodeURIComponent(search)}`
+        )
+
+        const data = await res.json()
+
+        setResults(data.posts || [])
+      } catch (error) {
+        console.error("Erro ao buscar posts:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const delay = setTimeout(() => {
+      fetchSearch()
+    }, 400)
+
+    return () => clearTimeout(delay)
+  }, [search])
 
   async function handleToggleNotifications() {
     const nextOpen = !openNotifications
+
     setOpenNotifications(nextOpen)
 
     if (nextOpen && userId && lastSeenKey) {
@@ -115,127 +170,224 @@ export function Header() {
   }
 
   return (
-<header className="fixed top-0 left-0 right-0 z-50 bg-[#F5F5F5] backdrop-blur-md border-b border-[#F5F5F5] shadow-sm md:sticky md:top-0 md:left-auto md:right-auto md:w-full">
-  <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#F5F5F5] backdrop-blur-md border-b border-[#F5F5F5] shadow-sm md:sticky md:top-0 md:left-auto md:right-auto md:w-full">
+      <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
 
-    <div
-      onClick={() => router.push("/intern/feed")}
-      className="flex items-center gap-3 cursor-pointer shrink-0"
-    >
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm bg-[var(--primary-dark)]">
-        <img
-          src="../icons/redikma_logo.png"
-          alt="logotipo ReDikma"
-          className="w-full h-full object-contain"
-        />
-      </div>
+        <div
+          onClick={() => router.push("/intern/feed")}
+          className="flex items-center gap-3 cursor-pointer shrink-0"
+        >
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm bg-[var(--primary-dark)]">
+            <img
+              src="../icons/redikma_logo.png"
+              alt="logotipo ReDikma"
+              className="w-full h-full object-contain"
+            />
+          </div>
 
-      <div className="leading-tight">
-        <h1 className="text-sm font-bold text-neutral-800">ReDikma</h1>
-        <p className="text-[10px] text-neutral-500 uppercase">
-          Comunicação Interna
-        </p>
-      </div>
-    </div>
+          <div className="leading-tight">
+            <h1 className="text-sm font-bold text-neutral-800">
+              ReDikma
+            </h1>
 
-    <div className="flex items-center gap-3 shrink-0">
+            <p className="text-[10px] text-neutral-500 uppercase">
+              Comunicação Interna
+            </p>
+          </div>
+        </div>
 
-      <button className="w-9 h-9 flex items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100">
-        <Search size={18} />
-      </button>
+        <div className="flex items-center gap-3 shrink-0">
 
-      {user?.id && (
-        <div className="relative" ref={notifyRef}>
-          <button
-            onClick={handleToggleNotifications}
-            className={`w-9 h-9 flex items-center justify-center rounded-full relative transition ${
-              unreadCount > 0
-                ? "text-orange-500 bg-orange-50"
-                : "text-neutral-500 hover:bg-neutral-100"
-            }`}
-          >
-            <Bell size={18} className={unreadCount > 0 ? "fill-current" : ""} />
+          <div className="relative" ref={searchRef}>
+            <button
+              onClick={() => setOpenSearch(!openSearch)}
+              className="w-9 h-9 flex items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 transition"
+            >
+              <Search size={18} />
+            </button>
 
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
+            {openSearch && (
+              <div className="absolute right-0 mt-3 w-[360px] bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden">
+
+                <div className="p-3 border-b border-neutral-100">
+                  <input
+                    type="text"
+                    placeholder="Buscar pessoas ou publicações..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-neutral-200 outline-none text-sm focus:border-neutral-400"
+                  />
+                </div>
+
+                <div className="max-h-[420px] overflow-y-auto">
+
+                  {loading && (
+                    <div className="p-4 text-sm text-neutral-500">
+                      Buscando...
+                    </div>
+                  )}
+
+                  {!loading && results.length === 0 && search && (
+                    <div className="p-4 text-sm text-neutral-500">
+                      Nenhuma publicação encontrada
+                    </div>
+                  )}
+
+                  {!loading && results.length > 0 && (
+                    <div className="grid grid-cols-3 gap-1 p-1">
+                      {results.map((post) => (
+                        <button
+                          key={post.id}
+                          onClick={() => {
+                            const postElement = document.getElementById(
+                              `post-${post.id}`
+                            )
+
+                            if (postElement) {
+                              postElement.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center",
+                              })
+
+                              postElement.classList.add(
+                                "ring-4",
+                                "ring-cyan-400",
+                                "ring-offset-2"
+                              )
+
+                              setTimeout(() => {
+                                postElement.classList.remove(
+                                  "ring-4",
+                                  "ring-cyan-400",
+                                  "ring-offset-2"
+                                )
+                              }, 3000)
+                            }
+
+                            setOpenSearch(false)
+                            setSearch("")
+                          }}
+                          className="relative aspect-square overflow-hidden bg-neutral-100 group"
+                        >
+                          <img
+                            src={post.image}
+                            alt=""
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          />
+
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                </div>
+              </div>
             )}
-          </button>
+          </div>
 
-          {openNotifications && (
-            <div className="absolute right-0 mt-3 z-50">
-              <NotificationsBox userId={user.id} />
+          {user?.id && (
+            <div className="relative" ref={notifyRef}>
+              <button
+                onClick={handleToggleNotifications}
+                className={`w-9 h-9 flex items-center justify-center rounded-full relative transition ${unreadCount > 0
+                    ? "text-orange-500 bg-orange-50"
+                    : "text-neutral-500 hover:bg-neutral-100"
+                  }`}
+              >
+                <Bell
+                  size={18}
+                  className={unreadCount > 0 ? "fill-current" : ""}
+                />
+
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {openNotifications && (
+                <div className="absolute right-0 mt-3 z-50">
+                  <NotificationsBox userId={user.id} />
+                </div>
+              )}
             </div>
           )}
-        </div>
-      )}
 
-      <div className="relative" ref={avatarRef}>
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-9 h-9 rounded-full overflow-hidden border border-neutral-200"
-        >
-          <img
-            src={user?.foto || "../photoProfile/userDefault.png"}
-            className="w-full h-full object-cover"
-          />
-        </button>
+          <div className="relative" ref={avatarRef}>
+            <button
+              onClick={() => setOpen(!open)}
+              className="w-9 h-9 rounded-full overflow-hidden border border-neutral-200"
+            >
+              <img
+                src={user?.foto || "../photoProfile/userDefault.png"}
+                className="w-full h-full object-cover"
+              />
+            </button>
 
-        {open && (
-          <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border border-neutral-200 shadow-lg overflow-hidden">
+            {open && (
+              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border border-neutral-200 shadow-lg overflow-hidden">
 
-            <div className="py-2">
-              <button
-                onClick={() => router.push("/intern/profile")}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
-              >
-                <User size={18} /> Perfil
-              </button>
+                <div className="py-2">
+                  <button
+                    onClick={() => router.push("/intern/profile")}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                  >
+                    <User size={18} /> Perfil
+                  </button>
 
-              <button
-                onClick={() => router.push("/intern/feed")}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
-              >
-                <Rss size={18} /> Feed
-              </button>
-            </div>
+                  <button
+                    onClick={() => router.push("/intern/feed")}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                  >
+                    <Rss size={18} /> Feed
+                  </button>
+                </div>
 
-            <div className="border-t py-2">
-              <button
-                onClick={() =>
-                  window.open("https://telemedicina.dikma.com.br", "_blank")
-                }
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
-              >
-                <FaUserDoctor size={18} /> Telemedicina
-              </button>
+                <div className="border-t py-2">
+                  <button
+                    onClick={() =>
+                      window.open(
+                        "https://www.saobernardosamp.com.br/servicos/telemedicina/?v=1",
+                        "_blank"
+                      )
+                    }
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                  >
+                    <FaUserDoctor size={18} /> Telemedicina
+                  </button>
 
-              <button
-                onClick={() =>
-                  window.open("https://ouvidoria.dikma.com.br", "_blank")
-                }
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm"
-              >
-                <FaHeadset size={18} /> Ouvidoria Dikma
-              </button>
-            </div>
+                  <button
+                    onClick={() =>
+                      window.open(
+                        "https://dikma.com.br/contato/#ouvidoria",
+                        "_blank"
+                      )
+                    }
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                  >
+                    <FaHeadset size={18} /> Ouvidoria Dikma
+                  </button>
+                </div>
 
-            <div className="border-t py-2">
-              <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-500"
-              >
-                <LogOut size={18} /> Sair
-              </button>
-            </div>
+                <div className="border-t py-2">
+                  <button
+                    onClick={() =>
+                      signOut({ callbackUrl: "/login" })
+                    }
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-500"
+                  >
+                    <LogOut size={18} /> Sair
+                  </button>
+                </div>
 
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-    </div>
-  </div>
-</header>
+        </div>
+      </div>
+    </header>
   )
 }

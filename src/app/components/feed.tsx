@@ -392,398 +392,372 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }
 
   return (
-    <section className="w-full max-w-3xl space-y-4 md:space-y-1">
-      <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
+<section className="w-full max-w-3xl space-y-4 md:space-y-1">
+<PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
-      {loading && (
-        <p
-          className="text-sm px-2"
-          style={{ color: "var(--gray)" }}
+{loading && (
+  <p
+    className="text-sm px-2"
+    style={{ color: "var(--gray)" }}
+  >
+    Carregando posts...
+  </p>
+)}
+
+{posts.map((post) => {
+  const liked = likedPosts[post.id] || false
+  const postLikesCount = likesCount[post.id] || 0
+  const isTooltipOpen = activeTooltip === post.id
+
+  return (
+    <div
+      id={`post-${post.id}`}
+      key={post.id}
+      className="relative rounded-2xl border shadow-sm overflow-visible transition-all duration-500"
+      style={{
+        backgroundColor: "var(--white)",
+        borderColor: "var(--border)",
+        boxShadow: "0 4px 16px rgba(10, 69, 84, 0.04)",
+      }}
+    >
+      {/* Barra decorativa superior */}
+      <div
+        className="h-1 w-full"
+        style={{
+          background:
+            "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+        }}
+      />
+
+      {/* Menu de opções */}
+      <div className="absolute top-4 right-4 z-20">
+        <PostOptions
+          postId={post.id}
+          onDelete={handleDeletePost}
+          onEdit={handleEditPost}
+        />
+      </div>
+
+      <div className="p-4 md:p-5 space-y-4 overflow-visible">
+        {/* Cabeçalho */}
+        <div
+          className="flex items-start gap-3 pb-4 border-b"
+          style={{ borderColor: "var(--border)" }}
         >
-          Carregando posts...
-        </p>
-      )}
-
-      {posts.map((post) => {
-        const liked = likedPosts[post.id] || false
-        const postLikesCount = likesCount[post.id] || 0
-        const isTooltipOpen = activeTooltip === post.id
-
-        return (
-          <div
-            key={post.id}
-            className="relative rounded-2xl border shadow-sm overflow-visible"
-            style={{
-              backgroundColor: "var(--white)",
-              borderColor: "var(--border)",
-              boxShadow: "0 4px 16px rgba(10, 69, 84, 0.04)",
-            }}
-          >
-            {/* Barra decorativa superior */}
+          <div className="relative flex-shrink-0">
             <div
-              className="h-1 w-full"
-              style={{
-                background:
-                  "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
-              }}
+              className="absolute -inset-1 rounded-full opacity-15"
+              style={{ backgroundColor: "var(--secondary)" }}
             />
 
-            {/* Menu de opções */}
-            <div className="absolute top-4 right-4 z-20">
-              <PostOptions
-                postId={post.id}
-                onDelete={handleDeletePost}
-                onEdit={handleEditPost}
+            <img
+              src={
+                post.author.foto ||
+                "/photoProfile/userDefault.png"
+              }
+              alt={post.author.nome}
+              className="relative w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2"
+              style={{ borderColor: "var(--white)" }}
+            />
+          </div>
+
+          <div className="flex-1 min-w-0 pr-8">
+            <p
+              className="text-sm md:text-base font-semibold truncate"
+              style={{ color: "var(--black)" }}
+            >
+              {post.author.nome}
+            </p>
+
+            <p
+              className="text-xs truncate mt-0.5"
+              style={{ color: "var(--gray)" }}
+            >
+              {post.postador}
+            </p>
+
+            <div className="flex items-center gap-2 mt-2">
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{
+                  backgroundColor: "var(--success)",
+                }}
               />
-            </div>
 
-            <div className="p-4 md:p-5 space-y-4 overflow-visible">
-              {/* Cabeçalho do Post */}
-              <div
-                className="flex items-start gap-3 pb-4 border-b"
-                style={{ borderColor: "var(--border)" }}
+              <p
+                className="text-[11px] font-medium"
+                style={{ color: "var(--gray)" }}
               >
-                {/* Avatar */}
-                <div className="relative flex-shrink-0">
-                  <div
-                    className="absolute -inset-1 rounded-full opacity-15"
-                    style={{ backgroundColor: "var(--secondary)" }}
-                  />
+                {new Date(post.createdAt).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
 
-                  <img
-                    src={
-                      post.author.foto ||
-                      "/photoProfile/userDefault.png"
-                    }
-                    alt={post.author.nome}
-                    className="relative w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2"
-                    style={{ borderColor: "var(--white)" }}
-                  />
-                </div>
+        {/* Texto */}
+        <div className="px-1">
+          <div
+            className="text-sm leading-7 whitespace-pre-wrap break-words"
+            style={{ color: "var(--black)" }}
+          >
+            {renderTextWithLinks(post.label)}
+          </div>
+        </div>
 
-                {/* Informações */}
-                <div className="flex-1 min-w-0 pr-8">
-                  <p
-                    className="text-sm md:text-base font-semibold truncate"
-                    style={{ color: "var(--black)" }}
-                  >
-                    {post.author.nome}
-                  </p>
+        {/* Imagem */}
+        {post.image && (
+          <div
+            className="rounded-2xl overflow-hidden border"
+            style={{
+              backgroundColor: "var(--background)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <img
+              src={post.image}
+              onClick={() =>
+                handleOpenImage(post.image)
+              }
+              className="w-full max-h-[300px] md:max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
+              alt="Imagem da postagem"
+            />
+          </div>
+        )}
 
-                  <p
-                    className="text-xs truncate mt-0.5"
-                    style={{ color: "var(--gray)" }}
-                  >
-                    {post.postador}
-                  </p>
+        {/* Área interação */}
+        <div
+          className="pt-4 border-t space-y-4 overflow-visible"
+          style={{ borderColor: "var(--border)" }}
+        >
+          {/* Botões */}
+          <div className="flex items-center gap-6 relative overflow-visible">
 
-                  <div className="flex items-center gap-2 mt-2">
-                    <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{
-                        backgroundColor: "var(--success)",
-                      }}
-                    />
+            {/* Likes */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  curtir(post.id, post.authorId)
 
-                    <p
-                      className="text-[11px] font-medium"
-                      style={{ color: "var(--gray)" }}
-                    >
-                      {new Date(post.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Conteúdo do Post */}
-              <div className="px-1">
+                  setActiveTooltip(
+                    isTooltipOpen
+                      ? null
+                      : post.id
+                  )
+                }}
+                className="flex items-center gap-2 transition-all hover:opacity-80"
+              >
                 <div
-                  className="text-sm leading-7 whitespace-pre-wrap break-words"
-                  style={{ color: "var(--black)" }}
-                >
-                  {renderTextWithLinks(post.label)}
-                </div>
-              </div>
-
-              {/* Imagem do Post */}
-              {post.image && (
-                <div
-                  className="rounded-2xl overflow-hidden border"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    liked ? "scale-105" : ""
+                  }`}
                   style={{
-                    backgroundColor: "var(--background)",
-                    borderColor: "var(--border)",
+                    backgroundColor: liked
+                      ? "rgba(255, 0, 85, 0.12)"
+                      : "rgba(79, 195, 217, 0.08)",
                   }}
                 >
-                  <img
-                    src={post.image}
-                    onClick={() => handleOpenImage(post.image)}
-                    className="w-full max-h-[300px] md:max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
-                    alt="Imagem da postagem"
+                  <Image
+                    src="/icons/like.png"
+                    alt="Curtir"
+                    width={18}
+                    height={18}
+                    className={`transition-all duration-300 ${
+                      liked
+                        ? "opacity-100 scale-110"
+                        : "opacity-60"
+                    }`}
                   />
                 </div>
-              )}
 
-              {/* Área de interação */}
-              <div
-                className="pt-4 border-t space-y-4 overflow-visible"
-                style={{ borderColor: "var(--border)" }}
-              >
-                {/* Linha superior: likes e ações */}
-                <div className="flex items-center justify-between gap-4 relative overflow-visible">
-                  {/* Contador de likes */}
-                  <div className="relative">
-                    <button
-                      type="button"
+                <span
+                  className="text-sm font-semibold"
+                  style={{
+                    color: liked
+                      ? "var(--warning)"
+                      : "var(--gray)",
+                  }}
+                >
+                  {postLikesCount}
+                </span>
+              </button>
+
+              {/* Tooltip */}
+              {isTooltipOpen &&
+                postLikesCount > 0 && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
                       onClick={() =>
-                        setActiveTooltip(
-                          isTooltipOpen ? null : post.id
-                        )
+                        setActiveTooltip(null)
                       }
-                      className="flex items-center gap-2 transition-opacity hover:opacity-80"
-                    >
+                    />
+
+                    <div className="absolute bottom-full left-0 mb-3 z-20 animate-in fade-in zoom-in-95 duration-200">
                       <div
-                        className="w-7 h-7 rounded-full flex items-center justify-center"
+                        className="relative rounded-2xl border shadow-2xl p-2 min-w-[200px]"
                         style={{
                           backgroundColor:
-                            "rgba(79, 195, 217, 0.08)",
+                            "var(--white)",
+                          borderColor:
+                            "var(--border)",
                         }}
                       >
-                        <Image
-                          src="/icons/like.png"
-                          alt="Likes"
-                          width={14}
-                          height={14}
-                          className="opacity-70"
-                        />
-                      </div>
-
-                      <span
-                        className="text-sm font-semibold"
-                        style={{ color: "var(--black)" }}
-                      >
-                        {postLikesCount}
-                      </span>
-                    </button>
-
-                    {/* Tooltip de likes */}
-                    {isTooltipOpen && postLikesCount > 0 && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() =>
-                            setActiveTooltip(null)
+                        <LikeView
+                          totalLikes={
+                            (
+                              listOfLikes[
+                                post.id
+                              ] || []
+                            ).length
+                          }
+                          likers={
+                            listOfLikes[
+                              post.id
+                            ] || []
                           }
                         />
 
-                        <div className="absolute bottom-full left-0 mb-3 z-20 animate-in fade-in zoom-in-95 duration-200">
-                          <div
-                            className="relative rounded-2xl border shadow-2xl p-2 min-w-[200px]"
-                            style={{
-                              backgroundColor:
-                                "var(--white)",
-                              borderColor:
-                                "var(--border)",
-                            }}
-                          >
-                            <LikeView
-                              totalLikes={
-                                (
-                                  listOfLikes[
-                                  post.id
-                                  ] || []
-                                ).length
-                              }
-                              likers={
-                                listOfLikes[
-                                post.id
-                                ] || []
-                              }
-                            />
+                        <div
+                          className="absolute top-full left-4 w-4 h-4 rotate-45 -translate-y-2 border-r border-b"
+                          style={{
+                            backgroundColor:
+                              "var(--white)",
+                            borderColor:
+                              "var(--border)",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+            </div>
 
-                            <div
-                              className="absolute top-full left-4 w-4 h-4 rotate-45 -translate-y-2 border-r border-b"
-                              style={{
-                                backgroundColor:
-                                  "var(--white)",
-                                borderColor:
-                                  "var(--border)",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
+            {/* Comentários */}
+            <button
+              type="button"
+              onClick={() =>
+                toggleComments(post.id)
+              }
+              className="flex items-center gap-2 transition-all hover:opacity-80"
+            >
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor:
+                    "rgba(79, 195, 217, 0.08)",
+                }}
+              >
+                <Image
+                  src="/icons/coments.png"
+                  alt="Comentários"
+                  width={18}
+                  height={18}
+                  className="opacity-70"
+                />
+              </div>
 
-                  {/* Botões de ação */}
-                  <div className="flex items-center gap-5">
-                    {/* Curtir */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        curtir(
-                          post.id,
-                          post.authorId
-                        )
-                      }
-                      className="flex items-center gap-2 transition-opacity hover:opacity-80"
-                    >
-                      <Image
-                        src="/icons/like.png"
-                        alt="Curtir"
-                        width={20}
-                        height={20}
-                        className={`transition-all duration-300 w-5 h-5 ${liked
-                          ? "opacity-100 scale-110"
-                          : "opacity-50"
-                          }`}
-                      />
+              <span
+                className="text-sm font-semibold"
+                style={{
+                  color: "var(--gray)",
+                }}
+              >
+                {commentsCount[post.id] || 0}
+              </span>
+            </button>
+          </div>
 
-                      <span
-                        className={`text-sm transition-all duration-300 ${liked
-                          ? "font-semibold"
-                          : "font-medium"
-                          }`}
-                        style={{
-                          color: liked
-                            ? "var(--warning)"
-                            : "var(--gray)",
-                        }}
-                      >
-                        {liked
-                          ? "Curtido"
-                          : "Curtir"}
-                      </span>
-                    </button>
+          {/* Campo comentário */}
+          <div
+            className="flex items-center gap-3 rounded-full px-3 py-2 border relative"
+            style={{
+              backgroundColor:
+                "var(--background)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <img
+              src={
+                user?.foto ||
+                "https://i.pravatar.cc/100?img=1"
+              }
+              className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+              alt="Comentador"
+            />
 
-                    {/* Comentários */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        toggleComments(post.id)
-                      }
-                      className="flex items-center gap-2 transition-opacity hover:opacity-80"
-                    >
-                      <Image
-                        src="/icons/coments.png"
-                        alt="Comentários"
-                        width={20}
-                        height={20}
-                        className="w-5 h-5 opacity-70"
-                      />
+            <input
+              id={`comment-input-${post.id}`}
+              value={comments[post.id] || ""}
+              maxLength={50}
+              onChange={(e) =>
+                setComments((prev) => ({
+                  ...prev,
+                  [post.id]:
+                    e.target.value,
+                }))
+              }
+              onKeyDown={(e) => {
+                if (
+                  e.key === "Enter" &&
+                  !e.shiftKey &&
+                  (
+                    comments[
+                      post.id
+                    ] || ""
+                  ).trim() !== ""
+                ) {
+                  comentar(post.id)
+                }
+              }}
+              placeholder="Escreva um comentário..."
+              className="flex-1 bg-transparent outline-none text-sm pr-12"
+              style={{
+                color: "var(--black)",
+              }}
+            />
 
-                      <span
-                        className="hidden sm:inline text-sm font-medium"
-                        style={{ color: "var(--gray)" }}
-                      >
-                        {commentsCount[post.id] || 0} comentários
-                      </span>
-
-                      <span
-                        className="sm:hidden inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full text-[11px] font-semibold"
-                        style={{
-                          backgroundColor:
-                            "var(--background)",
-                          color: "var(--gray)",
-                        }}
-                      >
-                        {commentsCount[post.id] || 0}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Campo de comentário */}
-                <div
-                  className="flex items-center gap-3 rounded-full px-3 py-2 border relative"
+            {(comments[post.id] || "")
+              .trim() !== "" && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    comentar(post.id)
+                  }
+                  className="absolute right-2 w-9 h-9 rounded-full flex items-center justify-center transition-opacity hover:opacity-85"
                   style={{
                     backgroundColor:
-                      "var(--background)",
-                    borderColor: "var(--border)",
+                      "var(--primary-dark)",
                   }}
                 >
                   <img
-                    src={
-                      user?.foto ||
-                      "https://i.pravatar.cc/100?img=1"
-                    }
-                    className="w-7 h-7 rounded-full object-cover flex-shrink-0"
-                    alt="Comentador"
+                    src="/icons/enviar.png"
+                    alt="Enviar"
+                    className="w-4 h-4"
                   />
-
-                  <input
-                    id={`comment-input-${post.id}`}
-                    value={comments[post.id] || ""}
-                    maxLength={50}
-                    onChange={(e) =>
-                      setComments((prev) => ({
-                        ...prev,
-                        [post.id]:
-                          e.target.value,
-                      }))
-                    }
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "Enter" &&
-                        !e.shiftKey &&
-                        (
-                          comments[
-                          post.id
-                          ] || ""
-                        ).trim() !== ""
-                      ) {
-                        comentar(post.id)
-                      }
-                    }}
-                    placeholder="Escreva um comentário..."
-                    className="flex-1 bg-transparent outline-none text-sm pr-12"
-                    style={{
-                      color: "var(--black)",
-                    }}
-                  />
-
-                  {(comments[post.id] || "")
-                    .trim() !== "" && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          comentar(post.id)
-                        }
-                        className="absolute right-2 w-9 h-9 rounded-full flex items-center justify-center transition-opacity hover:opacity-85"
-                        style={{
-                          backgroundColor:
-                            "var(--primary-dark)",
-                        }}
-                      >
-                        <img
-                          src="/icons/enviar.png"
-                          alt="Enviar"
-                          className="w-4 h-4"
-                        />
-                      </button>
-                    )}
-                </div>
-
-                {/* Caixa de comentários */}
-                <div className="overflow-visible">
-                  <CommentsBox
-                    postId={post.id}
-                    postAuthorId={
-                      post.author.id
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+                </button>
+              )}
           </div>
-        )
-      })}
 
-      <ImageModal
-        image={selectedImage}
-        open={openModal}
-        onClose={handleCloseImage}
-      />
-    </section>
+          {/* Comentários */}
+          <div className="overflow-visible">
+            <CommentsBox
+              postId={post.id}
+              postAuthorId={
+                post.author.id
+              }
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   )
-}
+})}
+
+<ImageModal
+  image={selectedImage}
+  open={openModal}
+  onClose={handleCloseImage}
+/>
+</section>
+) }
