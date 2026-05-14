@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FaTrash } from "react-icons/fa";
 
 type Notification = {
   id: string;
@@ -32,14 +33,12 @@ export function NotificationsBox({ userId }: { userId: string }) {
       } catch {}
     }
 
-    // 2. Busca notificações da API e consome (deleta do banco)
-    async function fetchAndConsume() {
+    // 2. Busca notificações da API
+    async function fetchData() {
       try {
         setLoading(true);
 
-        const res = await fetch(
-          `/api/notifications?userId=${userId}&consume=true`
-        );
+        const res = await fetch(`/api/notifications?userId=${userId}`);
         const data = await res.json();
 
         if (!mounted) return;
@@ -73,12 +72,28 @@ export function NotificationsBox({ userId }: { userId: string }) {
       }
     }
 
-    fetchAndConsume();
+    fetchData();
 
     return () => {
       mounted = false;
     };
   }, [userId, cacheKey, lastSeenKey]);
+
+  async function handleDelete(id: string) {
+    try {
+      const res = await fetch(`/api/notifications?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) return;
+
+      const updated = notifications.filter((n) => n.id !== id);
+      setNotifications(updated);
+      localStorage.setItem(cacheKey, JSON.stringify(updated));
+    } catch (err) {
+      console.error("Erro ao deletar notificação:", err);
+    }
+  }
 
   return (
     <div className="w-80 bg-white border border-neutral-200 shadow-xl rounded-xl overflow-hidden">
@@ -99,12 +114,22 @@ export function NotificationsBox({ userId }: { userId: string }) {
           notifications.map((n) => (
             <div
               key={n.id}
-              className="p-3 border-b text-sm transition-colors hover:bg-neutral-50 cursor-pointer"
+              className="group flex items-start gap-2 p-3 border-b text-sm transition-colors hover:bg-neutral-50"
             >
-              <div className="text-neutral-800">{n.title}</div>
-              <div className="text-neutral-500 text-xs mt-0.5">
-                {n.message}
+              <div className="flex-1 min-w-0">
+                <div className="text-neutral-800 truncate">{n.title}</div>
+                <div className="text-neutral-500 text-xs mt-0.5 truncate">
+                  {n.message}
+                </div>
               </div>
+
+              <button
+                onClick={() => handleDelete(n.id)}
+                className="shrink-0 mt-0.5 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
+                title="Deletar notificação"
+              >
+                <FaTrash size={10} />
+              </button>
             </div>
           ))
         )}

@@ -53,6 +53,27 @@ export async function GET(req: NextRequest) {
   }
 }
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "id obrigatório" }, { status: 400 });
+    }
+
+    await prisma.notification.delete({ where: { id } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    if ((error as any)?.code === "P2025") {
+      return NextResponse.json({ error: "Notificação não encontrada" }, { status: 404 });
+    }
+    console.error(error);
+    return NextResponse.json({ error: "Erro ao deletar notificação" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

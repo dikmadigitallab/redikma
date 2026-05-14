@@ -111,32 +111,33 @@ src/
 
 ---
 
-### Sistema de Notificações (Consumo ao Abrir)
+### Sistema de Notificações (Delete Manual + Cache Local)
 
-**Arquivos modificados:**
-- `src/app/api/notifications/route.ts` — GET com parâmetro `?consume=true`
-- `src/app/components/box-notify.tsx` — Consumo + cache localStorage
+**Arquivos:**
+- `src/app/api/notifications/route.ts` — GET (listar), POST (criar), DELETE (deletar individual)
+- `src/app/components/box-notify.tsx` — Lista com lixeira + cache localStorage
 
 **Fluxo atual:**
 1. Notificações são criadas no banco via `notify()` (server-side) ou POST /api/notifications
 2. `feedHeader.tsx` faz polling a cada 30s via `/api/notifications/count` para exibir badge
-3. Ao clicar no sino, `NotificationsBox` abre e chama GET `/api/notifications?userId=X&consume=true`
-4. API retorna as notificações e **deleta todas do banco** (para o userId)
-5. `NotificationsBox` salva as notificações no `localStorage` (`notifications-cache-{userId}`)
-6. Na próxima abertura, exibe o cache local instantaneamente enquanto busca atualizações
+3. Ao clicar no sino, `NotificationsBox` abre e busca notificações da API
+4. `NotificationsBox` salva as notificações no `localStorage` (`notifications-cache-{userId}`)
+5. Cada notificação tem um ícone de lixeira (visível ao passar o mouse)
+6. Ao clicar na lixeira → DELETE `/api/notifications?id=X` → remove do banco + do estado + atualiza cache local
 7. **7-day cleanup:** toda chamada GET já limpa notificações com mais de 7 dias
 
-**Benefícios:** Notificações não acumulam no banco, desempenho da consulta se mantém rápido, usuário nunca perde histórico (fica no navegador), e o banco faz limpeza automática de notificações não lidas após 7 dias.
+**Benefícios:** Usuário controla o que deletar, notificações deletadas persistem no navegador, cleanup automático de 7 dias para não acumular.
 
 ---
 
 ## Histórico de Alterações
 
-### 14/05/2026 - Sistema de Notificações: Consumo ao Abrir
-- GET `/api/notifications` agora aceita `?consume=true` para deletar notificações do banco após retorná-las
-- `NotificationsBox` consome as notificações ao abrir e salva no `localStorage`
-- Cache local exibe notificações instantaneamente em abertas subsequentes
-- 7-day cleanup automático mantido para notificações nunca abertas
+### 14/05/2026 - Sistema de Notificações: Lixeira Manual + Cache Local
+- DELETE `/api/notifications?id=X` adicionado para deletar notificação individual
+- `NotificationsBox`: cada notificação tem lixeira (visível no hover) que deleta do banco
+- Cache `localStorage` (`notifications-cache-{userId}`) mantém notificações deletadas visíveis
+- POST `/api/notifications` adicionado para suportar `NotificationProvider`
+- 7-day cleanup automático mantido para notificações não deletadas
 
 ### Commit Inicial - 14/05/2026
 - Criação dos arquivos `memoria.md` e `checkpoints.md`
