@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import { notify } from "@/lib/notifications/notify"
 
 // CREATE
 export async function POST(req: Request) {
@@ -39,6 +40,46 @@ export async function POST(req: Request) {
         }
       }
     })
+
+    // Notificações
+    const session = await getServerSession(authOptions)
+    const nome = session?.user?.nome || "Alguém"
+
+    if (parentId) {
+      // É uma resposta → notifica o autor do comentário pai
+      const parentComment = await prisma.comentario.findUnique({
+        where: { id: parentId },
+        select: { authorId: true },
+      })
+
+      if (parentComment && parentComment.authorId !== authorId) {
+        await notify({
+          type: "COMMENT",
+          title: "Nova resposta",
+          message: `${nome} respondeu seu comentário`,
+          userIds: [parentComment.authorId],
+          actorId: authorId,
+          data: { postId },
+        })
+      }
+    } else {
+      // É um comentário no post → notifica o autor do post
+      const post = await prisma.postagem.findUnique({
+        where: { id: postId },
+        select: { authorId: true },
+      })
+
+      if (post && post.authorId !== authorId) {
+        await notify({
+          type: "COMMENT",
+          title: "Novo comentário",
+          message: `${nome} comentou em sua postagem`,
+          userIds: [post.authorId],
+          actorId: authorId,
+          data: { postId },
+        })
+      }
+    }
 
     return NextResponse.json(comentario)
   } catch (error) {
