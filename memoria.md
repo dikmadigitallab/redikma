@@ -130,33 +130,38 @@ src/
 
 ---
 
-## Histórico de Alterações
+## Histórico de Alterações — 14/05/2026
 
-### 14/05/2026 - Sistema de Notificações: Lixeira Manual + Cache Local
-- DELETE `/api/notifications?id=X` adicionado para deletar notificação individual
-- `NotificationsBox`: cada notificação tem lixeira (visível no hover) que deleta do banco
-- Cache `localStorage` (`notifications-cache-{userId}`) mantém notificações deletadas visíveis
-- POST `/api/notifications` adicionado para suportar `NotificationProvider`
-- 7-day cleanup automático mantido para notificações não deletadas
+### Commit Inicial
+- Criação dos arquivos `memoria.md` e `checkpoints.md`
+- Branch `opencode` criada e configurada no GitHub
 
-### 14/05/2026 - Foto de Perfil nos Likes
-- `list-likes/route.ts`: fallback corrigido de pravatar para `/photoProfile/userDefault.png`
-- `feed.tsx`: avatar do comentário usa `userDefault.png` em vez de pravatar
-- `admin/usuarios/page.tsx`: fallback corrigido para `userDefault.png`
+### Notificações — Lixeira + Cache Local
+- DELETE `/api/notifications?id=X` p/ deletar notificação individual do banco
+- `NotificationsBox`: lixeira visível no hover que deleta do banco
+- Cache `localStorage` (`notifications-cache-{userId}`) mantém notificações mesmo após deletadas
+- POST `/api/notifications` adicionado
+- 7-day cleanup automático (já existia)
 
-### 14/05/2026 - Notificações: Curtidas, Comentários e Respostas
+### Notificações — Foto do Autor + Tempo Relativo
+- `Notification` type agora inclui `actor { nome, foto }`
+- Exibe foto de perfil de quem gerou a notificação (fallback `userDefault.png`)
+- Função `timeAgo()`: "agora", "há X min", "há X h", "há X dias", "há 1 semana", ou data formatada
+
+### Notificações — Curtidas, Comentários e Respostas
 - `comments-likes/route.ts`: notifica autor do comentário quando alguém curte
 - `posts-comments/route.ts`: notifica autor do post quando comentam
 - `posts-comments/route.ts`: notifica autor do comentário pai quando respondem
 - `types.ts`: corrigido tipo `data` de `Record<string, ''>` para `Record<string, any>`
 
-### 14/05/2026 - Modal de Postagem nas Notificações
+### Notificações — Modal de Postagem
 - `PostModalContext`: provider global com `openPost(postId)` e `closePost()`
-- `modal-post-view.tsx`: modal que busca e exibe a postagem (autor, texto, imagem, data)
-- `box-notify.tsx`: ao clicar na notificação, abre o modal com o post
-- `feed.tsx`: removido scroll-to-post (substituído pelo modal)
+- `modal-post-view.tsx`: modal completo com autor, texto, imagem, curtidas (toggle + LikeView), CommentsBox, ImageModal
+- `box-notify.tsx`: clique na notificação abre o modal
 - `layout.tsx`: `PostModalProvider` adicionado ao root layout
+- Scrollbar personalizada (aparece apenas ao rolar/hover)
 
-### Commit Inicial - 14/05/2026
-- Criação dos arquivos `memoria.md` e `checkpoints.md`
-- Branch `opencode` criada para desenvolvimento
+### Foto de Perfil — Fallback Corrigido
+- `list-likes/route.ts`: fallback de pravatar → `/photoProfile/userDefault.png`
+- `feed.tsx`: avatar do input de comentário corrigido
+- `admin/usuarios/page.tsx`: fallback corrigido
