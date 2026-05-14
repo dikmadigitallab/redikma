@@ -9,6 +9,10 @@ type Notification = {
   message: string;
   read: boolean;
   createdAt: string;
+  actor?: {
+    nome: string;
+    foto: string | null;
+  } | null;
 };
 
 export function NotificationsBox({ userId }: { userId: string }) {
@@ -114,8 +118,17 @@ export function NotificationsBox({ userId }: { userId: string }) {
           notifications.map((n) => (
             <div
               key={n.id}
-              className="group flex items-start gap-2 p-3 border-b text-sm transition-colors hover:bg-neutral-50"
+              className="group flex items-start gap-3 p-3 border-b text-sm transition-colors hover:bg-neutral-50"
             >
+              <img
+                src={
+                  n.actor?.foto ||
+                  "/photoProfile/userDefault.png"
+                }
+                alt={n.actor?.nome || "Usuário"}
+                className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
+              />
+
               <div className="flex-1 min-w-0">
                 <div className="text-neutral-800 truncate">{n.title}</div>
                 <div className="text-neutral-500 text-xs mt-0.5 truncate">
@@ -125,7 +138,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
 
               <button
                 onClick={() => handleDelete(n.id)}
-                className="shrink-0 mt-0.5 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
+                className="shrink-0 mt-1 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
                 title="Deletar notificação"
               >
                 <FaTrash size={10} />
