@@ -14,47 +14,51 @@ export function NotificationsBox({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // Chave única por usuário para salvar no navegador
-  const storageKey = `notifications-last-seen-${userId}`;
+  const cacheKey = `notifications-cache-${userId}`;
+  const lastSeenKey = `notifications-last-seen-${userId}`;
 
   useEffect(() => {
     let mounted = true;
 
-    async function fetchData() {
+    // 1. Carrega cache local imediatamente (se existir)
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          setNotifications(parsed);
+          setLoading(false);
+        }
+      } catch {}
+    }
+
+    // 2. Busca notificações da API e consome (deleta do banco)
+    async function fetchAndConsume() {
       try {
         setLoading(true);
 
-        const res = await fetch(`/api/notifications?userId=${userId}`);
+        const res = await fetch(
+          `/api/notifications?userId=${userId}&consume=true`
+        );
         const data = await res.json();
 
         if (!mounted) return;
 
-        let fetchedNotifications: Notification[] = [];
+        const fetched: Notification[] = Array.isArray(data)
+          ? data
+          : Array.isArray(data.notifications)
+            ? data.notifications
+            : [];
 
-        if (Array.isArray(data)) {
-          fetchedNotifications = data;
-        } else if (Array.isArray(data.notifications)) {
-          fetchedNotifications = data.notifications;
-        }
+        setNotifications(fetched);
 
-        setNotifications(fetchedNotifications);
+        // Salva no localStorage para persistir localmente
+        localStorage.setItem(cacheKey, JSON.stringify(fetched));
 
-        // Ao abrir a caixa de notificações, salva no dispositivo
-        // o horário da notificação mais recente.
-        if (fetchedNotifications.length > 0) {
-          const latestNotificationDate =
-            fetchedNotifications[0].createdAt;
-
-          localStorage.setItem(
-            storageKey,
-            latestNotificationDate
-          );
+        if (fetched.length > 0) {
+          localStorage.setItem(lastSeenKey, fetched[0].createdAt);
         } else {
-          // Se não houver notificações, ainda assim marca como visto
-          localStorage.setItem(
-            storageKey,
-            new Date().toISOString()
-          );
+          localStorage.setItem(lastSeenKey, new Date().toISOString());
         }
       } catch (err) {
         console.error("Erro ao buscar notificações:", err);
@@ -69,12 +73,12 @@ export function NotificationsBox({ userId }: { userId: string }) {
       }
     }
 
-    fetchData();
+    fetchAndConsume();
 
     return () => {
       mounted = false;
     };
-  }, [userId, storageKey]);
+  }, [userId, cacheKey, lastSeenKey]);
 
   return (
     <div className="w-80 bg-white border border-neutral-200 shadow-xl rounded-xl overflow-hidden">
@@ -95,16 +99,9 @@ export function NotificationsBox({ userId }: { userId: string }) {
           notifications.map((n) => (
             <div
               key={n.id}
-              className={`p-3 border-b text-sm transition-colors hover:bg-neutral-50 cursor-pointer ${
-                n.read
-                  ? "opacity-60 bg-white"
-                  : "font-medium bg-blue-50/30"
-              }`}
+              className="p-3 border-b text-sm transition-colors hover:bg-neutral-50 cursor-pointer"
             >
-              <div className="text-neutral-800">
-                {n.title}
-              </div>
-
+              <div className="text-neutral-800">{n.title}</div>
               <div className="text-neutral-500 text-xs mt-0.5">
                 {n.message}
               </div>
