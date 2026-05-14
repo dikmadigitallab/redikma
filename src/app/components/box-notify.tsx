@@ -3,6 +3,37 @@
 import { useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const date = new Date(dateStr).getTime();
+  const diffMs = now - date;
+  const diffSec = Math.floor(diffMs / 1000);
+
+  if (diffSec < 5) return "agora";
+  if (diffSec < 60) return `há ${diffSec} segundos atrás`;
+
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return diffMin === 1 ? "há 1 minuto atrás" : `há ${diffMin} minutos atrás`;
+
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return diffH === 1 ? "há 1 hora atrás" : `há ${diffH} horas atrás`;
+
+  const diffD = Math.floor(diffH / 24);
+  if (diffD < 7) return diffD === 1 ? "há 1 dia atrás" : `há ${diffD} dias atrás`;
+
+  if (diffD === 7) return "há 1 semana atrás";
+
+  // Mais de 1 semana → mostra data
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 type Notification = {
   id: string;
   title: string;
@@ -133,6 +164,9 @@ export function NotificationsBox({ userId }: { userId: string }) {
                 <div className="text-neutral-800 truncate">{n.title}</div>
                 <div className="text-neutral-500 text-xs mt-0.5 truncate">
                   {n.message}
+                </div>
+                <div className="text-neutral-400 text-[10px] mt-1">
+                  {timeAgo(n.createdAt)}
                 </div>
               </div>
 
