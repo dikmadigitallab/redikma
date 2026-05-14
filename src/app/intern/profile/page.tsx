@@ -8,38 +8,37 @@ import { Sidebar } from "@/app/components/sidebar"
 export default function PerfilPage() {
   const { update } = useSession()
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const [form, setForm] = useState<{
-    senha: string
-    email: string
-    telefone: string
-    foto: string | File | Blob
-  }>({
+  const [form, setForm] = useState({
     senha: "",
     email: "",
     telefone: "",
-    foto: "",
+    foto: "" as string | File | Blob,
   })
 
-  const [preview, setPreview] = useState("")
+  const [preview, setPreview] = useState("src/app/intern/profile/page.tsx")
 
   useEffect(() => {
     async function fetchUser() {
-      const res = await fetch("/api/users/profile")
-      const data = await res.json()
+      try {
+        const res = await fetch("/api/users/profile")
+        const data = await res.json()
 
-      if (data?.user) {
-        setUser(data.user)
-        setForm({
-          senha: "",
-          email: data.user.email ?? "",
-          telefone: data.user.telefone ?? "",
-          foto: data.user.foto ?? "",
-        })
-        setPreview(data.user.foto ?? "")
+        if (data?.user) {
+          setUser(data.user)
+          setForm({
+            senha: "",
+            email: data.user.email ?? "",
+            telefone: data.user.telefone ?? "",
+            foto: data.user.foto ?? "../photoProfile/userDefault.png",
+          })
+          setPreview(data.user.foto ?? "")
+        }
+      } catch (err) {
+        toast.error("Erro ao carregar dados")
       }
     }
-
     fetchUser()
   }, [])
 
@@ -49,13 +48,11 @@ export default function PerfilPage() {
 
     const previewUrl = URL.createObjectURL(file)
     setPreview(previewUrl)
-
-    setForm((prev) => ({
-      ...prev,
-      foto: file,
-    }))
+    setForm((prev) => ({ ...prev, foto: file }))
   }
 
+
+  //edição de perfil, só envia os campos que foram alterados, se a foto for um arquivo, envia como multipart/form-data, senão envia a url atual
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const formData = new FormData()
@@ -63,7 +60,6 @@ export default function PerfilPage() {
     if (form.email) formData.append("email", form.email)
     if (form.telefone) formData.append("telefone", form.telefone)
     if (form.senha) formData.append("senha", form.senha)
-
     if (form.foto instanceof File || form.foto instanceof Blob) {
       formData.append("foto", form.foto, "profile.jpg")
     }
@@ -75,14 +71,9 @@ export default function PerfilPage() {
       })
 
       const data = await res.json()
-
-      if (!res.ok) {
-        toast.error("Erro ao atualizar perfil")
-        return
-      }
+      if (!res.ok) throw new Error()
 
       setPreview(data.user.foto)
-
       await update({
         email: form.email,
         telefone: form.telefone,
@@ -91,7 +82,7 @@ export default function PerfilPage() {
 
       toast.success("Perfil atualizado com sucesso")
     } catch (err) {
-      toast.error("Erro de conexão")
+      toast.error("Erro ao atualizar perfil")
     }
   }
 
@@ -103,141 +94,135 @@ export default function PerfilPage() {
   if (!user) return null
 
   return (
-    <div
-      className="min-h-screen flex justify-center items-start py-10 px-4"
-      style={{ backgroundColor: "var(--background)" }}
-    >
-      <Sidebar />
+<div className="h-screen w-full flex flex-col md:flex-row bg-neutral-50 overflow-hidden">
+  <Sidebar />
 
-      <div
-        className="w-full max-w-3xl rounded-2xl shadow-md p-6 space-y-6"
-        style={{ backgroundColor: "var(--white)" }}
-      >
-        <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-          <img
-            src={preview || "/photoProfile/default.jpeg"}
-            alt="foto"
-            className="w-20 h-20 rounded-full object-cover border-2 border-primary-dark"
-          />
-          <div>
-            <h1 className="text-xl font-semibold" style={{ color: "var(--black)" }}>
+  <main className="flex-1 h-full overflow-y-auto px-4 py-4 md:py-8 flex justify-center items-start">
+    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-sm border border-neutral-200/60 flex flex-col">
+      
+      {/* Cabeçalho Compacto com Upload Integrado */}
+      <div className="p-6 md:p-8 border-b border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="relative group">
+            <img
+              src={preview || user.foto || "../photoProfile/userDefault.png"}
+              alt="foto"
+              className="w-20 h-20 rounded-full object-cover ring-2 ring-neutral-100 shadow-sm"
+            />
+
+            <input
+              type="file"
+              id="upload-foto"
+              accept="image/*"
+              onChange={handleFile}
+              className="hidden"
+            />
+
+            <label
+              htmlFor="upload-foto"
+              className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity text-white text-[10px] font-bold uppercase"
+            >
+              Trocar
+            </label>
+          </div>
+
+          <div className="text-center sm:text-left">
+            <h1 className="text-xl font-black text-neutral-900 leading-tight">
               {user.nome}
             </h1>
-            <p className="text-sm" style={{ color: "var(--gray)" }}>
+            <p className="text-sm text-neutral-500">
               @{user.username}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <span style={{ color: "var(--gray)" }}>CPF</span>
-            <p style={{ color: "var(--black)" }}>{user.cpf}</p>
-          </div>
-          <div>
-            <span style={{ color: "var(--gray)" }}>Cargo</span>
-            <p style={{ color: "var(--black)" }}>{user.cargo}</p>
-          </div>
-          <div>
-            <span style={{ color: "var(--gray)" }}>Data de nascimento</span>
-            <p style={{ color: "var(--black)" }}>
-              {new Date(user.aniversario).toLocaleDateString()}
+        {/* Dados Administrativos em Badge Horizontal */}
+        <div className="flex gap-4">
+          <div className="bg-neutral-50 px-4 py-2 rounded-xl border border-neutral-100">
+            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
+              CPF
+            </p>
+            <p className="text-xs font-bold text-neutral-700">
+              {user.cpf}
             </p>
           </div>
-          <div>
-            <span style={{ color: "var(--gray)" }}>Admissão</span>
-            <p style={{ color: "var(--black)" }}>
-              {new Date(user.admissao).toLocaleDateString()}
+
+          <div className="bg-neutral-50 px-4 py-2 rounded-xl border border-neutral-100">
+            <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
+              Cargo
+            </p>
+            <p className="text-xs font-bold text-neutral-700">
+              {user.cargo}
             </p>
           </div>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm block mb-1" style={{ color: "var(--gray)" }}>
-              Foto de Perfil
+      {/* Formulário em Grid de Duas Colunas */}
+      <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-neutral-500 uppercase ml-1">
+              E-mail Corporativo
             </label>
-
-            <div className="relative">
-              <input
-                type="file"
-                id="upload-foto"
-                accept="image/*"
-                onChange={handleFile}
-                className="hidden"
-              />
-
-              <label
-                htmlFor="upload-foto"
-                className="w-full flex items-center justify-center p-2 border border-dashed rounded-lg cursor-pointer hover:opacity-70"
-                style={{
-                  borderColor: "var(--primary-dark)",
-                  backgroundColor: "var(--background)",
-                  color: "var(--primary-dark)",
-                }}
-              >
-                Escolher nova foto...
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm" style={{ color: "var(--gray)" }}>Email</label>
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg"
-              style={{
-                borderColor: "var(--border)",
-                backgroundColor: "var(--white)",
-                color: "var(--black)",
-              }}
+              className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none transition-all text-sm"
             />
           </div>
 
-          <div>
-            <label className="text-sm" style={{ color: "var(--gray)" }}>Telefone</label>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-neutral-500 uppercase ml-1">
+              Telefone / WhatsApp
+            </label>
             <input
               type="text"
               name="telefone"
               value={form.telefone}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg"
-              style={{
-                borderColor: "var(--border)",
-                backgroundColor: "var(--white)",
-                color: "var(--black)",
-              }}
+              className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none transition-all text-sm"
             />
           </div>
 
-          <div>
-            <label className="text-sm" style={{ color: "var(--gray)" }}>Nova senha</label>
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-[11px] font-bold text-neutral-500 uppercase ml-1">
+              Alterar Senha
+            </label>
             <input
               type="password"
               name="senha"
+              placeholder="Deixe em branco para não alterar"
               value={form.senha}
               onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg"
-              style={{
-                borderColor: "var(--border)",
-                backgroundColor: "var(--white)",
-                color: "var(--black)",
-              }}
+              className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-black outline-none transition-all text-sm"
             />
           </div>
+        </div>
+
+        {/* Rodapé do Form com Ações */}
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-neutral-100">
+          <button
+            type="button"
+            className="text-sm font-bold text-neutral-400 hover:text-neutral-600 transition-colors order-2 sm:order-1"
+            onClick={() => window.location.reload()}
+          >
+            Descartar
+          </button>
 
           <button
             type="submit"
-            className="w-full py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: "var(--primary-dark)", color: "var(--white)" }}
+            disabled={loading}
+            className="w-full sm:w-auto px-10 py-3.5 bg-black text-white rounded-xl font-bold text-sm hover:bg-neutral-800 active:scale-[0.98] transition-all shadow-lg shadow-neutral-200 disabled:opacity-50 order-1 sm:order-2"
           >
-            Salvar alterações
+            {loading ? "Salvando..." : "Salvar Alterações"}
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
+  </main>
+</div>
   )
 }

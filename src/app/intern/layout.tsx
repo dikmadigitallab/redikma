@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sidebar } from "../components/sidebar";
+import { Header } from "../components/feedHeader";
 
 
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       <main className="md:ml-64 pt-16 md:pt-0">
         <div className="w-full h-full">
           <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8">
+            <Header />
             {children}
           </div>
         </div>

@@ -18,29 +18,53 @@ export function UserCard({ size = "md" }: CardUserProps) {
   const user = session?.user
 
   return (
-    <div className="flex items-center gap-3">
-      {user?.foto ? (
-        <img
-          src={user.foto}
-          className={`${sizes[size]} rounded-full object-cover`}
-        />
-      ) : (
-        <div
-          className={`${sizes[size]} rounded-full flex items-center justify-center text-white font-semibold`}
-          style={{ backgroundColor: 'var(--secondary)' }}
-        >
-          {user?.nome?.charAt(0) || "?"}
-        </div>
-      )}
+<div
+  className="flex items-center gap-3 p-3 rounded-2xl border shadow-sm"
+  style={{
+    backgroundColor: "var(--white)",
+    borderColor: "var(--border)",
+  }}
+>
+  {/* Avatar */}
+  <div className="relative flex-shrink-0">
+    <div
+      className="absolute -inset-1 rounded-full opacity-20"
+      style={{ backgroundColor: "var(--secondary)" }}
+    />
 
-      <div>
-        <p className="text-sm font-semibold" style={{ color: 'var(--black)' }}>
-          {user?.nome || "Carregando..."}
-        </p>
-        <p className="text-xs" style={{ color: 'var(--gray)' }}>
-          @{user?.username || "..."}
-        </p>
-      </div>
-    </div>
+    {user?.foto ? (
+      <img
+        src={user.foto}
+        alt={user?.nome || "Usuário"}
+        className={`relative ${sizes[size]} rounded-full object-cover border-2`}
+        style={{ borderColor: "var(--white)" }}
+      />
+    ) : (
+      <img
+        src="../photoProfile/userDefault.png"
+        alt="Usuário padrão"
+        className={`relative ${sizes[size]} rounded-full object-cover border-2`}
+        style={{ borderColor: "var(--white)" }}
+      />
+    )}
+  </div>
+
+  {/* Informações do usuário */}
+  <div className="min-w-0 flex-1">
+    <p
+      className="text-[55%] font-semibold truncate"
+      style={{ color: "var(--black)" }}
+    >
+      {user?.nome || "Carregando..."}
+    </p>
+
+    <p
+      className="text-xs truncate mt-0.5"
+      style={{ color: "var(--gray)" }}
+    >
+      @{user?.username || "..."}
+    </p>
+  </div>
+</div>
   )
 }
