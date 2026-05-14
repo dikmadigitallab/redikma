@@ -22,7 +22,7 @@ git checkout -b <nova-branch> <commit-hash>
 
 | # | Data | Commit Hash | Descrição | Branch |
 |---|---|---|---|---|
-| 1 | 14/05/2026 | `PENDENTE` | Commit inicial: configuração do projeto e documentação | `opencode` |
+| 1 | 14/05/2026 | `c0045c4` | Commit inicial: configuração do projeto e documentação | `opencode` |
 
 ---
 
