@@ -4,6 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { uploadProfileImage } from "@/lib/uploads"
+import { encode, decode } from "next-auth/jwt"
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -195,6 +196,56 @@ export async function PUT(req: Request) {
       },
       data: dataToUpdate,
     })
+
+    if (dataToUpdate.foto) {
+      try {
+        const raw = req.headers.get("cookie") || ""
+        const pairs = raw.split(";").filter(Boolean)
+        const cookies: Record<string, string> = {}
+        for (const pair of pairs) {
+          const idx = pair.indexOf("=")
+          if (idx > 0) {
+            cookies[pair.substring(0, idx).trim()] =
+              pair.substring(idx + 1).trim()
+          }
+        }
+
+        const tokenName = "next-auth.session-token" in cookies
+          ? "next-auth.session-token"
+          : "__Secure-next-auth.session-token"
+        const sessionToken = cookies[tokenName]
+
+        if (sessionToken) {
+          const decoded = await decode({
+            token: sessionToken,
+            secret: process.env.NEXTAUTH_SECRET!,
+          })
+
+          if (decoded) {
+            decoded.foto = dataToUpdate.foto
+
+            const newToken = await encode({
+              token: decoded,
+              secret: process.env.NEXTAUTH_SECRET!,
+              maxAge: 60 * 60 * 24 * 7,
+            })
+
+            const response = NextResponse.json({ user })
+            response.cookies.set(tokenName, newToken, {
+              httpOnly: true,
+              sameSite: "lax",
+              path: "/",
+              secure: process.env.NODE_ENV === "production",
+              maxAge: 60 * 60 * 24 * 7,
+            })
+
+            return response
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao atualizar JWT cookie:", e)
+      }
+    }
 
     return NextResponse.json({ user })
   } catch (error) {

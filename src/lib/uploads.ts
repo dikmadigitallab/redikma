@@ -132,5 +132,5 @@ export async function uploadProfileImage(
     .from(bucket)
     .getPublicUrl(filePath)
 
-  return data.publicUrl
+  return `${data.publicUrl}?t=${Date.now()}`
 }

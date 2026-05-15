@@ -117,11 +117,7 @@ export default function PerfilPage() {
 
       setPreview(data.user.foto)
 
-      await update({
-        email: form.email,
-        telefone: form.telefone,
-        foto: data.user.foto,
-      })
+      await update({ foto: data.user.foto })
 
       toast.success(
         "Perfil atualizado com sucesso"
