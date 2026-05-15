@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { ImageModal } from "./modal-view-photo"
 import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view"
+import { EditPostModal } from "./modal-edit-post"
 import { containsBadWords } from "@/lib/ofensivas"
 
 type Post = {
@@ -40,6 +41,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const pathname = usePathname()
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null)
 
+  const [editingPost, setEditingPost] = useState<{ id: string; label: string } | null>(null)
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
@@ -269,8 +271,11 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
     }
   }
   //editar post
-  async function handleEditPost(postId: string) {
-    toast.info('Em desenvolvimento')
+  function handleEditPost(postId: string) {
+    const post = posts.find(p => p.id === postId)
+    if (post) {
+      setEditingPost({ id: post.id, label: post.label })
+    }
   }
 
   function renderTextWithLinks(text: string) {
@@ -691,5 +696,14 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   postId={selectedPostId}
   authorId={selectedAuthorId}
 />
+
+{editingPost && (
+  <EditPostModal
+    postId={editingPost.id}
+    currentText={editingPost.label}
+    onClose={() => setEditingPost(null)}
+    onSaved={handleRefresh}
+  />
+)}
 </section>
 ) }

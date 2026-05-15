@@ -37,6 +37,7 @@ git checkout -b <nova-branch> <commit-hash>
 | 13 | 15/05/2026 | `717cf52` | feat: double-tap to like on photo modal, fix comments scroll on mobile | `opencode` |
 | 14 | 15/05/2026 | `4d2b797` | fix: white footer on mobile for visual bottom boundary | `opencode` |
 | 15 | 15/05/2026 | `7f3c68c` | fix: notificações consumidas do DB ao abrir o sininho e lixeira só local | `opencode` |
+| 16 | 15/05/2026 | `b2fd339` | feat: edição de posts (texto) com modal dedicado | `opencode` |
 
 ---
 

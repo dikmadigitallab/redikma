@@ -184,3 +184,11 @@ src/
 - `box-notify.tsx`: fetch agora usa `consume=true` — busca e deleta do DB ao abrir o sininho
 - `box-notify.tsx`: merge de notificações novas com cache existente (em vez de sobrescrever)
 - `box-notify.tsx`: lixeira agora remove apenas do estado e localStorage (sem chamar DELETE API)
+
+### Edição de Posts — 15/05/2026
+- `src/app/api/posts/[id]/route.ts`: nova rota PUT para editar texto do post (label)
+- `modal-edit-post.tsx`: modal de edição com textarea pré-preenchido, apenas texto (sem imagem)
+- `feed.tsx`: `handleEditPost` agora abre o modal de edição; `onSaved` atualiza o feed
+- `modal-post-view.tsx`: botão editar visível apenas para o autor do post no cabeçalho
+- Permissão: autor ou admin podem editar; imagem não pode ser alterada na edição
+- Build validado com sucesso
