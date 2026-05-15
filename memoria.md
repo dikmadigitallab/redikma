@@ -175,3 +175,7 @@ src/
 - `comentarios.tsx`: CommentsBox mudou de dropdown absoluto para fluxo inline (funciona no scroll do mobile)
 - `feed.tsx`: `toggleComments` abre automaticamente os comentários e scrolla o post inteiro
 - `feed.tsx`: adicionado `setTimeout` no scrollIntoView para aguardar teclado mobile abrir
+
+### Footer Branco no Mobile — 15/05/2026
+- `footer.tsx`: footer agora visível no mobile com fundo branco (antes era `hidden md:block`)
+- `footer.tsx`: espaço vertical `h-6` no mobile para boundary visual sem conteúdo extra
