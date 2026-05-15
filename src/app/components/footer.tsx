@@ -10,7 +10,7 @@ export function Footer() {
           <span>Versão {VERSION}</span>
         </div>
       </div>
-      <div className="h-6 md:hidden" />
+      <div className="h-16 md:hidden" />
     </footer>
   );
 }
