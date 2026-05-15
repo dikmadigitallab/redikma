@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
+import sharp from "sharp"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,20 +29,42 @@ export async function uploadImage(
   file: File,
   bucket: string
 ): Promise<string> {
-  const extension = file.name.split(".").pop()
-  const fileName = generateFileName(extension || "png")
+  // comprime imagem sem perder qualidade visual
+  const arrayBuffer =
+    await file.arrayBuffer()
+
+  const buffer = Buffer.from(arrayBuffer)
+
+  const compressedImage = await sharp(buffer)
+    .rotate()
+    .resize({
+      width: 1920,
+      withoutEnlargement: true,
+    })
+    .jpeg({
+      quality: 92,
+      mozjpeg: true,
+    })
+    .toBuffer()
+
+  const fileName =
+    generateFileName("jpg")
 
   const filePath = `posts-image/${fileName}`
 
   const { error } = await supabase.storage
     .from(bucket)
-    .upload(filePath, file)
+    .upload(filePath, compressedImage, {
+      contentType: "image/jpeg",
+    })
 
   if (error) {
     throw new Error(error.message)
   }
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath)
+  const { data } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath)
 
   return data.publicUrl
 }
@@ -54,36 +77,60 @@ export async function uploadProfileImage(
   userId: string,
   bucket: string
 ): Promise<string> {
-  const extension = file.name.split(".").pop() || "png"
-  const filePath = `profile/${userId}.${extension}`
+  // comprime imagem sem perder qualidade visual
+  const arrayBuffer =
+    await file.arrayBuffer()
 
-  // remove qualquer arquivo anterior (independente da extensão)
+  const buffer = Buffer.from(arrayBuffer)
+
+  const compressedImage = await sharp(buffer)
+    .rotate()
+    .resize({
+      width: 1600,
+      withoutEnlargement: true,
+    })
+    .jpeg({
+      quality: 92,
+      mozjpeg: true,
+    })
+    .toBuffer()
+
+  const filePath = `profile/${userId}.jpg`
+
+  // remove qualquer arquivo anterior
   const { data: files } = await supabase.storage
     .from(bucket)
     .list("profile")
 
   if (files) {
     const toDelete = files
-      .filter((f) => f.name.startsWith(userId + "."))
+      .filter((f) =>
+        f.name.startsWith(userId + ".")
+      )
       .map((f) => `profile/${f.name}`)
 
     if (toDelete.length > 0) {
-      await supabase.storage.from(bucket).remove(toDelete)
+      await supabase.storage
+        .from(bucket)
+        .remove(toDelete)
     }
   }
 
-  // faz upload sobrescrevendo
+  // upload imagem comprimida
   const { error } = await supabase.storage
     .from(bucket)
-    .upload(filePath, file, {
+    .upload(filePath, compressedImage, {
       upsert: true,
+      contentType: "image/jpeg",
     })
 
   if (error) {
     throw new Error(error.message)
   }
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(filePath)
+  const { data } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath)
 
   return data.publicUrl
 }
