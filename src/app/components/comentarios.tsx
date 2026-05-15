@@ -214,6 +214,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
       {/* Botão para abrir/fechar comentários */}
       <button
         onClick={() => setOpen((prev) => !prev)}
+        data-comment-toggle={postId}
         className="flex items-center gap-2 text-xs font-semibold transition-opacity hover:opacity-80"
         style={{ color: "var(--gray)" }}
       >
@@ -231,7 +232,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
       {/* Dropdown de comentários */}
       {open && (
         <div
-          className="absolute left-0 top-full mt-3 w-80 max-w-[90vw] rounded-2xl border shadow-2xl overflow-hidden z-50"
+          className="mt-3 w-full rounded-2xl border overflow-hidden"
           style={{
             backgroundColor: "var(--white)",
             borderColor: "var(--border)",
@@ -263,7 +264,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
           </div>
 
           {/* Conteúdo */}
-          <div className="p-4 space-y-4 max-h-80 overflow-y-auto">
+          <div className="p-4 space-y-4">
             {/* Loading */}
             {loading && (
               <div className="flex items-center gap-3 py-3">

@@ -7,14 +7,17 @@ Antes de executar qualquer tarefa, você deve compreender completamente o contex
 ---
 
 # Fluxo Obrigatório de Inicialização
+## Aviso super importante
+Antes de qualquer coisa verifique se você esta na branch opencode, caso não esteja não realize nenhuma alteração no repositorio, se for possivel mude para a branch opencode, caso não seja possivel solicite ao usuario que faça isso e te avise para que você possa continuar
 
 Sempre que iniciar uma nova tarefa, execute obrigatoriamente as etapas abaixo, nesta ordem:
+
 
 1. Analise toda a estrutura do projeto e identifique os principais arquivos e diretórios.
 2. Leia integralmente o arquivo `memorias.md`.
 3. Leia integralmente o arquivo `checkpoints.md`.
-4. Leia integralmente o arquivo `instrucoes.md`.
-5. Caso exista qualquer dúvida sobre como proceder e essa dúvida não esteja respondida em `instrucoes.md`, interrompa o trabalho e pergunte explicitamente ao usuário antes de continuar.
+4. Leia integralmente o arquivo `instruções.md`.
+5. Caso exista qualquer dúvida sobre como proceder e essa dúvida não esteja respondida em `instruções.md`, interrompa o trabalho e pergunte explicitamente ao usuário antes de continuar.
 6. Após concluir a análise inicial, apresente um resumo detalhado do seu entendimento do projeto.
 7. Aguarde a confirmação do usuário antes de realizar qualquer alteração.
 
@@ -53,6 +56,8 @@ Ao receber uma solicitação de desenvolvimento, siga este processo:
 6. Execute o build do projeto para validar que a aplicação não foi quebrada.
 7. Corrija automaticamente qualquer erro de build causado pelas alterações.
 8. Somente finalize quando o build estiver concluído com sucesso.
+9. Faça commit no github e atualize os arquivos: memoria.md e checkpoint.md
+10. Sempre use a mesma branch opencode nunca inicie nenhum trabalho em outra branch
 
 ---
 

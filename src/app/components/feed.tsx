@@ -38,10 +38,12 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
   const [refreshKey, setRefreshKey] = useState(0)
   const pathname = usePathname()
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null)
 
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+  const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null)
   const [openModal, setOpenModal] = useState(false)
 
 
@@ -53,14 +55,18 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
   const [listOfLikes, setListOfLikes] = useState<Record<string, Liker[]>>({})
 
-  function handleOpenImage(image: string) {
+  function handleOpenImage(image: string, postId: string, authorId: string) {
     setSelectedImage(image)
+    setSelectedPostId(postId)
+    setSelectedAuthorId(authorId)
     setOpenModal(true)
   }
 
   function handleCloseImage() {
     setOpenModal(false)
     setSelectedImage(null)
+    setSelectedPostId(null)
+    setSelectedAuthorId(null)
   }
 
   useEffect(() => {
@@ -293,12 +299,24 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
   function toggleComments(id: string): void {
     const commentInput = document.getElementById(`comment-input-${id}`)
+    const toggleBtn = document.querySelector(`[data-comment-toggle="${id}"]`)
+    if (toggleBtn instanceof HTMLButtonElement) {
+      const isOpen = toggleBtn.textContent?.includes("Esconder")
+      if (!isOpen) toggleBtn.click()
+    }
     if (commentInput instanceof HTMLInputElement) {
       if (document.activeElement === commentInput) {
         commentInput.blur()
       } else {
         commentInput.focus()
-        commentInput.scrollIntoView({ behavior: "smooth", block: "center" })
+        setTimeout(() => {
+          const postEl = document.getElementById(`post-${id}`)
+          if (postEl) {
+            postEl.scrollIntoView({ behavior: "smooth", block: "start" })
+          } else {
+            commentInput.scrollIntoView({ behavior: "smooth", block: "center" })
+          }
+        }, 400)
       }
     }
   }
@@ -428,7 +446,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
             <img
               src={post.image}
               onClick={() =>
-                handleOpenImage(post.image)
+                handleOpenImage(post.image, post.id, post.authorId)
               }
               className="w-full max-h-[300px] md:max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
               alt="Imagem da postagem"
@@ -670,6 +688,8 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   image={selectedImage}
   open={openModal}
   onClose={handleCloseImage}
+  postId={selectedPostId}
+  authorId={selectedAuthorId}
 />
 </section>
 ) }

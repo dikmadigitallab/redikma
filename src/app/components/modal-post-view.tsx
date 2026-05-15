@@ -351,6 +351,8 @@ export function PostViewModal({ postId, onClose }: Props) {
         image={selectedImage}
         open={!!selectedImage}
         onClose={() => setSelectedImage(null)}
+        postId={post?.id}
+        authorId={post?.authorId}
       />
     </>
   );
