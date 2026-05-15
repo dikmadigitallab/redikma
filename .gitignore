@@ -44,3 +44,12 @@ next-env.d.ts
 proteção_main.json
 proteção_dev.json
 proteção_hml.json
+
+# documentos locais (não expor no GitHub)
+memoria.md
+checkpoints.md
+instruções.md
+version notes.md
+
+# páginas de teste (não expor no GitHub)
+src/app/tests/
