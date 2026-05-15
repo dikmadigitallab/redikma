@@ -94,14 +94,6 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      loadComments()
-    }, 0)
-
-    return () => clearTimeout(t)
-  }, [postId])
-
   async function delComents(id: string) {
     try {
       const res = await fetch("/api/posts/posts-comments", {
@@ -162,14 +154,23 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
   async function unlikeComment(commentId: string) {
     if (!user?.id) return
 
+    setComments(prev =>
+      prev.map(c => {
+        if (c.id !== commentId) return c
+        return {
+          ...c,
+          likes: c.likes?.filter(l => l.userId !== user.id) || [],
+          _count: { likes: Math.max((c._count?.likes || 0) - 1, 0) },
+        }
+      })
+    )
+
     try {
       await fetch("/api/posts/comments-likes", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ commentId, userId: user.id }),
       })
-
-      await loadComments()
     } catch {
       toast.error("Erro ao remover curtida")
     }

@@ -1,221 +1,189 @@
 "use client"
 
-import { useState } from "react"
-import { signIn } from "next-auth/react"
+import Link from "next/link"
 
-interface DetalheErro {
-  indice: number
-  cpf: string
-  senha: string
-  mensagem: string | null
-  status: number | undefined
-  ok: boolean | undefined
-  url: string | null | undefined
+interface TestItem {
+  href: string
+  title: string
+  description: string
+  category: "performance" | "integridade" | "edge-case"
 }
 
-interface ResultadoTeste {
-  sucesso: number
-  erro: number
-  total: number
-  tempoTotalSegundos: string
-  requestsPorSegundo: string
-  min: string
-  max: string
-  media: string
-  p95: string
-  p99: string
-  primeirosErros: DetalheErro[]
+const tests: TestItem[] = [
+  {
+    href: "/tests/test-likes-comments",
+    title: "Curtidas e Comentários",
+    description: "Teste de carga combinado: feed consolidado, visualizar comentários, curtir/descurtir posts, adicionar comentários",
+    category: "performance",
+  },
+  {
+    href: "/tests/test-auth",
+    title: "Autenticação",
+    description: "Teste de carga no login: 500 requisições simultâneas com credenciais CPF + senha",
+    category: "performance",
+  },
+  {
+    href: "/tests/test-feed-performance",
+    title: "Feed Page",
+    description: "Teste de carga no feed principal: GET /api/posts + POST /api/posts/feed-data",
+    category: "performance",
+  },
+  {
+    href: "/tests/test-notifications",
+    title: "Notificações",
+    description: "Teste de carga nas notificações: polling de count + listagem",
+    category: "performance",
+  },
+  {
+    href: "/tests/test-likes-mass",
+    title: "Like em Massa",
+    description: "Muitos usuários curtindo o mesmo post simultaneamente — testa concorrência na unique constraint",
+    category: "performance",
+  },
+  {
+    href: "/tests/test-search",
+    title: "Busca",
+    description: "Teste de carga na busca: consultas concorrentes com termos variados",
+    category: "performance",
+  },
+  {
+    href: "/tests/test-comment-cascade",
+    title: "Cascade de Comentários",
+    description: "Verifica integridade: deletar comentário pai com profundidade > 2 não deve deixar órfãos",
+    category: "integridade",
+  },
+  {
+    href: "/tests/test-post-deletion",
+    title: "Deleção de Post",
+    description: "Verifica integridade: deletar post com comentários aninhados + likes remove tudo",
+    category: "integridade",
+  },
+  {
+    href: "/tests/test-like-rollback",
+    title: "Rollback de Like",
+    description: "Verifica se o frontend trata falha na API após update otimista de like/unlike",
+    category: "integridade",
+  },
+  {
+    href: "/tests/test-self-like",
+    title: "Auto-Like",
+    description: "Verifica edge case: usuário curtir próprio post não deve gerar notificação",
+    category: "edge-case",
+  },
+  {
+    href: "/tests/test-security",
+    title: "Segurança",
+    description: "Testes de role enforcement, IDOR, SQL injection, XSS, mass assignment e bugs conhecidos. Inclui construtor de requisição personalizada.",
+    category: "edge-case",
+  },
+]
+
+const categoryColors: Record<string, string> = {
+  performance: "#0a4554",
+  integridade: "#2d6a4f",
+  "edge-case": "#9c6b1a",
 }
 
-export default function PaginaTesteCarga() {
-  const [resultado, setResultado] = useState<ResultadoTeste | null>(null)
-  const [executando, setExecutando] = useState(false)
+const categoryLabels: Record<string, string> = {
+  performance: "Performance",
+  integridade: "Integridade",
+  "edge-case": "Edge Case",
+}
 
-  async function executarTeste(): Promise<void> {
-    setExecutando(true)
-    setResultado(null)
-
-    const totalRequisicoes = 100
-    const concorrencia = 100
-
-    // Como sua autenticação usa CPF e senha
-    const cpf = "06230124645"
-    const senha = "175264"
-
-    let sucesso = 0
-    let erro = 0
-    let contadorGlobal = 0
-
-    const tempos: number[] = []
-    const primeirosErros: DetalheErro[] = []
-
-    async function realizarLogin(): Promise<void> {
-      const indice = ++contadorGlobal
-      const inicio = performance.now()
-
-      try {
-        const response = await signIn("credentials", {
-          cpf,
-          senha,
-          redirect: false,
-        })
-
-        const fim = performance.now()
-        tempos.push(fim - inicio)
-
-        // No seu authorize(), qualquer falha retorna null.
-        // Quando isso acontece, o signIn retorna ok=false e error="CredentialsSignin".
-        if (response?.ok) {
-          sucesso++
-        } else {
-          erro++
-
-          if (primeirosErros.length < 20) {
-            primeirosErros.push({
-              indice,
-              cpf,
-              senha,
-              mensagem: response?.error ?? "Falha na autenticação",
-              status: response?.status,
-              ok: response?.ok,
-              url: response?.url,
-            })
-          }
-
-          console.error("Falha no login", {
-            indice,
-            cpf,
-            senha,
-            response,
-          })
-        }
-      } catch (e) {
-        const fim = performance.now()
-        tempos.push(fim - inicio)
-        erro++
-
-        if (primeirosErros.length < 20) {
-          primeirosErros.push({
-            indice,
-            cpf,
-            senha,
-            mensagem:
-              e instanceof Error ? e.message : "Erro desconhecido",
-            status: undefined,
-            ok: false,
-            url: null,
-          })
-        }
-
-        console.error("Exceção no login", {
-          indice,
-          cpf,
-          senha,
-          erro: e,
-        })
-      }
-    }
-
-    async function worker(total: number): Promise<void> {
-      for (let i = 0; i < total; i++) {
-        await realizarLogin()
-      }
-    }
-
-    function calcularPercentil(
-      valores: number[],
-      percentil: number
-    ): number {
-      if (valores.length === 0) return 0
-
-      const ordenados = [...valores].sort((a, b) => a - b)
-      const indice = Math.floor((percentil / 100) * ordenados.length)
-
-      return ordenados[Math.min(indice, ordenados.length - 1)]
-    }
-
-    function formatar(valor: number): string {
-      return valor.toFixed(2)
-    }
-
-    const inicioTeste = performance.now()
-
-    const requisicoesPorWorker = Math.floor(
-      totalRequisicoes / concorrencia
-    )
-
-    const resto = totalRequisicoes % concorrencia
-
-    const workers: Promise<void>[] = []
-
-    for (let i = 0; i < concorrencia; i++) {
-      const total =
-        i < resto
-          ? requisicoesPorWorker + 1
-          : requisicoesPorWorker
-
-      workers.push(worker(total))
-    }
-
-    await Promise.all(workers)
-
-    const fimTeste = performance.now()
-    const duracaoSegundos = (fimTeste - inicioTeste) / 1000
-    const totalExecutado = sucesso + erro
-
-    const min = tempos.length ? Math.min(...tempos) : 0
-    const max = tempos.length ? Math.max(...tempos) : 0
-    const media = tempos.length
-      ? tempos.reduce((acc, valor) => acc + valor, 0) / tempos.length
-      : 0
-
-    setResultado({
-      sucesso,
-      erro,
-      total: totalExecutado,
-      tempoTotalSegundos: formatar(duracaoSegundos),
-      requestsPorSegundo: formatar(
-        totalExecutado / duracaoSegundos
-      ),
-      min: formatar(min),
-      max: formatar(max),
-      media: formatar(media),
-      p95: formatar(calcularPercentil(tempos, 95)),
-      p99: formatar(calcularPercentil(tempos, 99)),
-      primeirosErros,
-    })
-
-    setExecutando(false)
-  }
-
+export default function TestsMenu() {
   return (
-    <div style={{ padding: 40 }}>
-      <button
-        onClick={executarTeste}
-        disabled={executando}
-        style={{
-          padding: "12px 24px",
-          fontSize: 16,
-          cursor: executando ? "not-allowed" : "pointer",
-        }}
-      >
-        {executando ? "Executando teste..." : "Iniciar teste de carga"}
-      </button>
+    <div style={{ padding: 40, maxWidth: 900, fontFamily: "system-ui, sans-serif" }}>
+      <h1 style={{ fontSize: 28, marginBottom: 8, color: "#0a4554" }}>
+        Central de Testes
+      </h1>
+      <p style={{ fontSize: 14, color: "#666", marginBottom: 32 }}>
+        Selecione um teste para executar. Testes de performance usam requisições
+        reais contra a API. Testes de integridade verificam consistência dos dados.
+      </p>
 
-      {resultado && (
-        <pre
-          style={{
-            marginTop: 20,
-            padding: 20,
-            background: "#f4f4f4",
-            borderRadius: 8,
-            overflow: "auto",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {JSON.stringify(resultado, null, 2)}
-        </pre>
-      )}
+      {(["performance", "integridade", "edge-case"] as const).map((cat) => {
+        const items = tests.filter((t) => t.category === cat)
+        if (items.length === 0) return null
+        return (
+          <div key={cat} style={{ marginBottom: 32 }}>
+            <h2
+              style={{
+                fontSize: 16,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                color: categoryColors[cat],
+                marginBottom: 12,
+                paddingBottom: 6,
+                borderBottom: `2px solid ${categoryColors[cat]}20`,
+              }}
+            >
+              {categoryLabels[cat]}
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {items.map((test) => (
+                <Link
+                  key={test.href}
+                  href={test.href}
+                  style={{
+                    display: "block",
+                    padding: "14px 18px",
+                    borderRadius: 10,
+                    border: `1px solid ${categoryColors[cat]}30`,
+                    textDecoration: "none",
+                    color: "#212529",
+                    transition: "all 0.15s",
+                    background: "#fff",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = categoryColors[cat]
+                    e.currentTarget.style.boxShadow = `0 2px 8px ${categoryColors[cat]}20`
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = `${categoryColors[cat]}30`
+                    e.currentTarget.style.boxShadow = "none"
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        color: categoryColors[cat],
+                        background: `${categoryColors[cat]}10`,
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {categoryLabels[cat]}
+                    </span>
+                    <strong style={{ fontSize: 15 }}>{test.title}</strong>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#666",
+                      marginTop: 4,
+                      marginLeft: 0,
+                    }}
+                  >
+                    {test.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

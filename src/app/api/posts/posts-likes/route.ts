@@ -37,9 +37,10 @@ export async function POST(req: Request) {
 
 
 export async function POST(req: Request) {
-  const sessions = await getServerSession(authOptions);
-  const nome = sessions?.user.nome
   try {
+    const sessions = await getServerSession(authOptions);
+    const nome = sessions?.user?.nome || "Alguém";
+
     const { postId, userId } = await req.json();
 
     if (!postId || !userId) {
@@ -49,28 +50,22 @@ export async function POST(req: Request) {
       );
     }
 
+    const postExiste = await prisma.postagem.findUnique({ where: { id: postId }, select: { id: true, authorId: true } });
+    if (!postExiste) {
+      return NextResponse.json({ error: "Post não encontrado" }, { status: 404 });
+    }
+
     const like = await addLike({ postId, userId });
 
-    const post = await prisma.postagem.findUnique({
-      where: { id: postId },
-      select: {
-        authorId: true,
-      },
-    });
-
-    const autorPostId = post?.authorId;
-
-    if (autorPostId && autorPostId !== userId) {
+    if (postExiste.authorId !== userId) {
       await notify({
         type: "LIKE",
         title: "Nova curtida",
         message: `${nome} curtiu sua postagem`,
-        userIds: [autorPostId],
+        userIds: [postExiste.authorId],
         actorId: userId,
         excludeCurrentUser: true,
-        data: {
-          postId,
-        },
+        data: { postId },
       });
     }
 

@@ -53,38 +53,6 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
   const [listOfLikes, setListOfLikes] = useState<Record<string, Liker[]>>({})
 
-  useEffect(() => {
-    async function loadLikers() {
-      try {
-        const likersMap: Record<string, Liker[]> = {}
-
-        await Promise.all(
-          posts.map(async (post) => {
-            const res = await fetch(
-              `/api/posts/list-likes?postId=${post.id}`,
-              { cache: "no-store" }
-            )
-
-            if (!res.ok) return
-
-            const data = await res.json()
-
-            // A API retorna { total, likers }
-            likersMap[post.id] = data.likers || []
-          })
-        )
-
-        setListOfLikes(likersMap)
-      } catch (error) {
-        console.error("Erro ao carregar lista de curtidas:", error)
-      }
-    }
-
-    if (posts.length > 0) {
-      loadLikers()
-    }
-  }, [posts])
-
   function handleOpenImage(image: string) {
     setSelectedImage(image)
     setOpenModal(true)
@@ -118,67 +86,46 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
     onRefresh?.()
   }
 
-  //conta os liker
+  //consolidado: carrega likes, likers, status do user e contagem de comentários
   useEffect(() => {
-    async function loadLikesCount() {
+    if (!posts.length) return
+
+    async function loadFeedData() {
+      const postIds = posts.map(p => p.id)
       try {
-        const counts: Record<string, number> = {}
+        const res = await fetch("/api/posts/feed-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postIds, userId: user?.id }),
+        })
+        if (!res.ok) return
+        const data = await res.json()
 
-        await Promise.all(
-          posts.map(async (post) => {
-            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`, { cache: 'no-store' })
+        const newLikedPosts: Record<string, boolean> = {}
+        const newLikesCount: Record<string, number> = {}
+        const newCommentsCount: Record<string, number> = {}
+        const newListOfLikes: Record<string, Liker[]> = {}
 
-            if (!res.ok) return
+        for (const [postId, info] of Object.entries(data) as [string, { liked: boolean; likesCount: number; commentsCount: number; likers: Liker[] }][]) {
+          newLikedPosts[postId] = info.liked
+          newLikesCount[postId] = info.likesCount
+          newCommentsCount[postId] = info.commentsCount
+          newListOfLikes[postId] = info.likers
+        }
 
-            const data = await res.json()
-            counts[post.id] = data.total || 0
-          })
-        )
-
-        setLikesCount(counts)
+        setLikedPosts(newLikedPosts)
+        setLikesCount(newLikesCount)
+        setCommentsCount(newCommentsCount)
+        setListOfLikes(newListOfLikes)
       } catch (error) {
-        console.error(error)
+        console.error("Erro ao carregar dados do feed:", error)
       }
     }
 
-    if (posts.length > 0) {
-      loadLikesCount()
-    }
-  }, [posts])
+    loadFeedData()
 
-  //puxar o status do curtir do banco:
-  useEffect(() => {
-    async function loadLikes() {
-      try {
-        const updatedLikes: Record<string, boolean> = {}
-
-        await Promise.all(
-          posts.map(async (post) => {
-            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`, { cache: 'no-store' })
-
-            if (!res.ok) return
-
-            const data = await res.json()
-
-            const userLiked = data.likes.some(
-              (like: { userId: string }) => like.userId === user?.id
-            )
-
-            if (userLiked) {
-              updatedLikes[post.id] = true
-            }
-          })
-        )
-
-        setLikedPosts(updatedLikes)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    if (posts.length > 0 && user) {
-      loadLikes()
-    }
+    const interval = setInterval(loadFeedData, 30000)
+    return () => clearInterval(interval)
   }, [posts, user])
 
   //realiza o curtir
@@ -228,25 +175,6 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
 
   //comentar
-  // 1. Mova a lógica de carregar contagem para uma função fora do useEffect para que possa ser reutilizada
-  async function loadCommentsCount() {
-    try {
-      const counts: Record<string, number> = {}
-      await Promise.all(
-        posts.map(async (post) => {
-          const res = await fetch(`/api/posts/posts-comments?postId=${post.id}`)
-          if (!res.ok) return
-          const data = await res.json()
-          counts[post.id] = data.length || 0
-        })
-      )
-      setCommentsCount(counts)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // 2. Chame a função dentro do seu método de comentar
   async function comentar(postId: string) {
     if (!user) return
 
@@ -282,31 +210,16 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
         [postId]: "",
       }))
 
-      toast.success("Comentário postado!")
+      setCommentsCount((prev) => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1,
+      }))
 
-      loadCommentsCount()
+      toast.success("Comentário postado!")
     } catch {
       toast.error("Erro ao postar comentário")
     }
   }
-
-  // 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
-  useEffect(() => {
-    if (!posts.length) return
-
-    const run = () => {
-      loadCommentsCount()
-    }
-
-    const timeout = setTimeout(run, 0)
-    const interval = setInterval(run, 30000)
-
-    return () => {
-      clearTimeout(timeout)
-      clearInterval(interval)
-    }
-  }, [posts])
-
 
   //deletar post
   async function handleDeletePost(postId: string) {

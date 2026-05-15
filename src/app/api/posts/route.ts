@@ -148,7 +148,7 @@ export async function DELETE(req: Request) {
     }
 
     // Lógica: Se for ADM ou for o DONO, ele pode passar
-    const isAdmin = false//loggedUser.role === "ADMIN" || loggedUser.role === "SYSTEM_ADM";
+    const isAdmin = loggedUser.role === "ADMIN" || loggedUser.role === "SYSTEM_ADM";
     const isOwner = postagem.authorId === loggedUser.id;
 
     if (!isAdmin && !isOwner) {
