@@ -36,6 +36,7 @@ git checkout -b <nova-branch> <commit-hash>
 | 12 | 15/05/2026 | `9eb038b` | feat: performance optimization, test suite, and security fixes | `opencode` |
 | 13 | 15/05/2026 | `717cf52` | feat: double-tap to like on photo modal, fix comments scroll on mobile | `opencode` |
 | 14 | 15/05/2026 | `4d2b797` | fix: white footer on mobile for visual bottom boundary | `opencode` |
+| 15 | 15/05/2026 | `{{COMMIT_HASH}}` | Atualizado após commit | `opencode` |
 
 ---
 

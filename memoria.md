@@ -111,22 +111,22 @@ src/
 
 ---
 
-### Sistema de Notificações (Delete Manual + Cache Local)
+### Sistema de Notificações (Consume ao Abrir + Cache Local)
 
 **Arquivos:**
-- `src/app/api/notifications/route.ts` — GET (listar), POST (criar), DELETE (deletar individual)
+- `src/app/api/notifications/route.ts` — GET (listar + consume), POST (criar), DELETE (deletar individual)
 - `src/app/components/box-notify.tsx` — Lista com lixeira + cache localStorage
 
 **Fluxo atual:**
 1. Notificações são criadas no banco via `notify()` (server-side) ou POST /api/notifications
 2. `feedHeader.tsx` faz polling a cada 30s via `/api/notifications/count` para exibir badge
-3. Ao clicar no sino, `NotificationsBox` abre e busca notificações da API
-4. `NotificationsBox` salva as notificações no `localStorage` (`notifications-cache-{userId}`)
+3. Ao clicar no sino, `NotificationsBox` abre e busca com `consume=true`: busca **e deleta do DB**
+4. `NotificationsBox` faz merge das notificações novas com o cache do `localStorage` (`notifications-cache-{userId}`)
 5. Cada notificação tem um ícone de lixeira (visível ao passar o mouse)
-6. Ao clicar na lixeira → DELETE `/api/notifications?id=X` → remove do banco + do estado + atualiza cache local
+6. Ao clicar na lixeira → remove apenas do `useState` e do `localStorage` (já foi deletada do DB no passo 3)
 7. **7-day cleanup:** toda chamada GET já limpa notificações com mais de 7 dias
 
-**Benefícios:** Usuário controla o que deletar, notificações deletadas persistem no navegador, cleanup automático de 7 dias para não acumular.
+**Benefícios:** DB funciona como fila de entrega, notificações persistem no navegador, cleanup automático de 7 dias.
 
 ---
 
@@ -179,3 +179,8 @@ src/
 ### Footer Branco no Mobile — 15/05/2026
 - `footer.tsx`: footer agora visível no mobile com fundo branco (antes era `hidden md:block`)
 - `footer.tsx`: espaço vertical `h-6` no mobile para boundary visual sem conteúdo extra
+
+### Notificações — Consume ao Abrir + Lixeira Local — 15/05/2026
+- `box-notify.tsx`: fetch agora usa `consume=true` — busca e deleta do DB ao abrir o sininho
+- `box-notify.tsx`: merge de notificações novas com cache existente (em vez de sobrescrever)
+- `box-notify.tsx`: lixeira agora remove apenas do estado e localStorage (sem chamar DELETE API)

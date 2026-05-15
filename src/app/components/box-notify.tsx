@@ -76,7 +76,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
       try {
         setLoading(true);
 
-        const res = await fetch(`/api/notifications?userId=${userId}`);
+        const res = await fetch(`/api/notifications?userId=${userId}&consume=true`);
         const data = await res.json();
 
         if (!mounted) return;
@@ -87,13 +87,14 @@ export function NotificationsBox({ userId }: { userId: string }) {
             ? data.notifications
             : [];
 
-        setNotifications(fetched);
-
-        // Salva no localStorage para persistir localmente
-        localStorage.setItem(cacheKey, JSON.stringify(fetched));
-
+        // Merge: notificações novas (do DB) são prepended às que já estavam em cache
         if (fetched.length > 0) {
-          localStorage.setItem(lastSeenKey, fetched[0].createdAt);
+          const existingIds = new Set(notifications.map((n) => n.id));
+          const trulyNew = fetched.filter((n) => !existingIds.has(n.id));
+          const merged = [...trulyNew, ...notifications];
+          setNotifications(merged);
+          localStorage.setItem(cacheKey, JSON.stringify(merged));
+          localStorage.setItem(lastSeenKey, merged[0].createdAt);
         } else {
           localStorage.setItem(lastSeenKey, new Date().toISOString());
         }
@@ -117,20 +118,10 @@ export function NotificationsBox({ userId }: { userId: string }) {
     };
   }, [userId, cacheKey, lastSeenKey]);
 
-  async function handleDelete(id: string) {
-    try {
-      const res = await fetch(`/api/notifications?id=${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) return;
-
-      const updated = notifications.filter((n) => n.id !== id);
-      setNotifications(updated);
-      localStorage.setItem(cacheKey, JSON.stringify(updated));
-    } catch (err) {
-      console.error("Erro ao deletar notificação:", err);
-    }
+  function handleDelete(id: string) {
+    const updated = notifications.filter((n) => n.id !== id);
+    setNotifications(updated);
+    localStorage.setItem(cacheKey, JSON.stringify(updated));
   }
 
   return (
