@@ -165,3 +165,13 @@ src/
 - `list-likes/route.ts`: fallback de pravatar → `/photoProfile/userDefault.png`
 - `feed.tsx`: avatar do input de comentário corrigido
 - `admin/usuarios/page.tsx`: fallback corrigido
+
+### Double-tap to Like + Comments Scroll — 15/05/2026
+- `modal-view-photo.tsx`: duplo toque na foto em mobile curte a postagem com animação de coração
+- `modal-view-photo.tsx`: aceita `postId` e `authorId` como props opcionais
+- `feed.tsx`: `handleOpenImage` agora guarda `postId`/`authorId` e repassa ao modal
+- `modal-post-view.tsx`: repassa `postId`/`authorId` ao ImageModal
+- `globals.css`: keyframe `heart-burst` para animação do coração
+- `comentarios.tsx`: CommentsBox mudou de dropdown absoluto para fluxo inline (funciona no scroll do mobile)
+- `feed.tsx`: `toggleComments` abre automaticamente os comentários e scrolla o post inteiro
+- `feed.tsx`: adicionado `setTimeout` no scrollIntoView para aguardar teclado mobile abrir

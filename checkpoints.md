@@ -34,6 +34,7 @@ git checkout -b <nova-branch> <commit-hash>
 | 10 | 14/05/2026 | `a199ed1` | feat: modal ao clicar em notificação mostra a postagem completa | `opencode` |
 | 11 | 14/05/2026 | `3ba08b6` | feat: modal de postagem completo com curtidas, comentarios e interações | `opencode` |
 | 12 | 15/05/2026 | `9eb038b` | feat: performance optimization, test suite, and security fixes | `opencode` |
+| 13 | 15/05/2026 | `717cf52` | feat: double-tap to like on photo modal, fix comments scroll on mobile | `opencode` |
 
 ---
 
