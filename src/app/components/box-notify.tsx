@@ -68,7 +68,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
           setNotifications(parsed);
           setLoading(false);
         }
-      } catch {}
+      } catch { }
     }
 
     // 2. Busca notificações da API (sem deletar do banco)
@@ -99,7 +99,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
           // 3. Após salvar no localStorage, deleta do banco
           fetch(`/api/notifications?clearAll=true&userId=${userId}`, {
             method: "DELETE",
-          }).catch(() => {});
+          }).catch(() => { });
         } else {
           localStorage.setItem(lastSeenKey, new Date().toISOString());
         }
@@ -184,7 +184,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
                     e.stopPropagation();
                     handleDelete(n.id);
                   }}
-                  className="shrink-0 mt-1 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
+                  className="shrink-0 mt-1 text-red-500 md:text-neutral-400 md:opacity-0 md:group-hover:opacity-100 md:hover:text-red-500 transition"
                   title="Deletar notificação"
                 >
                   <FaTrash size={10} />
