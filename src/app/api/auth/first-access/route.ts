@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     const user = await prisma.user.update({
       where: { id: session.user.id },
-      data: { first_acess: true },
+      data: { first_acess: false },
     })
 
     const raw = req.headers.get("cookie") || ""
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
       })
 
       if (decoded) {
-        decoded.first_acess = true
+        decoded.first_acess = false
 
         const newToken = await encode({
           token: decoded,

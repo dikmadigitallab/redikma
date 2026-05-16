@@ -25,7 +25,7 @@ export default function PrimeiroAcessoPage() {
       return
     }
 
-    if (session.user.first_acess) {
+    if (!session.user.first_acess) {
       router.replace("/intern/feed")
     }
   }, [session, status, router])
@@ -52,7 +52,7 @@ export default function PrimeiroAcessoPage() {
         throw new Error(data.error || "Erro ao aceitar termos")
       }
 
-      await update({ first_acess: true })
+      await update({ first_acess: false })
 
       toast.success("Termos aceitos com sucesso!")
       router.push("/intern/profile?firstAccess=true")

@@ -81,7 +81,7 @@ model Comentario {
 
 model User {
   id          String   @id @default(uuid())
-  first_acess Boolean   @default(false)
+  first_acess Boolean   @default(true)
   nome        String
   username    String   @unique
   cpf         String   @unique

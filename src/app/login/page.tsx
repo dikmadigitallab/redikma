@@ -19,13 +19,13 @@ export default function LoginCPF() {
   useEffect(() => {
     if (status === "loading") return
 
-    if (session?.user) {
-      if (!session.user.first_acess) {
-        router.replace("/primeiro-acesso")
-      } else {
-        router.replace("/intern/feed")
+      if (session?.user) {
+        if (session.user.first_acess) {
+          router.replace("/primeiro-acesso")
+        } else {
+          router.replace("/intern/feed")
+        }
       }
-    }
   }, [session, status, router])
 
   function formatCPF(value: string) {
