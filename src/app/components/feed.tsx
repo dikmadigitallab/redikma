@@ -12,8 +12,7 @@ import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view"
 import { EditPostModal } from "./modal-edit-post"
 import { containsBadWords } from "@/lib/ofensivas"
-import { VscSend } from "react-icons/vsc";
-import { Send } from "lucide-react"
+import { MoreHorizontal, Send } from "lucide-react"
 
 type Post = {
   id: string
@@ -26,6 +25,7 @@ type Post = {
     nome: string
     foto: string
     cargo: string
+    role: string
   }
   postador: string
   comentarios: []
@@ -336,6 +336,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
   return (
     <section className="w-full max-w-3xl space-y-4 md:space-y-1">
+
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
       {loading && (
@@ -373,13 +374,28 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
             />
 
             {/* Menu de opções */}
-            <div className="absolute top-4 right-4 z-20">
-              <PostOptions
-                postId={post.id}
-                onDelete={handleDeletePost}
-                onEdit={handleEditPost}
-              />
-            </div>
+            {session?.user?.id === post.author.id ? (
+              <div className="absolute top-4 right-4 z-20">
+                <PostOptions
+                  postId={post.id}
+                  onDelete={handleDeletePost}
+                  onEdit={handleEditPost}
+                />
+              </div>
+
+            ) : (
+              <>
+                <div className="absolute top-4 right-4 z-20">
+                  <button
+                    className="text-zinc-950 hover:bg-neutral-100 p-1 rounded-full transition-colors flex items-center justify-center select-none"
+                  onClick={()=>{toast.info('Somente o criador do post poderá edita-lo')}}
+                  >
+                    <MoreHorizontal size={24} />
+                  </button>
+                </div>
+              </>
+            )}
+
 
             <div className="p-4 md:p-5 space-y-4 overflow-visible">
               {/* Cabeçalho */}

@@ -81,6 +81,7 @@ model Comentario {
 
 model User {
   id          String   @id @default(uuid())
+  first_acess Boolean   @default(false)
   nome        String
   username    String   @unique
   cpf         String   @unique
@@ -127,4 +128,25 @@ enum NotificationType {
   BIRTHDAY
   WORK_ANNIVERSARY
 }
+ 
+ //aceite de termos de uso sem relacionamento apenas registra o id que aceitou 
+ model aceite_termos {
+  id        String   @id @default(uuid())
+  userId    String
+  acceptedAt DateTime @default(now())
+ }
 
+ //aceite de lgpd sem relacionamento apenas registra o id que aceitou
+ model aceite_lgpd {
+  id        String   @id @default(uuid())
+  userId    String
+  acceptedAt DateTime @default(now())
+ }
+
+//aceite de politica de cookies sem relacionamento apenas registra o id, o horario, e o ip do usuario que aceitou
+model aceite_cookies {
+  id        String   @id @default(uuid())
+  userId    String
+  acceptedAt DateTime @default(now())
+  ip        String?
+}

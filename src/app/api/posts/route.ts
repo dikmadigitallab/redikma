@@ -103,7 +103,8 @@ export async function POST(req: Request) {
             id: true,
             nome: true,
             foto: true,
-            cargo: true
+            cargo: true,
+            role: true
           }
         }
       }
