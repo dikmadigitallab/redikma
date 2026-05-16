@@ -12,6 +12,8 @@ import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view"
 import { EditPostModal } from "./modal-edit-post"
 import { containsBadWords } from "@/lib/ofensivas"
+import { VscSend } from "react-icons/vsc";
+import { Send } from "lucide-react"
 
 type Post = {
   id: string
@@ -534,19 +536,13 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     .trim() !== "" && (
                       <button
                         type="button"
-                        onClick={() =>
-                          comentar(post.id)
-                        }
-                        className="absolute right-2 w-9 h-9 rounded-full flex items-center justify-center transition-opacity hover:opacity-85"
-                        style={{
-                          backgroundColor:
-                            "var(--primary-dark)",
-                        }}
+                        onClick={() => comentar(post.id)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-transparent transition-all duration-200 hover:bg-amber-50 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#feb416]/30 disabled:opacity-40 disabled:pointer-events-none"
                       >
-                        <img
-                          src="/icons/enviar.png"
-                          alt="Enviar"
-                          className="w-4 h-4"
+                        <Send
+                          size={16}
+                          color="#feb416"
+                          className="translate-x-[1px] -translate-y-[0.5px]"
                         />
                       </button>
                     )}
@@ -601,8 +597,8 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                           width={18}
                           height={18}
                           className={`transition-all duration-300 ${liked
-                              ? "opacity-100 scale-110"
-                              : "opacity-60"
+                            ? "opacity-100 scale-110"
+                            : "opacity-60"
                             }`}
                         />
                       </div>

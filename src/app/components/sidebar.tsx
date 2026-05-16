@@ -33,12 +33,12 @@ export function Sidebar() {
       },
       disabled: false,
     },
-    {
+   /*  {
       icon: Search,
       label: "Buscar",
       onClick: aviso,
       disabled: true,
-    },
+    }, */
     ...(isAdmin
       ? [
         {
@@ -64,6 +64,7 @@ export function Sidebar() {
       label: "Vídeos",
       onClick: aviso,
       disabled: true,
+      name:'Em breve',
     },
     {
       icon: User,
@@ -115,6 +116,7 @@ export function Sidebar() {
           <div className="p-2">
             {menuItems.map((item) => (
               <button
+              title={item.name}
                 key={item.label}
                 onClick={item.onClick}
                 disabled={item.disabled}
