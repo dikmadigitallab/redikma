@@ -1,28 +1,25 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { getToken } from "next-auth/jwt"
 
-export function proxy(req: NextRequest) {
-  const session = req.cookies.get("session")
-  const isLoginPage = req.nextUrl.pathname.startsWith("/login")
-  const role = req.cookies.get("role")?.value
+export async function proxy(req: NextRequest) {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  })
 
-
-
-  // ❌ não logado → manda pro login
-  if (!session && !isLoginPage) {
+  // Se não estiver logado, redireciona para /login
+  if (!token) {
     return NextResponse.redirect(new URL("/login", req.url))
   }
 
-  // ✅ já logado → evita voltar pro login
-  if (session && isLoginPage) {
-    return NextResponse.redirect(new URL("/intern/feed", req.url))
-  }
-
+  // Se estiver logado, permite o acesso
+  return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    "/intern/feed/:path*",
-    "/login",
+    "/intern/:path*",
+    "/admin/:path*",
   ],
 }
