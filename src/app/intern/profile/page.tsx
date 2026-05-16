@@ -1,19 +1,24 @@
 "use client"
 
 import { User } from "next-auth"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Sidebar } from "@/app/components/sidebar"
 import {
   Camera,
   Mail,
   Phone,
   Lock,
+  AlertTriangle,
 } from "lucide-react"
 
-export default function PerfilPage() {
+function PerfilPageContent() {
   const { update } = useSession()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const isFirstAccess = searchParams.get("firstAccess") === "true"
 
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
@@ -140,6 +145,10 @@ export default function PerfilPage() {
       toast.success(
         "Perfil atualizado com sucesso"
       )
+
+      if (isFirstAccess) {
+        router.replace("/intern/profile")
+      }
     } catch {
       toast.error("Erro ao atualizar perfil")
     } finally {
@@ -256,6 +265,20 @@ export default function PerfilPage() {
               </div>
             </div>
 
+            {isFirstAccess && (
+              <div className="mx-5 md:mx-8 mt-5 md:mt-8 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-start gap-3">
+                <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-amber-800 text-sm">
+                    Primeiro Acesso
+                  </p>
+                  <p className="text-sm text-amber-700 mt-0.5">
+                    Por segurança, cadastre uma nova senha antes de começar a usar a plataforma. Preencha o campo &quot;Alterar senha&quot; abaixo e clique em Salvar.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Form */}
             <form
               onSubmit={handleSubmit}
@@ -360,5 +383,13 @@ export default function PerfilPage() {
         </div>
       </main>
     </section>
+  )
+}
+
+export default function PerfilPage() {
+  return (
+    <Suspense fallback={null}>
+      <PerfilPageContent />
+    </Suspense>
   )
 }
