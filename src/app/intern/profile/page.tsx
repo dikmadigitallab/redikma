@@ -79,17 +79,20 @@ export default function PerfilPage() {
 
     const formData = new FormData()
 
-    if (form.email)
+    if (form.email) {
       formData.append("email", form.email)
+    }
 
-    if (form.telefone)
+    if (form.telefone) {
       formData.append(
         "telefone",
         form.telefone
       )
+    }
 
-    if (form.senha)
+    if (form.senha) {
       formData.append("senha", form.senha)
+    }
 
     if (
       form.foto instanceof File ||
@@ -117,7 +120,9 @@ export default function PerfilPage() {
 
       setPreview(data.user.foto)
 
-      await update({ foto: data.user.foto })
+      await update({
+        foto: data.user.foto,
+      })
 
       toast.success(
         "Perfil atualizado com sucesso"
@@ -140,25 +145,39 @@ export default function PerfilPage() {
     }))
   }
 
-  if (!user) return null
+  if (!user) {
+    return (
+      <div className="h-screen w-full flex bg-[#f6f7fb] overflow-hidden">
+        <Sidebar />
+
+        <main className="flex-1 overflow-y-auto px-3 py-4 md:px-8 md:py-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="bg-white border border-neutral-200 rounded-[28px] shadow-sm p-8">
+              <div className="animate-pulse space-y-4">
+                <div className="h-24 w-24 rounded-full bg-neutral-200 mx-auto" />
+                <div className="h-6 w-48 bg-neutral-200 rounded mx-auto" />
+                <div className="h-4 w-32 bg-neutral-200 rounded mx-auto" />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   return (
-    <div className="h-screen w-full flex bg-[#f6f7fb] overflow-hidden">
+    <section className="h-screen w-full flex bg-[#f6f7fb] overflow-hidden">
       <Sidebar />
 
-      <main className="flex-1 overflow-y-auto px-3 py-4 md:px-8 md:py-8">
+      <main className="flex-1 overflow-y-auto px-3 py-4 md:px-8 md:py-8 pb-24 sm:pb-8">
         <div className="max-w-5xl mx-auto">
-
           <div className="bg-white border border-neutral-200 rounded-[28px] overflow-hidden shadow-sm">
-
             {/* Topo */}
             <div className="px-5 md:px-8 py-7 border-b border-neutral-100 bg-[#fafcff]">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-
                 {/* Perfil */}
-                <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4">
-
-                  <div className="relative group">
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="relative group flex-shrink-0">
                     <img
                       src={
                         preview ||
@@ -188,36 +207,35 @@ export default function PerfilPage() {
                     </label>
                   </div>
 
-                  <div className="text-center sm:text-left">
-                    <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">
+                  <div className="text-center sm:text-left min-w-0">
+                    <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 break-words">
                       {user.nome}
                     </h1>
 
-                    <p className="text-sm text-neutral-500 mt-1">
+                    <p className="text-sm text-neutral-500 mt-1 break-all">
                       @{user.username}
                     </p>
                   </div>
                 </div>
 
                 {/* Infos */}
-                <div className="flex flex-wrap justify-center lg:justify-end gap-3">
-
-                  <div className="bg-white border border-neutral-200 rounded-2xl px-4 py-3 min-w-[160px]">
+                <div className="flex flex-col sm:flex-row w-full lg:w-auto justify-center lg:justify-end gap-3">
+                  <div className="bg-white border border-neutral-200 rounded-2xl px-4 py-3 w-full sm:min-w-[160px] sm:w-auto">
                     <p className="text-[10px] uppercase font-semibold text-neutral-400">
                       CPF
                     </p>
 
-                    <p className="text-sm font-semibold text-neutral-700 mt-1">
+                    <p className="text-sm font-semibold text-neutral-700 mt-1 break-all">
                       {user.cpf}
                     </p>
                   </div>
 
-                  <div className="bg-white border border-neutral-200 rounded-2xl px-4 py-3 min-w-[160px]">
+                  <div className="bg-white border border-neutral-200 rounded-2xl px-4 py-3 w-full sm:min-w-[160px] sm:w-auto">
                     <p className="text-[10px] uppercase font-semibold text-neutral-400">
                       Cargo
                     </p>
 
-                    <p className="text-sm font-semibold text-neutral-700 mt-1">
+                    <p className="text-sm font-semibold text-neutral-700 mt-1 break-words">
                       {user.cargo}
                     </p>
                   </div>
@@ -231,7 +249,6 @@ export default function PerfilPage() {
               className="p-5 md:p-8"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
                 {/* Email */}
                 <div>
                   <label className="text-[11px] font-semibold uppercase text-neutral-500 ml-1">
@@ -301,32 +318,34 @@ export default function PerfilPage() {
               </div>
 
               {/* Footer */}
-              <div className="mt-8 pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-end gap-3">
+              <div className="mt-8 pt-6 border-t border-neutral-100">
+                <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.location.reload()
+                    }
+                    disabled={loading}
+                    className="w-full sm:w-auto sm:min-w-[140px] h-12 px-6 rounded-2xl text-sm font-semibold text-neutral-500 hover:bg-neutral-100 transition-all flex items-center justify-center disabled:opacity-60"
+                  >
+                    Descartar
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    window.location.reload()
-                  }
-                  className="w-full sm:w-auto px-6 h-12 rounded-2xl text-sm font-semibold text-neutral-500 hover:bg-neutral-100 transition-all"
-                >
-                  Descartar
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full sm:w-auto px-8 h-12 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 transition-all"
-                >
-                  {loading
-                    ? "Salvando..."
-                    : "Salvar Alterações"}
-                </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full sm:w-auto sm:min-w-[140px] h-12 px-8 rounded-2xl bg-black text-white text-sm font-semibold hover:opacity-90 transition-all flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {loading
+                      ? "Salvando..."
+                      : "Salvar"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
       </main>
-    </div>
+    </section>
   )
 }
