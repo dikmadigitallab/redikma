@@ -120,7 +120,20 @@ export default function PerfilPage() {
 
       setPreview(data.user.foto)
 
+      setUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              ...(form.email ? { email: form.email } : {}),
+              ...(form.telefone ? { telefone: form.telefone } : {}),
+              foto: data.user.foto,
+            }
+          : prev
+      )
+
       await update({
+        ...(form.email ? { email: form.email } : {}),
+        ...(form.telefone ? { telefone: form.telefone } : {}),
         foto: data.user.foto,
       })
 

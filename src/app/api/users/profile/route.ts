@@ -197,7 +197,12 @@ export async function PUT(req: Request) {
       data: dataToUpdate,
     })
 
-    if (dataToUpdate.foto) {
+    const hasSyncableFields =
+      dataToUpdate.email !== undefined ||
+      dataToUpdate.telefone !== undefined ||
+      dataToUpdate.foto !== undefined
+
+    if (hasSyncableFields) {
       try {
         const raw = req.headers.get("cookie") || ""
         const pairs = raw.split(";").filter(Boolean)
@@ -222,7 +227,9 @@ export async function PUT(req: Request) {
           })
 
           if (decoded) {
-            decoded.foto = dataToUpdate.foto
+            if (dataToUpdate.email !== undefined) decoded.email = dataToUpdate.email
+            if (dataToUpdate.telefone !== undefined) decoded.telefone = dataToUpdate.telefone
+            if (dataToUpdate.foto !== undefined) decoded.foto = dataToUpdate.foto
 
             const newToken = await encode({
               token: decoded,
