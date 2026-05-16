@@ -21,6 +21,10 @@ export default async function RootLayout({
     redirect("/login")
   }
 
+  if (session.user.first_acess) {
+    redirect("/primeiro-acesso")
+  }
+
   return (
     <div
       className="fixed min-h-screen w-full"
