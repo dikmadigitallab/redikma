@@ -71,12 +71,12 @@ export function NotificationsBox({ userId }: { userId: string }) {
       } catch {}
     }
 
-    // 2. Busca notificações da API
+    // 2. Busca notificações da API (sem deletar do banco)
     async function fetchData() {
       try {
         setLoading(true);
 
-        const res = await fetch(`/api/notifications?userId=${userId}&consume=true`);
+        const res = await fetch(`/api/notifications?userId=${userId}&all=true`);
         const data = await res.json();
 
         if (!mounted) return;
@@ -95,6 +95,11 @@ export function NotificationsBox({ userId }: { userId: string }) {
           setNotifications(merged);
           localStorage.setItem(cacheKey, JSON.stringify(merged));
           localStorage.setItem(lastSeenKey, merged[0].createdAt);
+
+          // 3. Após salvar no localStorage, deleta do banco
+          fetch(`/api/notifications?clearAll=true&userId=${userId}`, {
+            method: "DELETE",
+          }).catch(() => {});
         } else {
           localStorage.setItem(lastSeenKey, new Date().toISOString());
         }
