@@ -83,6 +83,7 @@ export function ImageModal({ image, open, onClose, postId, authorId }: Props) {
         <img
           src={image}
           alt="Visualização da imagem"
+          onDoubleClick={() => curtir()}
           onTouchEnd={(e) => {
             if (!postId || !authorId) return
             const now = Date.now()

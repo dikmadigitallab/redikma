@@ -483,6 +483,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     onClick={() =>
                       handleOpenImage(post.image, post.id, post.authorId)
                     }
+                    onDoubleClick={() => curtir(post.id, post.authorId)}
                     className="w-full max-h-[300px] md:max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
                     alt="Imagem da postagem"
                   />
