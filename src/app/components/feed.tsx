@@ -12,7 +12,7 @@ import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view"
 import { EditPostModal } from "./modal-edit-post"
 import { containsBadWords } from "@/lib/ofensivas"
-import { MoreHorizontal, Send } from "lucide-react"
+import { MoreHorizontal, Send, Heart } from "lucide-react"
 
 type Post = {
   id: string
@@ -42,12 +42,6 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
   const [refreshKey, setRefreshKey] = useState(0)
   const pathname = usePathname()
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null)
-  const [isTouchDevice, setIsTouchDevice] = useState(false)
-
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
 
   const [editingPost, setEditingPost] = useState<{ id: string; label: string } | null>(null)
 
@@ -351,7 +345,6 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
       {posts.map((post) => {
         const liked = likedPosts[post.id] || false
         const postLikesCount = likesCount[post.id] || 0
-        const isTooltipOpen = activeTooltip === post.id
 
         return (
           <div
@@ -388,7 +381,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 <div className="absolute top-4 right-4 z-20">
                   <button
                     className="text-zinc-950 hover:bg-neutral-100 p-1 rounded-full transition-colors flex items-center justify-center select-none"
-                  onClick={()=>{toast.info('Somente o criador do post poderá edita-lo')}}
+                  onClick={()=>{toast.info('Esse post não pode ser editado ou excluído!')}}
                   >
                     <MoreHorizontal size={24} />
                   </button>
@@ -569,120 +562,58 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 {/* Botões */}
                 <div className="flex items-center gap-6 relative overflow-visible">
 
-                  {/* Likes */}
-                  <div
-                    className="relative"
-                    onMouseEnter={() => {
-                      if (!isTouchDevice && postLikesCount > 0) {
-                        setActiveTooltip(post.id)
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      if (!isTouchDevice) {
-                        setActiveTooltip(null)
-                      }
-                    }}
-                  >
+                  {/* Like */}
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
-                      onClick={() => {
-                        curtir(post.id, post.authorId)
-
-                        if (isTouchDevice) {
-                          setActiveTooltip(
-                            isTooltipOpen
-                              ? null
-                              : post.id
-                          )
-                        }
-                      }}
+                      onClick={() => curtir(post.id, post.authorId)}
                       className="flex items-center gap-2 transition-all hover:opacity-80"
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${liked ? "scale-105" : ""
-                          }`}
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
                         style={{
                           backgroundColor: liked
-                            ? "rgba(255, 0, 85, 0.12)"
+                            ? "rgba(239, 68, 68, 0.1)"
                             : "rgba(79, 195, 217, 0.08)",
                         }}
                       >
-                        <Image
-                          src="/icons/like.png"
-                          alt="Curtir"
-                          width={18}
-                          height={18}
-                          className={`transition-all duration-300 ${liked
-                            ? "opacity-100 scale-110"
-                            : "opacity-60"
-                            }`}
+                        <Heart
+                          size={18}
+                          className={liked ? "fill-red-500 text-red-500" : "opacity-70"}
+                          style={{ color: liked ? "#ef4444" : "var(--gray)" }}
                         />
                       </div>
 
                       <span
                         className="text-sm font-semibold"
-                        style={{
-                          color: liked
-                            ? "var(--warning)"
-                            : "var(--gray)",
-                        }}
+                        style={{ color: liked ? "#ef4444" : "var(--gray)" }}
                       >
                         {postLikesCount}
                       </span>
                     </button>
 
-                    {/* Tooltip */}
-                    {isTooltipOpen &&
-                      postLikesCount > 0 && (
-                        <>
-                          {isTouchDevice && (
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() =>
-                                setActiveTooltip(null)
-                              }
-                            />
-                          )}
-
-                          <div className="absolute bottom-full left-0 mb-3 z-20 animate-in fade-in zoom-in-95 duration-200">
-                            <div
-                              className="relative rounded-2xl border shadow-2xl p-2 min-w-[200px]"
-                              style={{
-                                backgroundColor:
-                                  "var(--white)",
-                                borderColor:
-                                  "var(--border)",
-                              }}
-                            >
-                              <LikeView
-                                totalLikes={
-                                  (
-                                    listOfLikes[
-                                    post.id
-                                    ] || []
-                                  ).length
-                                }
-                                likers={
-                                  listOfLikes[
-                                  post.id
-                                  ] || []
-                                }
-                              />
-
-                              <div
-                                className="absolute top-full left-4 w-4 h-4 rotate-45 -translate-y-2 border-r border-b"
-                                style={{
-                                  backgroundColor:
-                                    "var(--white)",
-                                  borderColor:
-                                    "var(--border)",
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </>
-                      )}
+                    {postLikesCount > 0 && (
+                      <div className="hidden sm:block">
+                        <LikeView
+                          totalLikes={(listOfLikes[post.id] || []).length}
+                          likers={listOfLikes[post.id] || []}
+                        />
+                      </div>
+                    )}
                   </div>
+
+                  {postLikesCount > 0 && (
+                    <div className="sm:hidden text-[10px] text-neutral-400 leading-tight max-w-[160px] truncate">
+                      {(() => {
+                        const likes = listOfLikes[post.id] || []
+                        const shuffled = [...likes].sort(() => Math.random() - 0.5)
+                        const names = shuffled.slice(0, 3).map(
+                          (like) => like.nome
+                        )
+                        return `curtido por: ${names.join(", ")}${likes.length > 3 ? ", ..." : ""}`
+                      })()}
+                    </div>
+                  )}
 
                   {/* Comentários */}
                   <button
