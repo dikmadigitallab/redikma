@@ -388,7 +388,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 <div className="absolute top-4 right-4 z-20">
                   <button
                     className="text-zinc-950 hover:bg-neutral-100 p-1 rounded-full transition-colors flex items-center justify-center select-none"
-                  onClick={()=>{toast.info('Somente o criador do post poderá edita-lo')}}
+                    onClick={() => { toast.info('Somente o criador do post poderá edita-lo') }}
                   >
                     <MoreHorizontal size={24} />
                   </button>
@@ -427,7 +427,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       {post.author.nome}
                     </h3>
                     {post.author.cargo && (
-                      <span className="text-xs md:text-sm font-normal text-[var(--gray)] truncate">
+                      <span className="text-[10px] md:text-xs font-normal text-[var(--gray)] truncate">
                         • {post.author.cargo}
                       </span>
                     )}
@@ -483,6 +483,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     onClick={() =>
                       handleOpenImage(post.image, post.id, post.authorId)
                     }
+                    onDoubleClick={() => curtir(post.id, post.authorId)}
                     className="w-full max-h-[300px] md:max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
                     alt="Imagem da postagem"
                   />
@@ -718,6 +719,17 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     </span>
                   </button>
                 </div>
+
+                {postLikesCount > 0 && (
+                  <div className="sm:hidden text-[10px] text-neutral-400 leading-tight -mt-2">
+                    {(() => {
+                      const likes = listOfLikes[post.id] || []
+                      const shuffled = [...likes].sort(() => Math.random() - 0.5)
+                      const names = shuffled.slice(0, 3).map((like) => like.nome)
+                      return `curtido por: ${names.join(", ")}${likes.length > 3 ? ", ..." : ""}`
+                    })()}
+                  </div>
+                )}
 
 
 

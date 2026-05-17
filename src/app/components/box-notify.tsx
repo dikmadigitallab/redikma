@@ -184,7 +184,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
                     e.stopPropagation();
                     handleDelete(n.id);
                   }}
-                  className="shrink-0 mt-1 text-red-500 md:text-neutral-400 md:opacity-0 md:group-hover:opacity-100 md:hover:text-red-500 transition"
+                  className="shrink-0 mt-1 text-red-500 opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:text-red-600 transition"
                   title="Deletar notificação"
                 >
                   <FaTrash size={10} />

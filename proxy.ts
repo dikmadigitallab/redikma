@@ -1,46 +1,42 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { getToken } from "next-auth/jwt"
 
-export function proxy(req: NextRequest) {
-  const session = req.cookies.get("session");
-  const accepted = req.cookies.get("first_acess")?.value;
+export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl
 
-  const pathname = req.nextUrl.pathname;
+  const isProtected = ["/intern", "/admin"].some((route) =>
+    pathname.startsWith(route)
+  )
 
-  const isLoginPage = pathname.startsWith("/login");
-  const isLegalPage = pathname.startsWith("/legal");
-  const isFeedPage = pathname.startsWith("/intern/feed");
+  if (!isProtected) return NextResponse.next()
 
-  // ❌ Não logado -> redireciona para login
-  if (!session && !isLoginPage) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  let token
+  try {
+    token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    })
+  } catch {
+    token = null
   }
 
-  // ✅ Logado, mas ainda não aceitou os termos
-  if (session && accepted !== "false") {
-    // Permite acessar apenas a página de termos
-    if (!isLegalPage) {
-      return NextResponse.redirect(new URL("/legal", req.url));
-    }
+  if (!token) {
+    const loginUrl = new URL("/login", req.url)
+    loginUrl.searchParams.set("callbackUrl", pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
-  // ✅ Logado e já aceitou os termos
-  if (session && accepted === "true") {
-    // Evita voltar para login ou legal
-    if (isLoginPage || isLegalPage) {
-      return NextResponse.redirect(
-        new URL("/intern/feed", req.url)
-      );
-    }
+  if (token.first_acess) {
+    return NextResponse.redirect(new URL("/primeiro-acesso", req.url))
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    "/intern/feed/:path*",
-    "/login",
-    "/legal/:path*",
+    "/intern/:path*",
+    "/admin/:path*",
   ],
 };
