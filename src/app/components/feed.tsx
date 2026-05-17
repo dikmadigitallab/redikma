@@ -388,7 +388,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 <div className="absolute top-4 right-4 z-20">
                   <button
                     className="text-zinc-950 hover:bg-neutral-100 p-1 rounded-full transition-colors flex items-center justify-center select-none"
-                  onClick={()=>{toast.info('Somente o criador do post poderá edita-lo')}}
+                    onClick={() => { toast.info('Somente o criador do post poderá edita-lo') }}
                   >
                     <MoreHorizontal size={24} />
                   </button>
@@ -427,7 +427,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       {post.author.nome}
                     </h3>
                     {post.author.cargo && (
-                      <span className="text-xs md:text-sm font-normal text-[var(--gray)] truncate">
+                      <span className="text-[10px] md:text-xs font-normal text-[var(--gray)] truncate">
                         • {post.author.cargo}
                       </span>
                     )}

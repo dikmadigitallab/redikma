@@ -76,9 +76,9 @@ export default function PrimeiroAcessoPage() {
       <header className="bg-white border-b border-neutral-200 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#0A4554] flex items-center justify-center text-white font-bold text-sm">
-            D
+            <img src="./icons/redikma_logo.png" alt="" />
           </div>
-          <span className="font-bold text-lg text-neutral-900">Dikma</span>
+          <span className="font-bold text-lg text-neutral-900">ReDikma</span>
         </div>
       </header>
 

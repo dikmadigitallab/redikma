@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Search, Video, User, LogOut, Menu, X, UserPlus, Users } from "lucide-react"
+import {  Video, User, LogOut, UserPlus, Users,Rss } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { UserCard } from "./cardUser"
 import { useState } from "react"
@@ -25,8 +25,8 @@ export function Sidebar() {
 
   const menuItems = [
     {
-      icon: Home,
-      label: "Início",
+      icon: Rss,
+      label: "Feed",
       onClick: () => {
         router.push("/intern/feed")
         setIsOpen(false)
