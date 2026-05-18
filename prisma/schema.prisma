@@ -35,7 +35,7 @@ model Postagem {
   label       String
   authorId    String
   duration    String?
-  publicado   Boolean      @default(false)
+  publicado   Boolean      @default(true)
   image       String?
   video       String?
   author      User         @relation(fields: [authorId], references: [id])
