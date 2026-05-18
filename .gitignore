@@ -45,3 +45,6 @@ proteção_hml.json
 proteção_main.json
 
 /src/generated/prisma
+
+/scripts_sql/dev
+/scripts_sql/prd
