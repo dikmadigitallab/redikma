@@ -1,0 +1,27 @@
+{
+  "name": "Protecao HML",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/hml"
+      ],
+      "exclude": []
+    }
+  },
+  "rules": [
+    { "type": "non_fast_forward" },
+    { "type": "deletion" },
+    { "type": "required_linear_history" },
+    { "type": "pull_request" },
+    { "type": "required_signatures" }
+  ],
+  "bypass_actors": [
+    {
+      "actor_id": 5,
+      "actor_type": "RepositoryRole",
+      "bypass_mode": "always"
+    }
+  ]
+}
