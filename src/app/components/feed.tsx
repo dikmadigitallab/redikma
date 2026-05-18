@@ -1,8 +1,7 @@
 "use client"
 
-import {  usePathname } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-
 import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
@@ -10,6 +9,10 @@ import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { ImageModal } from "./modal-view-photo"
 import { PostOptions } from "./postDelete"
+import { LikeView } from "./likes-view"
+import { EditPostModal } from "./modal-edit-post"
+import { containsBadWords } from "@/lib/ofensivas"
+import { MoreHorizontal, Send } from "lucide-react"
 
 type Post = {
   id: string
@@ -21,6 +24,8 @@ type Post = {
     id: string
     nome: string
     foto: string
+    cargo: string
+    role: string
   }
   postador: string
   comentarios: []
@@ -37,28 +42,51 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [likesCount, setLikesCount] = useState<Record<string, number>>({})
   const [refreshKey, setRefreshKey] = useState(0)
   const pathname = usePathname()
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
 
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  }, [])
+
+  const [editingPost, setEditingPost] = useState<{ id: string; label: string } | null>(null)
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+  const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null)
   const [openModal, setOpenModal] = useState(false)
 
-  function handleOpenImage(image: string) {
+
+  type Liker = {
+    id: string
+    nome: string
+    foto: string
+  }
+
+  const [listOfLikes, setListOfLikes] = useState<Record<string, Liker[]>>({})
+
+  function handleOpenImage(image: string, postId: string, authorId: string) {
     setSelectedImage(image)
+    setSelectedPostId(postId)
+    setSelectedAuthorId(authorId)
     setOpenModal(true)
   }
 
   function handleCloseImage() {
     setOpenModal(false)
     setSelectedImage(null)
+    setSelectedPostId(null)
+    setSelectedAuthorId(null)
   }
 
   useEffect(() => {
     async function loadPosts() {
       setLoading(true)
       try {
-        const res = await fetch("/api/posts", { cache: 'no-store' })
+        const res = await fetch("/api/posts", { cache: "no-store" })
         const data = await res.json()
-        setPosts(data)
+
+        setPosts(Array.isArray(data) ? data : data?.posts ?? [])
       } catch (err) {
         console.error(err)
       } finally {
@@ -69,80 +97,58 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
   }, [pathname, refreshKey])
 
-
   function handleRefresh() {
     setRefreshKey(k => k + 1)
     onRefresh?.()
   }
 
-  //conta os liker
+  //consolidado: carrega likes, likers, status do user e contagem de comentários
   useEffect(() => {
-    async function loadLikesCount() {
+    if (!posts.length) return
+
+    async function loadFeedData() {
+      const postIds = posts.map(p => p.id)
       try {
-        const counts: Record<string, number> = {}
+        const res = await fetch("/api/posts/feed-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postIds, userId: user?.id }),
+        })
+        if (!res.ok) return
+        const data = await res.json()
 
-        await Promise.all(
-          posts.map(async (post) => {
-            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`, { cache: 'no-store' })
+        const newLikedPosts: Record<string, boolean> = {}
+        const newLikesCount: Record<string, number> = {}
+        const newCommentsCount: Record<string, number> = {}
+        const newListOfLikes: Record<string, Liker[]> = {}
 
-            if (!res.ok) return
+        for (const [postId, info] of Object.entries(data) as [string, { liked: boolean; likesCount: number; commentsCount: number; likers: Liker[] }][]) {
+          newLikedPosts[postId] = info.liked
+          newLikesCount[postId] = info.likesCount
+          newCommentsCount[postId] = info.commentsCount
+          newListOfLikes[postId] = info.likers
+        }
 
-            const data = await res.json()
-            counts[post.id] = data.total || 0
-          })
-        )
-
-        setLikesCount(counts)
+        setLikedPosts(newLikedPosts)
+        setLikesCount(newLikesCount)
+        setCommentsCount(newCommentsCount)
+        setListOfLikes(newListOfLikes)
       } catch (error) {
-        console.error(error)
+        console.error("Erro ao carregar dados do feed:", error)
       }
     }
 
-    if (posts.length > 0) {
-      loadLikesCount()
-    }
-  }, [posts])
+    loadFeedData()
 
-  //puxar o status do curtir do banco:
-  useEffect(() => {
-    async function loadLikes() {
-      try {
-        const updatedLikes: Record<string, boolean> = {}
-
-        await Promise.all(
-          posts.map(async (post) => {
-            const res = await fetch(`/api/posts/posts-likes?postId=${post.id}`, { cache: 'no-store' })
-
-            if (!res.ok) return
-
-            const data = await res.json()
-
-            const userLiked = data.likes.some(
-              (like: { userId: string }) => like.userId === user?.id
-            )
-
-            if (userLiked) {
-              updatedLikes[post.id] = true
-            }
-          })
-        )
-
-        setLikedPosts(updatedLikes)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    if (posts.length > 0 && user) {
-      loadLikes()
-    }
+    const interval = setInterval(loadFeedData, 30000)
+    return () => clearInterval(interval)
   }, [posts, user])
 
   //realiza o curtir
-  async function curtir(postId: string) {
-    if (!user) return
+  async function curtir(postId: string, autorPostId: string) {
+    if (!user) return;
 
-    const isLiked = likedPosts[postId]
+    const isLiked = likedPosts[postId];
 
     try {
       const res = await fetch("/api/posts/posts-likes", {
@@ -154,335 +160,610 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
           postId,
           userId: user.id,
         }),
-      })
+      });
 
       if (!res.ok) {
-        const err = await res.json()
-        console.error(err)
-        throw new Error("Erro ao curtir")
+        const err = await res.json();
+        console.error(err);
+        throw new Error("Erro ao curtir");
       }
 
-      // atualiza status do like
+      // atualiza UI
       setLikedPosts((prev) => ({
         ...prev,
         [postId]: !isLiked,
-      }))
+      }));
 
-      // atualiza contagem sem precisar refetch
       setLikesCount((prev) => ({
         ...prev,
         [postId]: isLiked
           ? Math.max((prev[postId] || 1) - 1, 0)
           : (prev[postId] || 0) + 1,
-      }))
+      }));
+
+
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
+
+
 
 
   //comentar
-  // 1. Mova a lógica de carregar contagem para uma função fora do useEffect para que possa ser reutilizada
-  async function loadCommentsCount() {
-    try {
-      const counts: Record<string, number> = {}
-      await Promise.all(
-        posts.map(async (post) => {
-          const res = await fetch(`/api/posts/posts-comments?postId=${post.id}`)
-          if (!res.ok) return
-          const data = await res.json()
-          counts[post.id] = data.length || 0
-        })
-      )
-      setCommentsCount(counts)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // 2. Chame a função dentro do seu método de comentar
   async function comentar(postId: string) {
     if (!user) return
+
     const texto = comments[postId]?.trim()
+
     if (!texto) return
+
+    if (containsBadWords(texto)) {
+      setComments((prev) => ({
+        ...prev,
+        [postId]: "",
+      }))
+
+      toast.error("Comentário ofensivo não pode ser enviado")
+      return
+    }
 
     try {
       const res = await fetch("/api/posts/posts-comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto, postId, authorId: user.id }),
+        body: JSON.stringify({
+          texto,
+          postId,
+          authorId: user.id,
+        }),
       })
 
       if (!res.ok) throw new Error("Erro ao comentar")
 
-      setComments((prev) => ({ ...prev, [postId]: "" }))
+      setComments((prev) => ({
+        ...prev,
+        [postId]: "",
+      }))
+
+      setCommentsCount((prev) => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1,
+      }))
+
       toast.success("Comentário postado!")
-
-      loadCommentsCount()
-
     } catch {
       toast.error("Erro ao postar comentário")
     }
   }
 
-  // 3. Mantenha o useEffect apenas para o carregamento inicial e o intervalo
-  useEffect(() => {
-    if (!posts.length) return
-
-    const run = () => {
-      loadCommentsCount()
+  //deletar post
+  async function handleDeletePost(postId: string) {
+    // Verifica se o usuário está logado antes de tentar deletar
+    if (!session?.user?.id) {
+      return toast.error("Você precisa estar logado para excluir um post");
     }
 
-    const timeout = setTimeout(run, 0)
-    const interval = setInterval(run, 30000)
+    // Confirmação simples para evitar exclusões acidentais
+    if (!confirm("Tem certeza que deseja excluir esta postagem?")) return;
 
-    return () => {
-      clearTimeout(timeout)
-      clearInterval(interval)
+    try {
+      // Ajuste da URL para usar Query Params conforme esperado pelo seu DELETE:
+      // /api/posts?postId=XXX&userId=YYY
+      const res = await fetch(`/api/posts?postId=${postId}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Usa a mensagem de erro vinda do servidor (ex: "Sem permissão")
+        throw new Error(data.error || "Erro ao deletar post");
+      }
+
+      toast.success("Postagem excluída com sucesso!");
+      await handleRefresh();
+
+
+      // Atualiza o feed após a exclusão
+
+      // ou handleRefresh(), dependendo de como está nomeado no seu componente
+
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Erro de conexão ao excluir post";
+
+      toast.error(message);
     }
-  }, [posts])
-
-
-//deletar post
-async function handleDeletePost(postId: string) {
-  // Verifica se o usuário está logado antes de tentar deletar
-  if (!session?.user?.id) {
-    return toast.error("Você precisa estar logado para excluir um post");
+  }
+  //editar post
+  function handleEditPost(postId: string) {
+    const post = posts.find(p => p.id === postId)
+    if (post) {
+      setEditingPost({ id: post.id, label: post.label })
+    }
   }
 
-  // Confirmação simples para evitar exclusões acidentais
-  if (!confirm("Tem certeza que deseja excluir esta postagem?")) return;
+  function renderTextWithLinks(text: string) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    const parts = text.split(urlRegex)
 
-  try {
-    // Ajuste da URL para usar Query Params conforme esperado pelo seu DELETE:
-    // /api/posts?postId=XXX&userId=YYY
-    const res = await fetch(`/api/posts?postId=${postId}`, {
-      method: "DELETE",
-    });
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline break-all hover:text-blue-800"
+          >
+            {part}
+          </a>
+        )
+      }
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      // Usa a mensagem de erro vinda do servidor (ex: "Sem permissão")
-      throw new Error(data.error || "Erro ao deletar post");
-    }
-
-    toast.success("Postagem excluída com sucesso!");
-    await handleRefresh();
-     
-    
-    // Atualiza o feed após a exclusão
-   
-    // ou handleRefresh(), dependendo de como está nomeado no seu componente
-    
-  } catch (error: any) {
-    toast.error(error.message || "Erro de conexão ao excluir post");
+      return <span key={index}>{part}</span>
+    })
   }
-}
-//editar post
-async function handleEditPost(postId: string) {
-  toast.info('Em desenvolvimento')
-}
 
+
+  function toggleComments(id: string): void {
+    const commentInput = document.getElementById(`comment-input-${id}`)
+    const toggleBtn = document.querySelector(`[data-comment-toggle="${id}"]`)
+    if (toggleBtn instanceof HTMLButtonElement) {
+      const isOpen = toggleBtn.textContent?.includes("Esconder")
+      if (!isOpen) toggleBtn.click()
+    }
+    if (commentInput instanceof HTMLInputElement) {
+      if (document.activeElement === commentInput) {
+        commentInput.blur()
+      } else {
+        commentInput.focus()
+        setTimeout(() => {
+          const postEl = document.getElementById(`post-${id}`)
+          if (postEl) {
+            postEl.scrollIntoView({ behavior: "smooth", block: "start" })
+          } else {
+            commentInput.scrollIntoView({ behavior: "smooth", block: "center" })
+          }
+        }, 400)
+      }
+    }
+  }
 
   return (
-    <section className="w-full space-y-4 md:space-y-6 max-w-3xl">
-
+    <section className="w-full max-w-3xl space-y-4 md:space-y-1">
 
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
-
       {loading && (
-        <p className="text-sm" style={{ color: "var(--gray)" }}>
+        <p
+          className="text-sm px-2"
+          style={{ color: "var(--gray)" }}
+        >
           Carregando posts...
         </p>
       )}
 
       {posts.map((post) => {
         const liked = likedPosts[post.id] || false
+        const postLikesCount = likesCount[post.id] || 0
+        const isTooltipOpen = activeTooltip === post.id
 
         return (
           <div
+            id={`post-${post.id}`}
             key={post.id}
-            className="rounded-lg md:rounded-xl shadow-sm p-3 md:p-4 space-y-3"
-            style={{ backgroundColor: "var(--white)", border: "1px solid var(--border)" }}
+            className="relative rounded-2xl border shadow-sm overflow-visible transition-all duration-500"
+            style={{
+              backgroundColor: "var(--white)",
+              borderColor: "var(--border)",
+              boxShadow: "0 4px 16px rgba(10, 69, 84, 0.04)",
+            }}
           >
-        <PostOptions postId={post.id} onDelete={handleDeletePost} onEdit={handleEditPost} />
+            {/* Barra decorativa superior */}
             <div
-              className="flex items-center gap-2 md:gap-3"
-              style={{ paddingBottom: "0.75rem", borderBottom: "1px solid var(--border)" }}
-            >
-              {/* trocar por Image do next */}
-              <img
-                src={post.author.foto}
-                alt="user"
-                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover object-center flex-shrink-0 border border-gray-200"
-              />
+              className="h-1 w-full"
+              style={{
+                background:
+                  "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+              }}
+            />
 
-              <div className="min-w-0 flex flex-col leading-tight">
-                <p
-                  className="text-sm md:text-base font-semibold truncate"
-                  style={{ color: "var(--black)" }}
-                >
-                  {post.author.nome}
-                </p>
-
-                <p
-                  className="text-xs truncate opacity-50"
-                  style={{ color: "var(--gray)" }}
-                >
-                  {post.postador}
-                </p>
-
-                <p
-                  className="text-[10px] md:text-xs opacity-70"
-                  style={{ color: "var(--gray)" }}
-                >
-                  {new Date(post.createdAt).toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            <p className="text-sm" style={{ color: "var(--black)" }}>
-              {post.label}
-            </p>
-
-            {post.image && (
-              <div className="p-4 bg-gray-200 rounded-lg border border-[#6bc28c3f]">
-                <img
-                  src={post.image}
-                  onClick={() => handleOpenImage(post.image)}
-                  className="w-full max-h-[300px] md:max-h-[500px] object-center rounded-lg md:rounded-xl cursor-pointer"
-                  alt="Post image"
+            {/* Menu de opções */}
+            {session?.user?.id === post.author.id ? (
+              <div className="absolute top-4 right-4 z-20">
+                <PostOptions
+                  postId={post.id}
+                  onDelete={handleDeletePost}
+                  onEdit={handleEditPost}
                 />
               </div>
+
+            ) : (
+              <>
+                <div className="absolute top-4 right-4 z-20">
+                  <button
+                    className="text-zinc-950 hover:bg-neutral-100 p-1 rounded-full transition-colors flex items-center justify-center select-none"
+                    onClick={() => { toast.info('Somente o criador do post poderá edita-lo') }}
+                  >
+                    <MoreHorizontal size={24} />
+                  </button>
+                </div>
+              </>
             )}
 
-            <div
-              className="flex items-center justify-between text-xs md:text-sm gap-3"
-              style={{
-                color: "var(--gray)",
-                paddingTop: "0.75rem",
-                borderTop: "1px solid var(--border)",
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/icons/like.png"
-                  alt="likes"
-                  width={16}
-                  height={16}
-                  className="opacity-60"
-                />
-                <span className="font-medium" style={{ color: "var(--black)" }}>
-                  {likesCount[post.id] || 0}
-                </span>
+
+            <div className="p-4 md:p-5 space-y-4 overflow-visible">
+              {/* Cabeçalho */}
+              <div
+                className="flex items-start gap-3 pb-4 border-b"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <div className="relative flex-shrink-0">
+                  <div
+                    className="absolute -inset-1 rounded-full opacity-15"
+                    style={{ backgroundColor: "var(--secondary)" }}
+                  />
+
+                  <img
+                    src={
+                      post.author.foto ||
+                      "/photoProfile/userDefault.png"
+                    }
+                    alt={post.author.nome}
+                    className="relative w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2"
+                    style={{ borderColor: "var(--white)" }}
+                  />
+                </div>
+
+                <div className="flex-1 min-w-0 pr-8">
+                  {/* Linha do Autor e Cargo */}
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <h3 className="text-sm md:text-base font-bold text-[var(--black)] truncate">
+                      {post.author.nome}
+                    </h3>
+                    {post.author.cargo && (
+                      <span className="text-[10px] md:text-xs font-normal text-[var(--gray)] truncate">
+                        • {post.author.cargo}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Quem postou (se for diferente do autor, ganha um contexto sutil) */}
+                  {post.postador && post.postador !== post.author.nome && (
+                    <p className="text-xs text-[var(--gray)]/80 mt-0.5 truncate">
+                      via {post.postador}
+                    </p>
+                  )}
+
+                  {/* Metadados: Status e Data */}
+                  <div className="flex items-center gap-1.5 mt-1.5 text-[11px] md:text-xs font-medium text-[var(--gray)]">
+                    <span
+                      className="w-2 h-2 rounded-full bg-[var(--success)]"
+                      aria-hidden="true"
+                    />
+                    <time dateTime={post.createdAt}>
+                      {new Date(post.createdAt).toLocaleDateString(undefined, {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </time>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => curtir(post.id)}
-                  className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
+              {/* Texto */}
+              <div className="px-1">
+                <div
+                  className="text-sm leading-7 whitespace-pre-wrap break-words"
+                  style={{ color: "var(--black)" }}
                 >
-                  <Image
-                    src="/icons/like.png"
-                    alt="reação"
-                    width={20}
-                    height={20}
-                    className={`transition-all duration-300 w-4 h-4 md:w-5 md:h-5 ${liked ? "opacity-100 scale-110" : "opacity-50"
-                      }`}
-                  />
-                  <span
-                    className={`transition-all duration-300 ${liked ? "font-semibold" : ""
-                      }`}
-                    style={{ color: liked ? "var(--warning)" : "var(--gray)" }}
-                  >
-                    {liked ? "curtido" : "curtir"}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className="flex items-center gap-1 md:gap-2 transition hover:opacity-70"
-                >
-                  <Image
-                    src="/icons/coments.png"
-                    alt="comentários"
-                    width={20}
-                    height={20}
-                    className="w-5 h-5 md:w-6 md:h-6 opacity-70"
-                  />
-                  <span className="hidden sm:inline">{commentsCount[post.id || 0]} comentários</span>
-                  <span className="inline-flex items-center justify-center bg-gray-100 text-gray-600 text-xs font-medium px-2 py-0.5 rounded-full sm:hidden">
-                    {commentsCount[post.id] || 0}
-                  </span>
-                </button>
+                  {renderTextWithLinks(post.label)}
+                </div>
               </div>
-            </div>
-            <div
-              className="flex items-center gap-2 rounded-lg md:rounded-full px-3 py-2 relative"
-              style={{
-                backgroundColor: "var(--background)",
-                border: `1px solid var(--border)`,
-              }}
-            >
 
-              {/* trocar por Image do next */}
-              <img
-                src={user?.foto || "https://i.pravatar.cc/100?img=1"}
-                className="w-6 h-6 md:w-7 md:h-7 rounded-full object-cover object-center flex-shrink-0"
-                alt={user?.username || "comentador"}
-              />
-
-              <input
-                value={comments[post.id] || ""}
-                maxLength={50}
-                onChange={(e) =>
-                  setComments((prev) => ({
-                    ...prev,
-                    [post.id]: e.target.value,
-                  }))
-                }
-                onKeyDown={(e) => {
-                  const value = comments[post.id] || ""
-                  if (e.key === "Enter" && !e.shiftKey && value.trim() !== "") {
-                    comentar(post.id)
-                  }
-                }}
-                placeholder="Comentar..."
-                className="bg-transparent outline-none text-xs md:text-sm w-full pr-10"
-                style={{ color: "var(--black)" }}
-              />
-
-              {(comments[post.id] || "").trim() !== "" && (
-                <button
-                  className="absolute right-2 p-2 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: "var(--primary)" }}
-                  onClick={() => comentar(post.id)}
+              {/* Imagem */}
+              {post.image && (
+                <div
+                  className="rounded-2xl overflow-hidden border"
+                  style={{
+                    backgroundColor: "var(--background)",
+                    borderColor: "var(--border)",
+                  }}
                 >
-                  {/* trocar por Image do next */}
-                  <img src="/icons/enviar.png" alt="enviar" className="w-5 h-5" />
-                </button>
+                  <img
+                    src={post.image}
+                    onClick={() =>
+                      handleOpenImage(post.image, post.id, post.authorId)
+                    }
+                    onDoubleClick={() => curtir(post.id, post.authorId)}
+                    className="w-full max-h-[300px] md:max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
+                    alt="Imagem da postagem"
+                  />
+                </div>
               )}
 
-            </div>
+              {/* Área interação */}
 
-            <CommentsBox
-              postId={post.id}
-              postAuthorId={post.author.id}
-            />
+
+
+              <div
+                className="pt-4 border-t space-y-4 overflow-visible"
+                style={{ borderColor: "var(--border)" }}
+              >
+
+
+                {/* Campo comentário */}
+                <div
+                  className="flex items-center gap-3 rounded-full px-3 py-2 border relative"
+                  style={{
+                    backgroundColor:
+                      "var(--background)",
+                    borderColor: "var(--border)",
+                  }}
+                >
+                  <img
+                    src={
+                      user?.foto ||
+                      "/photoProfile/userDefault.png"
+                    }
+                    className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                    alt="Comentador"
+                  />
+
+                  <input
+                    id={`comment-input-${post.id}`}
+                    value={comments[post.id] || ""}
+                    maxLength={50}
+                    onChange={(e) =>
+                      setComments((prev) => ({
+                        ...prev,
+                        [post.id]:
+                          e.target.value,
+                      }))
+                    }
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "Enter" &&
+                        !e.shiftKey &&
+                        (
+                          comments[
+                          post.id
+                          ] || ""
+                        ).trim() !== ""
+                      ) {
+                        comentar(post.id)
+                      }
+                    }}
+                    placeholder="Escreva um comentário..."
+                    className="flex-1 bg-transparent outline-none text-sm pr-12"
+                    style={{
+                      color: "var(--black)",
+                    }}
+                  />
+
+                  {(comments[post.id] || "")
+                    .trim() !== "" && (
+                      <button
+                        type="button"
+                        onClick={() => comentar(post.id)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-transparent transition-all duration-200 hover:bg-amber-50 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#feb416]/30 disabled:opacity-40 disabled:pointer-events-none"
+                      >
+                        <Send
+                          size={16}
+                          color="#feb416"
+                          className="translate-x-[1px] -translate-y-[0.5px]"
+                        />
+                      </button>
+                    )}
+                </div>
+
+
+
+                {/* Botões */}
+                <div className="flex items-center gap-6 relative overflow-visible">
+
+                  {/* Likes */}
+                  <div
+                    className="relative"
+                    onMouseEnter={() => {
+                      if (!isTouchDevice && postLikesCount > 0) {
+                        setActiveTooltip(post.id)
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (!isTouchDevice) {
+                        setActiveTooltip(null)
+                      }
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        curtir(post.id, post.authorId)
+
+                        if (isTouchDevice) {
+                          setActiveTooltip(
+                            isTooltipOpen
+                              ? null
+                              : post.id
+                          )
+                        }
+                      }}
+                      className="flex items-center gap-2 transition-all hover:opacity-80"
+                    >
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${liked ? "scale-105" : ""
+                          }`}
+                        style={{
+                          backgroundColor: liked
+                            ? "rgba(255, 0, 85, 0.12)"
+                            : "rgba(79, 195, 217, 0.08)",
+                        }}
+                      >
+                        <Image
+                          src="/icons/like.png"
+                          alt="Curtir"
+                          width={18}
+                          height={18}
+                          className={`transition-all duration-300 ${liked
+                            ? "opacity-100 scale-110"
+                            : "opacity-60"
+                            }`}
+                        />
+                      </div>
+
+                      <span
+                        className="text-sm font-semibold"
+                        style={{
+                          color: liked
+                            ? "var(--warning)"
+                            : "var(--gray)",
+                        }}
+                      >
+                        {postLikesCount}
+                      </span>
+                    </button>
+
+                    {/* Tooltip */}
+                    {isTooltipOpen &&
+                      postLikesCount > 0 && (
+                        <>
+                          {isTouchDevice && (
+                            <div
+                              className="fixed inset-0 z-10"
+                              onClick={() =>
+                                setActiveTooltip(null)
+                              }
+                            />
+                          )}
+
+                          <div className="absolute bottom-full left-0 mb-3 z-20 animate-in fade-in zoom-in-95 duration-200">
+                            <div
+                              className="relative rounded-2xl border shadow-2xl p-2 min-w-[200px]"
+                              style={{
+                                backgroundColor:
+                                  "var(--white)",
+                                borderColor:
+                                  "var(--border)",
+                              }}
+                            >
+                              <LikeView
+                                totalLikes={
+                                  (
+                                    listOfLikes[
+                                    post.id
+                                    ] || []
+                                  ).length
+                                }
+                                likers={
+                                  listOfLikes[
+                                  post.id
+                                  ] || []
+                                }
+                              />
+
+                              <div
+                                className="absolute top-full left-4 w-4 h-4 rotate-45 -translate-y-2 border-r border-b"
+                                style={{
+                                  backgroundColor:
+                                    "var(--white)",
+                                  borderColor:
+                                    "var(--border)",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                  </div>
+
+                  {/* Comentários */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      toggleComments(post.id)
+                    }
+                    className="flex items-center gap-2 transition-all hover:opacity-80"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{
+                        backgroundColor:
+                          "rgba(79, 195, 217, 0.08)",
+                      }}
+                    >
+                      <Image
+                        src="/icons/coments.png"
+                        alt="Comentários"
+                        width={18}
+                        height={18}
+                        className="opacity-70"
+                      />
+                    </div>
+
+                    <span
+                      className="text-sm font-semibold"
+                      style={{
+                        color: "var(--gray)",
+                      }}
+                    >
+                      {commentsCount[post.id] || 0}
+                    </span>
+                  </button>
+                </div>
+
+                {postLikesCount > 0 && (
+                  <div className="sm:hidden text-[10px] text-neutral-400 leading-tight -mt-2">
+                    {(() => {
+                      const likes = listOfLikes[post.id] || []
+                      const shuffled = [...likes].sort(() => Math.random() - 0.5)
+                      const names = shuffled.slice(0, 3).map((like) => like.nome)
+                      return `curtido por: ${names.join(", ")}${likes.length > 3 ? ", ..." : ""}`
+                    })()}
+                  </div>
+                )}
+
+
+
+                {/* Comentários */}
+                <div className="overflow-visible">
+                  <CommentsBox
+                    postId={post.id}
+                    postAuthorId={
+                      post.author.id
+                    }
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         )
       })}
-
-
 
       <ImageModal
         image={selectedImage}
         open={openModal}
         onClose={handleCloseImage}
+        postId={selectedPostId}
+        authorId={selectedAuthorId}
       />
-    </section >
+
+      {editingPost && (
+        <EditPostModal
+          postId={editingPost.id}
+          currentText={editingPost.label}
+          onClose={() => setEditingPost(null)}
+          onSaved={handleRefresh}
+        />
+      )}
+    </section>
   )
 }

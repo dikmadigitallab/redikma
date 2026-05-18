@@ -9,15 +9,34 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData()
 
-    const label = formData.get("label") as string
+    const label = ((formData.get("label") as string) || "").trim()
     const authorId = formData.get("authorId") as string
     const postador = formData.get("postador") as string
     const duration = formData.get("duration") as string
     const imageFile = formData.get("image")
 
-    if (!label || !authorId) {
+    // Agora authorId é obrigatório, mas label pode ser vazio
+    // desde que exista uma imagem.
+    if (!authorId) {
       return NextResponse.json(
-        { error: "Campos obrigatórios não informados" },
+        { error: "Usuário não informado" },
+        { status: 400 }
+      )
+    }
+
+    // Verifica se foi enviada uma imagem válida
+    const hasImage =
+      imageFile instanceof File && imageFile.size > 0
+
+    // Permite:
+    // - somente texto
+    // - somente imagem
+    // - texto + imagem
+    // Impede:
+    // - texto vazio e sem imagem
+    if (!label && !hasImage) {
+      return NextResponse.json(
+        { error: "Adicione um texto ou uma imagem para postar" },
         { status: 400 }
       )
     }
@@ -33,8 +52,11 @@ export async function POST(req: Request) {
       )
     }
 
-
-    if (user.role !== "POSTADOR" && user.role !== "ADMIN" && user.role !== "SYSTEM_ADM")   { 
+    if (
+      user.role !== "POSTADOR" &&
+      user.role !== "ADMIN" &&
+      user.role !== "SYSTEM_ADM"
+    ) {
       return NextResponse.json(
         { error: "Sem permissão para postar" },
         { status: 403 }
@@ -43,7 +65,7 @@ export async function POST(req: Request) {
 
     let imageUrl: string | null = null
 
-    if (imageFile && imageFile instanceof File) {
+    if (hasImage) {
       imageUrl = await uploadImage(imageFile, "Postagens")
     }
 
@@ -69,7 +91,6 @@ export async function POST(req: Request) {
 }
 
 
-
   export async function GET() {
   try {
     const postagens = await prisma.postagem.findMany({
@@ -81,7 +102,9 @@ export async function POST(req: Request) {
           select: {
             id: true,
             nome: true,
-            foto: true
+            foto: true,
+            cargo: true,
+            role: true
           }
         }
       }
@@ -127,7 +150,7 @@ export async function DELETE(req: Request) {
     }
 
     // Lógica: Se for ADM ou for o DONO, ele pode passar
-    const isAdmin = false//loggedUser.role === "ADMIN" || loggedUser.role === "SYSTEM_ADM";
+    const isAdmin = loggedUser.role === "ADMIN" || loggedUser.role === "SYSTEM_ADM";
     const isOwner = postagem.authorId === loggedUser.id;
 
     if (!isAdmin && !isOwner) {

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { notify } from "@/lib/notifications/notify"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../../auth/[...nextauth]/route"
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +14,10 @@ export async function POST(req: Request) {
 
     const comment = await prisma.comentario.findUnique({
       where: { id: commentId },
-      select: { postId: true },
+      select: {
+        postId: true,
+        authorId: true,
+      },
     })
 
     if (!comment) {
@@ -36,6 +42,21 @@ export async function POST(req: Request) {
         postId: comment.postId,
       },
     })
+
+    // Notifica o autor do comentário
+    const session = await getServerSession(authOptions)
+    const nome = session?.user?.nome || "Alguém"
+
+    if (comment.authorId !== userId) {
+      await notify({
+        type: "LIKE",
+        title: "Nova curtida",
+        message: `${nome} curtiu seu comentário`,
+        userIds: [comment.authorId],
+        actorId: userId,
+        data: { postId: comment.postId },
+      })
+    }
 
     return NextResponse.json({ message: "Curtido com sucesso" })
   } catch (error) {

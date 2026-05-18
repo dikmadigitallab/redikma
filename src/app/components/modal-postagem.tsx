@@ -40,11 +40,20 @@ export function CreatNewPost({ open, onClose, onSuccess, onRefresh }: Props) {
       toast.error("Usuário não identificado")
       return
     }
+const trimmedText = text.trim()
 
-    if (!text && !image) {
-      toast.warning("Adicione texto ou imagem para postar")
-      return
-    }
+// Permite:
+// - somente texto
+// - somente imagem
+// - texto + imagem
+// Impede:
+// - texto vazio e sem imagem
+if (!trimmedText && !image) {
+  toast.warning("Adicione um texto ou uma imagem para postar")
+  return
+}
+
+
 
     setLoading(true)
 

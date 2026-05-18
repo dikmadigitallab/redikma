@@ -4,6 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { uploadProfileImage } from "@/lib/uploads"
+import { encode, decode } from "next-auth/jwt"
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -71,7 +72,7 @@ export async function PUT(req: Request) {
 
  */
 
-
+/* 
 export async function PUT(req: Request) {
   const session = await getServerSession(authOptions)
 
@@ -120,5 +121,151 @@ export async function PUT(req: Request) {
     return NextResponse.json({ user })
   } catch (error) {
     return NextResponse.json({ error: "Erro ao atualizar" }, { status: 500 })
+  }
+} */
+
+  export async function PUT(req: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (!session || !session.user?.id) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
+  try {
+    const contentType = req.headers.get("content-type") || ""
+
+    let email: string | null = null
+    let telefone: string | null = null
+    let senha: string | null = null
+    let file: File | null = null
+
+    // Se vier multipart/form-data (com foto)
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData()
+
+      email = formData.get("email") as string | null
+      telefone = formData.get("telefone") as string | null
+      senha = formData.get("senha") as string | null
+
+      const foto = formData.get("foto")
+      if (foto instanceof File && foto.size > 0) {
+        file = foto
+      }
+    } else {
+      // Se vier JSON (sem foto)
+      const body = await req.json()
+
+      email = body.email || null
+      telefone = body.telefone || null
+      senha = body.senha || null
+    }
+
+    const dataToUpdate: {
+      email?: string
+      telefone?: string
+      foto?: string
+      senha_hash?: string
+    } = {}
+
+    if (email) {
+      dataToUpdate.email = email
+    }
+
+    if (telefone) {
+      dataToUpdate.telefone = telefone
+    }
+
+    if (senha) {
+      const hash = await bcrypt.hash(senha, 10)
+      dataToUpdate.senha_hash = hash
+    }
+
+    if (file) {
+      const url = await uploadProfileImage(
+        file,
+        session.user.id,
+        "profile"
+      )
+
+      dataToUpdate.foto = url
+    }
+
+    const user = await prisma.user.update({
+      where: {
+        id: session.user.id,
+      },
+      data: dataToUpdate,
+    })
+
+    const hasSyncableFields =
+      dataToUpdate.email !== undefined ||
+      dataToUpdate.telefone !== undefined ||
+      dataToUpdate.foto !== undefined
+
+    if (hasSyncableFields) {
+      try {
+        const raw = req.headers.get("cookie") || ""
+        const pairs = raw.split(";").filter(Boolean)
+        const cookies: Record<string, string> = {}
+        for (const pair of pairs) {
+          const idx = pair.indexOf("=")
+          if (idx > 0) {
+            cookies[pair.substring(0, idx).trim()] =
+              pair.substring(idx + 1).trim()
+          }
+        }
+
+        const tokenName = "next-auth.session-token" in cookies
+          ? "next-auth.session-token"
+          : "__Secure-next-auth.session-token"
+        const sessionToken = cookies[tokenName]
+
+        if (sessionToken) {
+          const decoded = await decode({
+            token: sessionToken,
+            secret: process.env.NEXTAUTH_SECRET!,
+          })
+
+          if (decoded) {
+            if (dataToUpdate.email !== undefined) decoded.email = dataToUpdate.email
+            if (dataToUpdate.telefone !== undefined) decoded.telefone = dataToUpdate.telefone
+            if (dataToUpdate.foto !== undefined) decoded.foto = dataToUpdate.foto
+
+            const newToken = await encode({
+              token: decoded,
+              secret: process.env.NEXTAUTH_SECRET!,
+              maxAge: 60 * 60 * 24 * 7,
+            })
+
+            const response = NextResponse.json({ user })
+            response.cookies.set(tokenName, newToken, {
+              httpOnly: true,
+              sameSite: "lax",
+              path: "/",
+              secure: process.env.NODE_ENV === "production",
+              maxAge: 60 * 60 * 24 * 7,
+            })
+
+            return response
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao atualizar JWT cookie:", e)
+      }
+    }
+
+    return NextResponse.json({ user })
+  } catch (error) {
+    console.error("Erro ao atualizar perfil:", error)
+
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Erro ao atualizar perfil",
+      },
+      { status: 500 }
+    )
   }
 }

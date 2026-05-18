@@ -6,6 +6,7 @@ import { Heart, Reply, Send } from "lucide-react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 
+
 type Comment = {
   id: string
   texto: string
@@ -93,14 +94,6 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      loadComments()
-    }, 0)
-
-    return () => clearTimeout(t)
-  }, [postId])
-
   async function delComents(id: string) {
     try {
       const res = await fetch("/api/posts/posts-comments", {
@@ -161,19 +154,29 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
   async function unlikeComment(commentId: string) {
     if (!user?.id) return
 
+    setComments(prev =>
+      prev.map(c => {
+        if (c.id !== commentId) return c
+        return {
+          ...c,
+          likes: c.likes?.filter(l => l.userId !== user.id) || [],
+          _count: { likes: Math.max((c._count?.likes || 0) - 1, 0) },
+        }
+      })
+    )
+
     try {
       await fetch("/api/posts/comments-likes", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ commentId, userId: user.id }),
       })
-
-      await loadComments()
     } catch {
       toast.error("Erro ao remover curtida")
     }
   }
 
+  //enviar resposta
   async function submitReply(commentId: string) {
     if (!user?.id || !replyText.trim()) return
 
@@ -199,6 +202,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
+  // Verificar se o usuário curtiu um comentário
   function hasUserLiked(comment: Comment): boolean {
     return comment.likes?.some(like => like.userId === user?.id) || false
   }
@@ -209,125 +213,309 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
 
   return (
     <div className="w-full relative" ref={boxRef}>
+      {/* Botão para abrir/fechar comentários */}
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="text-xs font-medium opacity-70 hover:opacity-100 transition-all flex items-center gap-1.5"
+        data-comment-toggle={postId}
+        className="flex items-center gap-2 text-xs font-semibold transition-opacity hover:opacity-80"
+        style={{ color: "var(--gray)" }}
       >
-        <span className={`w-1.5 h-1.5 rounded-full ${open ? "bg-green-500" : "bg-gray-400"}`} />
+        <span
+          className="w-2 h-2 rounded-full"
+          style={{
+            backgroundColor: open
+              ? "var(--success)"
+              : "var(--gray)",
+          }}
+        />
         {open ? "Esconder comentários" : "Ver comentários"}
       </button>
 
+      {/* Dropdown de comentários */}
       {open && (
         <div
-          className="absolute left-0 top-full mt-2 w-72 sm:w-80 rounded-xl border p-4 space-y-4 max-h-80 overflow-y-auto z-50 shadow-2xl"
+          className="mt-3 w-full rounded-2xl border overflow-hidden"
           style={{
             backgroundColor: "var(--white)",
             borderColor: "var(--border)",
           }}
         >
-          {loading && (
-            <div className="flex items-center gap-2 py-2">
-              <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin" />
-              <p className="text-[11px] opacity-60">Carregando...</p>
-            </div>
-          )}
+          {/* Barra decorativa superior */}
+          <div
+            className="h-1 w-full"
+            style={{
+              background:
+                "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+            }}
+          />
 
-          {!loading && comments.length === 0 && (
-            <p className="text-[11px] opacity-60 text-center py-2">
-              Nenhum comentário por aqui.
+          {/* Cabeçalho */}
+          <div
+            className="px-4 py-3 border-b"
+            style={{
+              backgroundColor: "var(--background)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.18em]"
+              style={{ color: "var(--primary-dark)" }}
+            >
+              Comentários
             </p>
-          )}
+          </div>
 
-          {comments
-            .filter((c) => !c.parentId)
-            .map((comment) => (
-              <div key={comment.id} className="group space-y-2 border-b pb-3 last:border-none">
-                <div className="flex gap-3">
-                  <img
-                    src={comment.author.foto || "https://i.pravatar.cc/100?img=1"}
-                    className="w-8 h-8 rounded-full object-cover"
-                    alt={comment.author.nome}
-                  />
-
-                  <div className="flex flex-col flex-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-bold text-[11px]">
-                        {comment.author.nome}
-                      </span>
-                      <span className="opacity-40 text-[9px]">
-                        {new Date(comment.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-
-                    <p className="text-[12px] mt-1">{comment.texto}</p>
-
-                    <div className="flex items-center gap-3 mt-1">
-                      <button
-                        onClick={() =>
-                          hasUserLiked(comment)
-                            ? unlikeComment(comment.id)
-                            : likeComment(comment.id)
-                        }
-                        className="flex items-center gap-1 text-[10px]"
-                      >
-                        <Heart
-                          size={12}
-                          fill={hasUserLiked(comment) ? "#E53935" : "none"}
-                          color={hasUserLiked(comment) ? "#E53935" : "currentColor"}
-                        />
-                        <span>{getLikesCount(comment)}</span>
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          setReplyingTo(
-                            replyingTo === comment.id ? null : comment.id
-                          )
-                        }
-                        className="flex items-center gap-1 text-[10px]"
-                      >
-                        <Reply size={12} />
-                        <span>Responder</span>
-                      </button>
-
-                      {comment.deletable && (
-                        <button
-                          onClick={() => delComents(comment.id)}
-                          className="ml-auto"
-                        >
-                          <FaTrash size={10} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {replyingTo === comment.id && (
-                  <div className="flex gap-2 pl-8">
-                    <input
-                      type="text"
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" && submitReply(comment.id)
-                      }
-                      className="flex-1 px-2 py-1 text-[11px] border rounded"
-                    />
-                    <button onClick={() => submitReply(comment.id)}>
-                      <Send size={12} />
-                    </button>
-                  </div>
-                )}
-
-                {comments
-                  .filter((r) => r.parentId === comment.id)
-                  .map((reply) => (
-                    <div key={reply.id} className="pl-8 text-[11px]">
-                      {reply.texto}
-                    </div>
-                  ))}
+          {/* Conteúdo */}
+          <div className="p-4 space-y-4">
+            {/* Loading */}
+            {loading && (
+              <div className="flex items-center gap-3 py-3">
+                <div
+                  className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"
+                  style={{ borderColor: "var(--secondary)" }}
+                />
+                <p
+                  className="text-xs font-medium"
+                  style={{ color: "var(--gray)" }}
+                >
+                  Carregando comentários...
+                </p>
               </div>
-            ))}
+            )}
+
+            {/* Sem comentários */}
+            {!loading && comments.length === 0 && (
+              <div
+                className="rounded-xl px-4 py-6 text-center"
+                style={{ backgroundColor: "var(--background)" }}
+              >
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--gray)" }}
+                >
+                  Nenhum comentário por aqui.
+                </p>
+              </div>
+            )}
+
+            {/* Comentários */}
+            {comments
+              .filter((c) => !c.parentId)
+              .map((comment) => (
+                <div
+                  key={comment.id}
+                  className="space-y-3 pb-4 border-b last:border-none"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {/* Comentário principal */}
+                  <div className="flex gap-3">
+                    <img
+                      src={
+                        comment.author.foto ||
+                        "../photoProfile/userDefault.png"
+                      }
+                      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                      alt={comment.author.nome}
+                    />
+
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className="rounded-2xl px-3 py-2"
+                        style={{
+                          backgroundColor: "var(--background)",
+                        }}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className="text-[11px] font-semibold truncate"
+                            style={{ color: "var(--black)" }}
+                          >
+                            {comment.author.nome}
+                          </span>
+
+                          <span
+                            className="text-[9px]"
+                            style={{ color: "var(--gray)" }}
+                          >
+                            {new Date(
+                              comment.createdAt
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+
+                        <p
+                          className="text-xs leading-5 break-words"
+                          style={{ color: "var(--black)" }}
+                        >
+                          {comment.texto}
+                        </p>
+                      </div>
+
+                      {/* Ações */}
+                      <div className="flex items-center gap-4 mt-2 pl-2">
+                        <button
+                          onClick={() =>
+                            hasUserLiked(comment)
+                              ? unlikeComment(comment.id)
+                              : likeComment(comment.id)
+                          }
+                          className="flex items-center gap-1 text-[10px] font-medium transition-opacity hover:opacity-80"
+                          style={{ color: "var(--gray)" }}
+                        >
+                          <Heart
+                            size={12}
+                            fill={
+                              hasUserLiked(comment)
+                                ? "#E53935"
+                                : "none"
+                            }
+                            color={
+                              hasUserLiked(comment)
+                                ? "#E53935"
+                                : "currentColor"
+                            }
+                          />
+                          <span>{getLikesCount(comment)}</span>
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            setReplyingTo(
+                              replyingTo === comment.id
+                                ? null
+                                : comment.id
+                            )
+                          }
+                          className="flex items-center gap-1 text-[10px] font-medium transition-opacity hover:opacity-80"
+                          style={{ color: "var(--gray)" }}
+                        >
+                          <Reply size={12} />
+                          <span>Responder</span>
+                        </button>
+
+                        {comment.deletable && (
+                          <button
+                            onClick={() =>
+                              delComents(comment.id)
+                            }
+                            className="ml-auto transition-opacity hover:opacity-80"
+                            style={{ color: "var(--warning)" }}
+                          >
+                            <FaTrash size={10} />
+                          </button>
+                        )}
+
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Campo de resposta */}
+                  {replyingTo === comment.id && (
+                    <div className="flex gap-2 pl-11">
+                      <input
+                        type="text"
+                        value={replyText}
+                        onChange={(e) =>
+                          setReplyText(e.target.value)
+                        }
+                        onKeyDown={(e) =>
+                          e.key === "Enter" &&
+                          submitReply(comment.id)
+                        }
+                        placeholder="Escreva uma resposta..."
+                        className="flex-1 px-3 py-2 text-xs rounded-xl border outline-none"
+                        style={{
+                          backgroundColor: "var(--background)",
+                          borderColor: "var(--border)",
+                          color: "var(--black)",
+                        }}
+                      />
+
+                      <button
+                        onClick={() =>
+                          submitReply(comment.id)
+                        }
+                        className="w-9 h-9 rounded-xl flex items-center justify-center"
+                        style={{
+                          backgroundColor:
+                            "var(--primary-dark)",
+                          color: "var(--white)",
+                        }}
+                      >
+                        <Send size={14} />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Respostas */}
+                  {comments
+                    .filter((reply) => reply.parentId === comment.id)
+                    .map((reply) => (
+                      <div
+                        key={reply.id}
+                        className="pl-11 mt-2"
+                      >
+                        <div
+                          className="relative rounded-2xl border border-neutral-200 bg-gradient-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm"
+                        >
+                          {/* Linha lateral para destacar que é uma resposta */}
+                          <div className="absolute -left-5 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-300 to-cyan-100" />
+                          <div className="absolute -left-[22px] top-4 w-3 h-3 rounded-full bg-cyan-400 border-2 border-white shadow-sm" />
+
+                          {/* Cabeçalho */}
+                          <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <img
+                                src={
+                                  reply.author?.foto ||
+                                  "../photoProfile/userDefault.png"
+                                }
+                                alt={
+                                  reply.author?.nome || "Usuário"
+                                }
+                                className="w-5 h-5 rounded-full object-cover border border-neutral-200 shadow-sm flex-shrink-0"
+                              />
+
+                              <span
+                                className="text-[11px] font-semibold truncate"
+                                style={{
+                                  color: "var(--primary-dark)",
+                                }}
+                              >
+                                {reply.author?.nome || "Usuário"}
+                              </span>
+                            </div>
+
+                            {reply.deletable && (
+                              <button
+                                onClick={() =>
+                                  delComents(reply.id)
+                                }
+                                className="p-1 rounded-full hover:bg-red-50 transition-colors flex-shrink-0"
+                                style={{
+                                  color: "var(--warning)",
+                                }}
+                              >
+                                <FaTrash size={8} />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Texto */}
+                          <p
+                            className="text-[12px] leading-5 whitespace-pre-wrap break-words"
+                            style={{
+                              color: "var(--black)",
+                            }}
+                          >
+                            {reply.texto}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              ))}
+          </div>
         </div>
       )}
     </div>

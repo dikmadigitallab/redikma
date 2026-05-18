@@ -96,3 +96,12 @@ button[disabled] {
     width: 100%;
   }
 }
+
+@keyframes heart-burst {
+  0% { transform: scale(0); opacity: 1; }
+  40% { transform: scale(1.3); opacity: 0.9; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.animate-heart-burst {
+  animation: heart-burst 0.8s ease-out forwards;
+}
