@@ -40,6 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+proteção_dev.json
+proteção_hml.json
+proteção_main.json
+
 /src/generated/prisma
 proteção_dev.json
 proteção_hml.json
