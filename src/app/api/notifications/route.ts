@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     const userId = searchParams.get("userId");
     const page = Number(searchParams.get("page") || 1);
     const limit = Number(searchParams.get("limit") || 20);
-    const consume = searchParams.get("consume") === "true";
+    const all = searchParams.get("all") === "true";
 
     if (!userId) {
       return NextResponse.json({ error: "userId obrigatório" }, { status: 400 });
@@ -36,15 +36,8 @@ export async function GET(req: NextRequest) {
           select: { nome: true, foto: true }
         }
       },
-      ...(consume ? {} : { skip: (page - 1) * limit, take: limit }),
+      ...(all ? {} : { skip: (page - 1) * limit, take: limit }),
     });
-
-    // 3. SE FOR CONSUMO, DELETA DO BANCO (notificação pessoal, mantém só local)
-    if (consume && notifications.length > 0) {
-      await prisma.notification.deleteMany({
-        where: { userId },
-      });
-    }
 
     return NextResponse.json(notifications);
   } catch (error) {
@@ -57,6 +50,16 @@ export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const clearAll = searchParams.get("clearAll") === "true";
+    const userId = searchParams.get("userId");
+
+    if (clearAll) {
+      if (!userId) {
+        return NextResponse.json({ error: "userId obrigatório para clearAll" }, { status: 400 });
+      }
+      await prisma.notification.deleteMany({ where: { userId } });
+      return NextResponse.json({ success: true });
+    }
 
     if (!id) {
       return NextResponse.json({ error: "id obrigatório" }, { status: 400 });

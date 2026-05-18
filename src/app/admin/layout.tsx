@@ -22,6 +22,14 @@ export default async function RootLayout({
   const isAdmin =
     role === "ADMIN" || role === "SYSTEM_ADM"
 
+  if (!session) {
+    redirect("/login")
+  }
+
+  if (session.user.first_acess) {
+    redirect("/primeiro-acesso")
+  }
+
   if (!isAdmin) {
     redirect("/intern/feed")
   }

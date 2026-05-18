@@ -68,15 +68,15 @@ export function NotificationsBox({ userId }: { userId: string }) {
           setNotifications(parsed);
           setLoading(false);
         }
-      } catch {}
+      } catch { }
     }
 
-    // 2. Busca notificações da API
+    // 2. Busca notificações da API (sem deletar do banco)
     async function fetchData() {
       try {
         setLoading(true);
 
-        const res = await fetch(`/api/notifications?userId=${userId}`);
+        const res = await fetch(`/api/notifications?userId=${userId}&all=true`);
         const data = await res.json();
 
         if (!mounted) return;
@@ -87,13 +87,19 @@ export function NotificationsBox({ userId }: { userId: string }) {
             ? data.notifications
             : [];
 
-        setNotifications(fetched);
-
-        // Salva no localStorage para persistir localmente
-        localStorage.setItem(cacheKey, JSON.stringify(fetched));
-
+        // Merge: notificações novas (do DB) são prepended às que já estavam em cache
         if (fetched.length > 0) {
-          localStorage.setItem(lastSeenKey, fetched[0].createdAt);
+          const existingIds = new Set(notifications.map((n) => n.id));
+          const trulyNew = fetched.filter((n) => !existingIds.has(n.id));
+          const merged = [...trulyNew, ...notifications];
+          setNotifications(merged);
+          localStorage.setItem(cacheKey, JSON.stringify(merged));
+          localStorage.setItem(lastSeenKey, merged[0].createdAt);
+
+          // 3. Após salvar no localStorage, deleta do banco
+          fetch(`/api/notifications?clearAll=true&userId=${userId}`, {
+            method: "DELETE",
+          }).catch(() => { });
         } else {
           localStorage.setItem(lastSeenKey, new Date().toISOString());
         }
@@ -117,20 +123,10 @@ export function NotificationsBox({ userId }: { userId: string }) {
     };
   }, [userId, cacheKey, lastSeenKey]);
 
-  async function handleDelete(id: string) {
-    try {
-      const res = await fetch(`/api/notifications?id=${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) return;
-
-      const updated = notifications.filter((n) => n.id !== id);
-      setNotifications(updated);
-      localStorage.setItem(cacheKey, JSON.stringify(updated));
-    } catch (err) {
-      console.error("Erro ao deletar notificação:", err);
-    }
+  function handleDelete(id: string) {
+    const updated = notifications.filter((n) => n.id !== id);
+    setNotifications(updated);
+    localStorage.setItem(cacheKey, JSON.stringify(updated));
   }
 
   return (
@@ -188,7 +184,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
                     e.stopPropagation();
                     handleDelete(n.id);
                   }}
-                  className="shrink-0 mt-1 text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition"
+                  className="shrink-0 mt-1 text-red-500 opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:text-red-600 transition"
                   title="Deletar notificação"
                 >
                   <FaTrash size={10} />

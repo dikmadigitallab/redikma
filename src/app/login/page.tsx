@@ -19,11 +19,13 @@ export default function LoginCPF() {
   useEffect(() => {
     if (status === "loading") return
 
-    if (session?.user) {
-      router.replace("/intern/feed")
-    }
-    // Removi o router.replace('/login') no else para evitar loop infinito 
-    // já que este é o próprio componente de login.
+      if (session?.user) {
+        if (session.user.first_acess) {
+          router.replace("/primeiro-acesso")
+        } else {
+          router.replace("/intern/feed")
+        }
+      }
   }, [session, status, router])
 
   function formatCPF(value: string) {
@@ -58,7 +60,6 @@ export default function LoginCPF() {
       }
 
       toast.success("Login realizado com sucesso!")
-      router.push("/intern/feed")
     } catch {
       toast.error("Erro de conexão")
     } finally {

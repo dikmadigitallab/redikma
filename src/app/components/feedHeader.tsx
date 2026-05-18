@@ -55,7 +55,9 @@ export function Header() {
 
     async function fetchNotificationCount() {
       try {
-        const res = await fetch(`/api/notifications/count?userId=${userId}`)
+        const res = await fetch(
+          `/api/notifications/count?userId=${userId}`
+        )
         const data = await res.json()
 
         const totalUnread = Number(data.unread) || 0
@@ -69,7 +71,9 @@ export function Header() {
 
         const lastSeenDate = new Date(lastSeen)
 
-        const resList = await fetch(`/api/notifications?userId=${userId}`)
+        const resList = await fetch(
+          `/api/notifications?userId=${userId}`
+        )
         const list = await resList.json()
 
         const notifications = Array.isArray(list)
@@ -77,50 +81,67 @@ export function Header() {
           : list.notifications || []
 
         const pending = notifications.filter(
-          (n: any) => new Date(n.createdAt) > lastSeenDate
+          (n: any) =>
+            new Date(n.createdAt) > lastSeenDate
         ).length
 
         setUnreadCount(pending)
       } catch (error) {
-        console.error("Erro ao buscar contagem:", error)
+        console.error(
+          "Erro ao buscar contagem:",
+          error
+        )
       }
     }
 
     fetchNotificationCount()
 
-    const interval = setInterval(fetchNotificationCount, 30000)
+    const interval = setInterval(
+      fetchNotificationCount,
+      30000
+    )
 
     return () => clearInterval(interval)
   }, [userId, lastSeenKey])
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(
+      event: MouseEvent
+    ) {
+      const target = event.target as Node
+
       if (
         notifyRef.current &&
-        !notifyRef.current.contains(event.target as Node)
+        !notifyRef.current.contains(target)
       ) {
         setOpenNotifications(false)
       }
 
       if (
         avatarRef.current &&
-        !avatarRef.current.contains(event.target as Node)
+        !avatarRef.current.contains(target)
       ) {
         setOpen(false)
       }
 
       if (
         searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
+        !searchRef.current.contains(target)
       ) {
         setOpenSearch(false)
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    )
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      )
     }
   }, [])
 
@@ -135,14 +156,19 @@ export function Header() {
         setLoading(true)
 
         const res = await fetch(
-          `/api/search-posts?query=${encodeURIComponent(search)}`
+          `/api/search-posts?query=${encodeURIComponent(
+            search
+          )}`
         )
 
         const data = await res.json()
 
         setResults(data.posts || [])
       } catch (error) {
-        console.error("Erro ao buscar posts:", error)
+        console.error(
+          "Erro ao buscar posts:",
+          error
+        )
       } finally {
         setLoading(false)
       }
@@ -172,9 +198,10 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#F5F5F5] backdrop-blur-md border-b border-[#F5F5F5] shadow-sm md:sticky md:top-0 md:left-auto md:right-auto md:w-full">
       <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
-
         <div
-          onClick={() => router.push("/intern/feed")}
+          onClick={() =>
+            router.push("/intern/feed")
+          }
           className="flex items-center gap-3 cursor-pointer shrink-0"
         >
           <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm bg-[var(--primary-dark)]">
@@ -197,195 +224,253 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-
-          <div className="relative" ref={searchRef}>
+          <div
+            className="relative"
+            ref={searchRef}
+          >
             <button
-              onClick={() => setOpenSearch(!openSearch)}
+              onClick={() =>
+                setOpenSearch(!openSearch)
+              }
               className="w-9 h-9 flex items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 transition"
             >
               <Search size={18} />
             </button>
 
             {openSearch && (
-              <div className="absolute right-0 mt-3 w-[360px] bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden">
-
+              <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden z-50">
                 <div className="p-3 border-b border-neutral-100">
                   <input
                     type="text"
                     placeholder="Buscar pessoas ou publicações..."
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) =>
+                      setSearch(e.target.value)
+                    }
                     className="w-full h-11 px-4 rounded-xl border border-neutral-200 outline-none text-sm focus:border-neutral-400"
                   />
                 </div>
 
                 <div className="max-h-[420px] overflow-y-auto">
-
                   {loading && (
                     <div className="p-4 text-sm text-neutral-500">
                       Buscando...
                     </div>
                   )}
 
-                  {!loading && results.length === 0 && search && (
-                    <div className="p-4 text-sm text-neutral-500">
-                      Nenhuma publicação encontrada
-                    </div>
-                  )}
+                  {!loading &&
+                    results.length === 0 &&
+                    search && (
+                      <div className="p-4 text-sm text-neutral-500">
+                        Nenhuma publicação
+                        encontrada
+                      </div>
+                    )}
 
-                  {!loading && results.length > 0 && (
-                    <div className="grid grid-cols-3 gap-1 p-1">
-                      {results.map((post) => (
-                        <button
-                          key={post.id}
-                          onClick={() => {
-                            const postElement = document.getElementById(
-                              `post-${post.id}`
-                            )
+                  {!loading &&
+                    results.length > 0 && (
+                      <div className="grid grid-cols-3 gap-1 p-1">
+                        {results.map((post) => (
+                          <button
+                            key={post.id}
+                            onClick={() => {
+                              const postElement =
+                                document.getElementById(
+                                  `post-${post.id}`
+                                )
 
-                            if (postElement) {
-                              postElement.scrollIntoView({
-                                behavior: "smooth",
-                                block: "center",
-                              })
+                              if (postElement) {
+                                postElement.scrollIntoView(
+                                  {
+                                    behavior:
+                                      "smooth",
+                                    block:
+                                      "center",
+                                  }
+                                )
 
-                              postElement.classList.add(
-                                "ring-4",
-                                "ring-cyan-400",
-                                "ring-offset-2"
-                              )
-
-                              setTimeout(() => {
-                                postElement.classList.remove(
+                                postElement.classList.add(
                                   "ring-4",
                                   "ring-cyan-400",
                                   "ring-offset-2"
                                 )
-                              }, 3000)
-                            }
 
-                            setOpenSearch(false)
-                            setSearch("")
-                          }}
-                          className="relative aspect-square overflow-hidden bg-neutral-100 group"
-                        >
-                          <img
-                            src={post.image}
-                            alt=""
-                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                          />
+                                setTimeout(
+                                  () => {
+                                    postElement.classList.remove(
+                                      "ring-4",
+                                      "ring-cyan-400",
+                                      "ring-offset-2"
+                                    )
+                                  },
+                                  3000
+                                )
+                              }
 
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                              setOpenSearch(
+                                false
+                              )
+                              setSearch("")
+                            }}
+                            className="relative aspect-square overflow-hidden bg-neutral-100 group"
+                          >
+                            <img
+                              src={post.image}
+                              alt=""
+                              className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                            />
 
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                 </div>
               </div>
             )}
           </div>
 
           {user?.id && (
-            <div className="relative" ref={notifyRef}>
+            <div
+              className="relative"
+              ref={notifyRef}
+            >
               <button
-                onClick={handleToggleNotifications}
-                className={`w-9 h-9 flex items-center justify-center rounded-full relative transition ${unreadCount > 0
+                onClick={
+                  handleToggleNotifications
+                }
+                className={`w-9 h-9 flex items-center justify-center rounded-full relative transition ${
+                  unreadCount > 0
                     ? "text-orange-500 bg-orange-50"
                     : "text-neutral-500 hover:bg-neutral-100"
-                  }`}
+                }`}
               >
                 <Bell
                   size={18}
-                  className={unreadCount > 0 ? "fill-current" : ""}
+                  className={
+                    unreadCount > 0
+                      ? "fill-current"
+                      : ""
+                  }
                 />
 
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                    {unreadCount > 9 ? "9+" : unreadCount}
+                    {unreadCount > 9
+                      ? "9+"
+                      : unreadCount}
                   </span>
                 )}
               </button>
 
               {openNotifications && (
                 <div className="absolute right-0 mt-3 z-50">
-                  <NotificationsBox userId={user.id} />
+                  <NotificationsBox
+                    userId={user.id}
+                  />
                 </div>
               )}
             </div>
           )}
 
-          <div className="relative" ref={avatarRef}>
+          <div
+            className="relative"
+            ref={avatarRef}
+          >
             <button
-              onClick={() => setOpen(!open)}
+              onClick={() =>
+                setOpen(!open)
+              }
               className="w-9 h-9 rounded-full overflow-hidden border border-neutral-200"
             >
               <img
-                src={user?.foto || "../photoProfile/userDefault.png"}
+                src={
+                  user?.foto ||
+                  "../photoProfile/userDefault.png"
+                }
+                alt="Foto do usuário"
                 className="w-full h-full object-cover"
               />
             </button>
 
             {open && (
-              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border border-neutral-200 shadow-lg overflow-hidden">
-
+              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border border-neutral-200 shadow-lg overflow-hidden z-50">
                 <div className="py-2">
                   <button
-                    onClick={() => router.push("/intern/profile")}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                    onClick={() => {
+                      setOpen(false)
+                      router.push(
+                        "/intern/profile"
+                      )
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
                   >
-                    <User size={18} /> Perfil
+                    <User size={18} />
+                    Perfil
                   </button>
 
                   <button
-                    onClick={() => router.push("/intern/feed")}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                    onClick={() => {
+                      setOpen(false)
+                      router.push(
+                        "/intern/feed"
+                      )
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
                   >
-                    <Rss size={18} /> Feed
+                    <Rss size={18} />
+                    Feed
                   </button>
                 </div>
 
                 <div className="border-t py-2">
                   <button
-                    onClick={() =>
+                    onClick={() => {
+                      setOpen(false)
                       window.open(
                         "https://www.saobernardosamp.com.br/servicos/telemedicina/?v=1",
                         "_blank"
                       )
-                    }
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
                   >
-                    <FaUserDoctor size={18} /> Telemedicina
+                    <FaUserDoctor size={18} />
+                    Telemedicina
                   </button>
 
                   <button
-                    onClick={() =>
+                    onClick={() => {
+                      setOpen(false)
                       window.open(
                         "https://dikma.com.br/contato/#ouvidoria",
                         "_blank"
                       )
-                    }
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm"
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
                   >
-                    <FaHeadset size={18} /> Ouvidoria Dikma
+                    <FaHeadset size={18} />
+                    Ouvidoria Dikma
                   </button>
                 </div>
 
                 <div className="border-t py-2">
                   <button
-                    onClick={() =>
-                      signOut({ callbackUrl: "/login" })
-                    }
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-500"
+                    onClick={() => {
+                      setOpen(false)
+                      signOut({
+                        callbackUrl:
+                          "/login",
+                      })
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition"
                   >
-                    <LogOut size={18} /> Sair
+                    <LogOut size={18} />
+                    Sair
                   </button>
                 </div>
-
               </div>
             )}
           </div>
-
         </div>
       </div>
     </header>

@@ -65,6 +65,7 @@ export const authOptions: NextAuthOptions = {
           foto: user.foto,
           aniversario: user.aniversario.toISOString(),
           admissao: user.admissao.toISOString(),
+          first_acess: user.first_acess,
         }
       },
     }),
@@ -84,12 +85,14 @@ export const authOptions: NextAuthOptions = {
         token.foto = user.foto
         token.aniversario = user.aniversario
         token.admissao = user.admissao
+        token.first_acess = user.first_acess
       }
 
       if (trigger === "update" && session) {
         if (session.email !== undefined) token.email = session.email
         if (session.telefone !== undefined) token.telefone = session.telefone
         if (session.foto !== undefined) token.foto = session.foto
+        if (session.first_acess !== undefined) token.first_acess = session.first_acess
       }
 
       return token
@@ -108,6 +111,7 @@ export const authOptions: NextAuthOptions = {
         foto: token.foto as string | null,
         aniversario: token.aniversario as string,
         admissao: token.admissao as string,
+        first_acess: token.first_acess as boolean,
       }
 
       return session

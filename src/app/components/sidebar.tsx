@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Search, Video, User, LogOut, Menu, X, UserPlus, Users } from "lucide-react"
+import {  Video, User, LogOut, UserPlus, Users,Rss } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { UserCard } from "./cardUser"
 import { useState } from "react"
@@ -25,20 +25,20 @@ export function Sidebar() {
 
   const menuItems = [
     {
-      icon: Home,
-      label: "Início",
+      icon: Rss,
+      label: "Feed",
       onClick: () => {
         router.push("/intern/feed")
         setIsOpen(false)
       },
       disabled: false,
     },
-    {
+   /*  {
       icon: Search,
       label: "Buscar",
       onClick: aviso,
       disabled: true,
-    },
+    }, */
     ...(isAdmin
       ? [
         {
@@ -64,6 +64,7 @@ export function Sidebar() {
       label: "Vídeos",
       onClick: aviso,
       disabled: true,
+      name:'Em breve',
     },
     {
       icon: User,
@@ -115,6 +116,7 @@ export function Sidebar() {
           <div className="p-2">
             {menuItems.map((item) => (
               <button
+              title={item.name}
                 key={item.label}
                 onClick={item.onClick}
                 disabled={item.disabled}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { X, Edit3 } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 
@@ -17,6 +17,7 @@ const scrollStyles = `
 import { CommentsBox } from "./comentarios";
 import { ImageModal } from "./modal-view-photo";
 import { LikeView } from "./likes-view";
+import { EditPostModal } from "./modal-edit-post";
 
 type Post = {
   id: string;
@@ -57,6 +58,7 @@ export function PostViewModal({ postId, onClose }: Props) {
   const [showLikers, setShowLikers] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [editingPost, setEditingPost] = useState<{ id: string; label: string } | null>(null);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -218,23 +220,33 @@ export function PostViewModal({ postId, onClose }: Props) {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate" style={{ color: "var(--black)" }}>
-                    {post.author.nome}
-                  </p>
-                  <p className="text-xs truncate mt-0.5" style={{ color: "var(--gray)" }}>
-                    {post.postador}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: "var(--success)" }}
-                    />
-                    <p className="text-[11px] font-medium" style={{ color: "var(--gray)" }}>
-                      {new Date(post.createdAt).toLocaleString("pt-BR")}
+                    <p className="text-sm font-semibold truncate" style={{ color: "var(--black)" }}>
+                      {post.author.nome}
                     </p>
+                    <p className="text-xs truncate mt-0.5" style={{ color: "var(--gray)" }}>
+                      {post.postador}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ backgroundColor: "var(--success)" }}
+                      />
+                      <p className="text-[11px] font-medium" style={{ color: "var(--gray)" }}>
+                        {new Date(post.createdAt).toLocaleString("pt-BR")}
+                      </p>
+                    </div>
                   </div>
+
+                  {user?.id === post.authorId && (
+                    <button
+                      onClick={() => setEditingPost({ id: post.id, label: post.label })}
+                      className="flex-shrink-0 p-2 rounded-full hover:bg-neutral-100 transition"
+                      title="Editar post"
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                  )}
                 </div>
-              </div>
 
               {/* Texto */}
               {post.label && (
@@ -351,7 +363,21 @@ export function PostViewModal({ postId, onClose }: Props) {
         image={selectedImage}
         open={!!selectedImage}
         onClose={() => setSelectedImage(null)}
+        postId={post?.id}
+        authorId={post?.authorId}
       />
+
+      {editingPost && (
+        <EditPostModal
+          postId={editingPost.id}
+          currentText={editingPost.label}
+          onClose={() => setEditingPost(null)}
+          onSaved={() => {
+            setEditingPost(null)
+            onClose()
+          }}
+        />
+      )}
     </>
   );
 }

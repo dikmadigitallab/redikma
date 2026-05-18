@@ -176,6 +176,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
+  //enviar resposta
   async function submitReply(commentId: string) {
     if (!user?.id || !replyText.trim()) return
 
@@ -201,6 +202,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
+  // Verificar se o usuário curtiu um comentário
   function hasUserLiked(comment: Comment): boolean {
     return comment.likes?.some(like => like.userId === user?.id) || false
   }
@@ -214,6 +216,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
       {/* Botão para abrir/fechar comentários */}
       <button
         onClick={() => setOpen((prev) => !prev)}
+        data-comment-toggle={postId}
         className="flex items-center gap-2 text-xs font-semibold transition-opacity hover:opacity-80"
         style={{ color: "var(--gray)" }}
       >
@@ -231,7 +234,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
       {/* Dropdown de comentários */}
       {open && (
         <div
-          className="absolute left-0 top-full mt-3 w-80 max-w-[90vw] rounded-2xl border shadow-2xl overflow-hidden z-50"
+          className="mt-3 w-full rounded-2xl border overflow-hidden"
           style={{
             backgroundColor: "var(--white)",
             borderColor: "var(--border)",
@@ -263,7 +266,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
           </div>
 
           {/* Conteúdo */}
-          <div className="p-4 space-y-4 max-h-80 overflow-y-auto">
+          <div className="p-4 space-y-4">
             {/* Loading */}
             {loading && (
               <div className="flex items-center gap-3 py-3">
@@ -401,6 +404,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                             <FaTrash size={10} />
                           </button>
                         )}
+
                       </div>
                     </div>
                   </div>
@@ -445,43 +449,61 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
 
                   {/* Respostas */}
                   {comments
-                    .filter(
-                      (reply) =>
-                        reply.parentId === comment.id
-                    )
+                    .filter((reply) => reply.parentId === comment.id)
                     .map((reply) => (
                       <div
                         key={reply.id}
-                        className="pl-11"
+                        className="pl-11 mt-2"
                       >
                         <div
-                          className="rounded-2xl px-3 py-2"
-                          style={{
-                            backgroundColor:
-                              "rgba(79, 195, 217, 0.06)",
-                          }}
+                          className="relative rounded-2xl border border-neutral-200 bg-gradient-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm"
                         >
-                          <p
-                            className="text-[11px] font-semibold mb-1 flex items-center gap-1"
-                            style={{
-                              color: "var(--primary-dark)",
-                            }}
-                          >
-                            <span className="flex-shrink-0">
+                          {/* Linha lateral para destacar que é uma resposta */}
+                          <div className="absolute -left-5 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-300 to-cyan-100" />
+                          <div className="absolute -left-[22px] top-4 w-3 h-3 rounded-full bg-cyan-400 border-2 border-white shadow-sm" />
+
+                          {/* Cabeçalho */}
+                          <div className="flex items-center justify-between gap-2 mb-1.5">
+                            <div className="flex items-center gap-2 min-w-0">
                               <img
-                                src={reply.author?.foto || "../photoProfile/userDefault.png"}
-                                alt={reply.author?.nome || "Usuário"}
-                                className="w-4 h-4 rounded-full object-cover border border-neutral-200"
+                                src={
+                                  reply.author?.foto ||
+                                  "../photoProfile/userDefault.png"
+                                }
+                                alt={
+                                  reply.author?.nome || "Usuário"
+                                }
+                                className="w-5 h-5 rounded-full object-cover border border-neutral-200 shadow-sm flex-shrink-0"
                               />
-                            </span>
 
-                            <span className="truncate">
-                              {reply.author?.nome || "Usuário"}
-                            </span>
-                          </p>
+                              <span
+                                className="text-[11px] font-semibold truncate"
+                                style={{
+                                  color: "var(--primary-dark)",
+                                }}
+                              >
+                                {reply.author?.nome || "Usuário"}
+                              </span>
+                            </div>
 
+                            {reply.deletable && (
+                              <button
+                                onClick={() =>
+                                  delComents(reply.id)
+                                }
+                                className="p-1 rounded-full hover:bg-red-50 transition-colors flex-shrink-0"
+                                style={{
+                                  color: "var(--warning)",
+                                }}
+                              >
+                                <FaTrash size={8} />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Texto */}
                           <p
-                            className="text-xs leading-5"
+                            className="text-[12px] leading-5 whitespace-pre-wrap break-words"
                             style={{
                               color: "var(--black)",
                             }}
