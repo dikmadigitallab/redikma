@@ -632,57 +632,37 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       </span>
                     </button>
 
-                    {/* Tooltip */}
-                    {isTooltipOpen &&
-                      postLikesCount > 0 && (
-                        <>
-                          {isTouchDevice && (
-                            <div
-                              className="fixed inset-0 z-10"
-                              onClick={() =>
-                                setActiveTooltip(null)
-                              }
-                            />
-                          )}
-
+                    <>
+                    {/* Tooltip - exibe apenas em telas >= 768px */ }
+                      {typeof window !== "undefined" &&
+                        window.innerWidth >= 768 &&
+                        isTooltipOpen &&
+                        postLikesCount > 0 && (
                           <div className="absolute bottom-full left-0 mb-3 z-20 animate-in fade-in zoom-in-95 duration-200">
                             <div
                               className="relative rounded-2xl border shadow-2xl p-2 min-w-[200px]"
                               style={{
-                                backgroundColor:
-                                  "var(--white)",
-                                borderColor:
-                                  "var(--border)",
+                                backgroundColor: "var(--white)",
+                                borderColor: "var(--border)",
                               }}
                             >
                               <LikeView
-                                totalLikes={
-                                  (
-                                    listOfLikes[
-                                    post.id
-                                    ] || []
-                                  ).length
-                                }
-                                likers={
-                                  listOfLikes[
-                                  post.id
-                                  ] || []
-                                }
+                                totalLikes={(listOfLikes[post.id] || []).length}
+                                likers={listOfLikes[post.id] || []}
                               />
 
                               <div
                                 className="absolute top-full left-4 w-4 h-4 rotate-45 -translate-y-2 border-r border-b"
                                 style={{
-                                  backgroundColor:
-                                    "var(--white)",
-                                  borderColor:
-                                    "var(--border)",
+                                  backgroundColor: "var(--white)",
+                                  borderColor: "var(--border)",
                                 }}
                               />
                             </div>
                           </div>
-                        </>
-                      )}
+                        )}
+
+                    </>
                   </div>
 
                   {/* Comentários */}
