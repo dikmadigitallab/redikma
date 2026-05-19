@@ -30,6 +30,7 @@ model autoPost {
   imagem    String?
   video     String?
 }
+
 model Postagem {
   id          String       @id @default(uuid())
   label       String
