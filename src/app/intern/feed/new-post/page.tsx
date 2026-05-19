@@ -48,7 +48,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
     } else if (!showCamera) {
       stopCamera()
     }
-  }, [showCamera, finalBlob, showEditor])
+  }, [showCamera, finalBlob, showEditor, facingMode])
 
   async function startCamera() {
     stopCamera()
