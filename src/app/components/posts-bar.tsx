@@ -275,7 +275,7 @@ function handleSaveEditedImage(blob: Blob) {
             <img
               src={
                 session?.user?.foto ||
-                "../photoProfile/userDefault.png"
+                "/photoProfile/userDefault.png"
               }
               className="relative w-11 h-11 rounded-full object-cover border-2"
               style={{ borderColor: "var(--white)" }}

@@ -312,7 +312,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                     <img
                       src={
                         comment.author.foto ||
-                        "../photoProfile/userDefault.png"
+                        "/photoProfile/userDefault.png"
                       }
                       className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                       alt={comment.author.nome}
@@ -468,7 +468,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                               <img
                                 src={
                                   reply.author?.foto ||
-                                  "../photoProfile/userDefault.png"
+                                  "/photoProfile/userDefault.png"
                                 }
                                 alt={
                                   reply.author?.nome || "Usuário"

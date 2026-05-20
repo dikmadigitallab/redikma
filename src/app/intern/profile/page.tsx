@@ -204,7 +204,7 @@ function PerfilPageContent() {
                       src={
                         preview ||
                         user.foto ||
-                        "../photoProfile/userDefault.png"
+                        "/photoProfile/userDefault.png"
                       }
                       alt="Foto"
                       className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-sm"
