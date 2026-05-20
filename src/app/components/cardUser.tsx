@@ -41,7 +41,7 @@ export function UserCard({ size = "md" }: CardUserProps) {
       />
     ) : (
       <img
-        src="../photoProfile/userDefault.png"
+        src="/photoProfile/userDefault.png"
         alt="Usuário padrão"
         className={`relative ${sizes[size]} rounded-full object-cover border-2`}
         style={{ borderColor: "var(--white)" }}

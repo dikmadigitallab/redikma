@@ -206,7 +206,7 @@ export function Header() {
         >
           <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shadow-lg bg-white border-2 border-white">
             <img
-              src="../icons/redikma_logo.png"
+              src="/icons/redikma_logo.png"
               alt="logotipo ReDikma"
               className="w-full h-full object-contain"
             />
@@ -387,7 +387,7 @@ export function Header() {
               <img
                 src={
                   user?.foto ||
-                  "../photoProfile/userDefault.png"
+                  "/photoProfile/userDefault.png"
                 }
                 alt="Foto do usuário"
                 className="w-full h-full object-cover"

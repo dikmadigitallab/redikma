@@ -87,14 +87,20 @@ export function PhotoPost({
           <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-4 z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/50 bg-white/10">
-                  <Image
-                    src={post.author.foto}
-                    alt={post.author.nome}
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/50 bg-white/10 flex items-center justify-center">
+                  {post.author.foto && (post.author.foto.startsWith('http') || post.author.foto.startsWith('/')) ? (
+                    <Image
+                      src={post.author.foto}
+                      alt={post.author.nome}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">{post.author.nome.charAt(0).toUpperCase()}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col">
                   <p className="text-white font-bold text-sm">{post.author.nome}</p>
