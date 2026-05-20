@@ -357,11 +357,11 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
           <div
             id={`post-${post.id}`}
             key={post.id}
-            className="relative rounded-2xl border shadow-sm overflow-visible transition-all duration-500"
+            className="relative rounded-2xl border-2 shadow-md overflow-visible transition-all duration-500 hover:shadow-lg hover:border-[var(--accent)]"
             style={{
               backgroundColor: "var(--white)",
-              borderColor: "var(--border)",
-              boxShadow: "0 4px 16px rgba(39, 38, 98, 0.04)",
+              borderColor: "var(--primary)",
+              boxShadow: "0 4px 16px rgba(39, 38, 98, 0.08)",
             }}
           >
             {/* Barra decorativa superior */}
@@ -387,7 +387,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               <>
                 <div className="absolute top-4 right-4 z-20">
                   <button
-                    className="text-zinc-950 hover:bg-neutral-100 p-1 rounded-full transition-colors flex items-center justify-center select-none"
+                    className="text-[var(--primary)] hover:bg-[var(--primary-10)] p-1 rounded-full transition-colors flex items-center justify-center select-none"
                     onClick={() => { toast.info('Somente o criador do post poderá edita-lo') }}
                   >
                     <MoreHorizontal size={24} />
@@ -423,7 +423,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 <div className="flex-1 min-w-0 pr-8">
                   {/* Linha do Autor e Cargo */}
                   <div className="flex items-baseline gap-2 flex-wrap">
-                    <h3 className="text-sm md:text-base font-bold text-[var(--black)] truncate">
+                    <h3 className="text-sm md:text-base font-bold text-[var(--primary)] truncate">
                       {post.author.nome}
                     </h3>
                     {post.author.cargo && (
@@ -502,11 +502,11 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
                 {/* Campo comentário */}
                 <div
-                  className="flex items-center gap-3 rounded-full px-3 py-2 border relative"
+                  className="flex items-center gap-3 rounded-full px-3 py-2 border-2 relative transition focus-within:border-[var(--accent)]"
                   style={{
                     backgroundColor:
                       "var(--background)",
-                    borderColor: "var(--border)",
+                    borderColor: "var(--primary)",
                   }}
                 >
                   <img
@@ -554,11 +554,11 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       <button
                         type="button"
                         onClick={() => comentar(post.id)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-transparent transition-all duration-200 hover:bg-amber-50 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#feb416]/30 disabled:opacity-40 disabled:pointer-events-none"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-[var(--accent)] transition-all duration-200 hover:shadow-md hover:scale-110 active:scale-95 focus:outline-none disabled:opacity-40 disabled:pointer-events-none"
                       >
                         <Send
                           size={16}
-                          color="#feb416"
+                          color="white"
                           className="translate-x-[1px] -translate-y-[0.5px]"
                         />
                       </button>
@@ -600,12 +600,12 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       className="flex items-center gap-2 transition-all hover:opacity-80"
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${liked ? "scale-105" : ""
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 font-bold ${liked ? "scale-110 bg-[var(--accent)]" : "bg-[var(--primary-10)]"
                           }`}
                         style={{
                           backgroundColor: liked
-                            ? "rgba(255, 0, 85, 0.12)"
-                            : "rgba(79, 195, 217, 0.08)",
+                            ? "var(--accent)"
+                            : "var(--primary-10)",
                         }}
                       >
                         <Image
@@ -674,10 +674,10 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     className="flex items-center gap-2 transition-all hover:opacity-80"
                   >
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition hover:bg-[var(--primary-20)]"
                       style={{
                         backgroundColor:
-                          "rgba(79, 195, 217, 0.08)",
+                          "var(--primary-10)",
                       }}
                     >
                       <Image

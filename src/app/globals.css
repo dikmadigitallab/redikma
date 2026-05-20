@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700;800;900&family=Red+Hat+Text:wght@300;400;500;600;700&display=swap');
 
 :root {
@@ -52,6 +51,21 @@ body {
   --radius-lg: 16px;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  
+  /* Gradientes Primários */
+  --gradient-primary: linear-gradient(135deg, #272662 0%, #1a1540 50%, #272662 100%);
+  --gradient-primary-light: linear-gradient(135deg, #272662 0%, #86B0DD 100%);
+  --gradient-accent: linear-gradient(135deg, #F15A24 0%, #d63a0a 100%);
+  --gradient-brand: linear-gradient(90deg, #272662 0%, #86B0DD 50%, #F15A24 100%);
+  
+  /* Variações de Opacidade */
+  --primary-10: rgba(39, 38, 98, 0.1);
+  --primary-15: rgba(39, 38, 98, 0.15);
+  --primary-20: rgba(39, 38, 98, 0.2);
+  --primary-30: rgba(39, 38, 98, 0.3);
+  --accent-10: rgba(241, 90, 36, 0.1);
+  --accent-15: rgba(241, 90, 36, 0.15);
+  --accent-20: rgba(241, 90, 36, 0.2);
 }
 
 /* esconder scrollbar global */
@@ -77,6 +91,27 @@ a:hover {
 
 button {
   transition: all 0.2s ease;
+  font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+}
+
+/* Buttons Primários - Azul Royal */
+button:not([disabled]):not(.icon-btn) {
+  font-weight: 600;
+}
+
+/* Inputs com foco em Azul Royal */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(39, 38, 98, 0.1) !important;
+  font-family: 'Red Hat Text', sans-serif;
+}
+
+input,
+textarea,
+select {
+  font-family: 'Red Hat Text', sans-serif;
 }
 
 /* Estilos do Sidebar */

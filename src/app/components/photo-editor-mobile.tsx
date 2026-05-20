@@ -383,11 +383,11 @@ export function Editor({
         <h2 className="text-xs font-bold tracking-wide">Editor</h2>
         <div className="flex items-center gap-1">
           <button type="button" onClick={undo} disabled={historyIndex <= 0}
-            className="p-1.5 rounded-lg hover:bg-neutral-100 disabled:opacity-30 transition" title="Desfazer">
+            className="p-1.5 rounded-lg hover:bg-[var(--primary-10)] disabled:opacity-30 transition" title="Desfazer">
             <Undo2 size={14} />
           </button>
           <button type="button" onClick={redo} disabled={historyIndex >= history.length - 1}
-            className="p-1.5 rounded-lg hover:bg-neutral-100 disabled:opacity-30 transition" title="Refazer">
+            className="p-1.5 rounded-lg hover:bg-[var(--primary-10)] disabled:opacity-30 transition" title="Refazer">
             <Redo2 size={14} />
           </button>
           <button type="button" onClick={() => setShowOriginal((prev) => !prev)}
@@ -396,11 +396,11 @@ export function Editor({
             onMouseLeave={() => setShowOriginal(false)}
             onTouchStart={() => setShowOriginal(true)}
             onTouchEnd={() => setShowOriginal(false)}
-            className={`p-1.5 rounded-lg hover:bg-neutral-100 transition ${showOriginal ? "bg-neutral-200" : ""}`}
+            className={`p-1.5 rounded-lg hover:bg-[var(--primary-10)] transition ${showOriginal ? "bg-neutral-200" : ""}`}
             title="Comparar original">
             {showOriginal ? <VscEyeClosed size={14} /> : <VscEye size={14} />}
           </button>
-          <button type="button" onClick={resetAll} className="p-1.5 rounded-lg hover:bg-neutral-100 transition" title="Resetar tudo">
+          <button type="button" onClick={resetAll} className="p-1.5 rounded-lg hover:bg-[var(--primary-10)] transition" title="Resetar tudo">
             <RxReset size={14} />
           </button>
         </div>
@@ -579,7 +579,7 @@ export function Editor({
           className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl border transition ${
             showOverlay && overlayTool === "adjust"
               ? "bg-black text-white border-black"
-              : "bg-white text-neutral-500 border-neutral-200 hover:border-neutral-400"
+              : "bg-white text-[var(--primary)] border-[var(--primary)] hover:border-neutral-400"
           }`}>
           <SlidersHorizontal size={16} />
           <span className="text-[9px] font-bold">Ajustes</span>
@@ -588,7 +588,7 @@ export function Editor({
           className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl border transition ${
             showOverlay && overlayTool === "filters"
               ? "bg-black text-white border-black"
-              : "bg-white text-neutral-500 border-neutral-200 hover:border-neutral-400"
+              : "bg-white text-[var(--primary)] border-[var(--primary)] hover:border-neutral-400"
           }`}>
           <ImageIcon size={16} />
           <span className="text-[9px] font-bold">Filtros</span>
@@ -597,13 +597,13 @@ export function Editor({
           className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl border transition ${
             showOverlay && overlayTool === "crop"
               ? "bg-black text-white border-black"
-              : "bg-white text-neutral-500 border-neutral-200 hover:border-neutral-400"
+              : "bg-white text-[var(--primary)] border-[var(--primary)] hover:border-neutral-400"
           }`}>
           <Crop size={16} />
           <span className="text-[9px] font-bold">Cortar</span>
         </button>
         <button type="button" onClick={() => openTool("crop")}
-          className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl border border-neutral-200 bg-white text-neutral-500 hover:border-neutral-400 transition">
+          className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl border border-[var(--primary)] bg-white text-[var(--primary)] hover:border-neutral-400 transition">
           <ZoomIn size={16} />
           <span className="text-[9px] font-bold">{zoom.toFixed(1)}x</span>
         </button>
@@ -616,15 +616,15 @@ export function Editor({
             Escolher foto
           </button>
           {showSourceOptions && (
-            <div className="absolute bottom-full mb-2 left-0 right-0 bg-white border border-neutral-200 rounded-2xl shadow-xl p-2 z-50">
+            <div className="absolute bottom-full mb-2 left-0 right-0 bg-white border border-[var(--primary)] rounded-2xl shadow-xl p-2 z-50">
               <button type="button" onClick={() => { setShowSourceOptions(false); cameraInputRef.current?.click() }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold">
-                <FaCamera className="text-neutral-500" />
+                <FaCamera className="text-[var(--primary)]" />
                 Câmera
               </button>
               <button type="button" onClick={() => { setShowSourceOptions(false); galleryInputRef.current?.click() }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold">
-                <FaImages className="text-neutral-500" />
+                <FaImages className="text-[var(--primary)]" />
                 Galeria
               </button>
             </div>

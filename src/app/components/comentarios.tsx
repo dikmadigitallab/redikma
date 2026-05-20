@@ -456,7 +456,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                         className="pl-11 mt-2"
                       >
                         <div
-                          className="relative rounded-2xl border border-neutral-200 bg-gradient-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm"
+                          className="relative rounded-2xl border border-[var(--primary)] bg-gradient-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm"
                         >
                           {/* Linha lateral para destacar que é uma resposta */}
                           <div className="absolute -left-5 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-300 to-cyan-100" />
@@ -473,7 +473,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                                 alt={
                                   reply.author?.nome || "Usuário"
                                 }
-                                className="w-5 h-5 rounded-full object-cover border border-neutral-200 shadow-sm flex-shrink-0"
+                                className="w-5 h-5 rounded-full object-cover border border-[var(--primary)] shadow-sm flex-shrink-0"
                               />
 
                               <span

@@ -98,10 +98,10 @@ export function Sidebar() {
 
         {/* Card do menu */}
         <div
-          className="rounded-2xl border shadow-sm overflow-hidden "
+          className="rounded-2xl border-2 shadow-md overflow-hidden "
           style={{
             backgroundColor: "var(--white)",
-            borderColor: "var(--border)",
+            borderColor: "var(--primary)",
           }}
         >
           {/* Barra decorativa superior */}
@@ -120,20 +120,20 @@ export function Sidebar() {
                 key={item.label}
                 onClick={item.onClick}
                 disabled={item.disabled}
-                className={`group flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all duration-200 text-left ${item.disabled
+                className={`group flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all duration-200 text-left font-semibold ${item.disabled
                     ? "opacity-40 cursor-not-allowed"
-                    : "cursor-pointer hover:opacity-85"
+                    : "cursor-pointer hover:bg-[var(--accent)] hover:text-white"
                   }`}
                 style={{
                   backgroundColor: "transparent",
-                  color: "var(--black)",
+                  color: "var(--primary)",
                 }}
               >
                 {/* Ícone */}
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-white group-hover:text-[var(--accent)]"
                     style={{
-                      backgroundColor: "var(--surface)",
+                      backgroundColor: "var(--primary-10)",
                       color: "var(--primary)",
                     }}
                   >
@@ -142,7 +142,7 @@ export function Sidebar() {
 
                 {/* Texto */}
                 <div className="flex flex-col items-start min-w-0">
-                  <span className="text-sm md:text-[80%] font-semibold truncate">
+                  <span className="text-sm md:text-[80%] font-bold truncate group-hover:text-white">
                     {item.label}
                   </span>
                 </div>
@@ -155,26 +155,26 @@ export function Sidebar() {
       {/* Rodapé / Logout */}
       <div className="px-3 md:px-4 mt-6">
         <div
-          className="rounded-2xl border shadow-sm p-2"
+          className="rounded-2xl border-2 shadow-md p-2"
           style={{
-            backgroundColor: "var(--white)",
-            borderColor: "var(--border)",
+            backgroundColor: "var(--accent)",
+            borderColor: "var(--accent)",
           }}
         >
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-opacity hover:opacity-85 cursor-pointer"
+            className="flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all hover:shadow-lg hover:scale-105 cursor-pointer font-bold"
             style={{
-              backgroundColor: "rgba(241, 90, 36, 0.10)",
-              color: "var(--accent)",
+              backgroundColor: "var(--accent)",
+              color: "white",
             }}
           >
             {/* Ícone */}
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
               style={{
-                backgroundColor: "rgba(241, 90, 36, 0.15)",
-                color: "var(--accent)",
+                backgroundColor: "rgba(255, 255, 255, 0.25)",
+                color: "white",
               }}
             >
               <LogOut size={18} />
@@ -182,10 +182,10 @@ export function Sidebar() {
 
             {/* Texto */}
             <div className="flex flex-col items-start">
-              <span className="text-sm md:text-[15px] font-semibold">
+              <span className="text-sm md:text-[15px] font-bold text-white">
                 Sair
               </span>
-              <span className="text-[11px]" style={{ color: "var(--gray)" }}>
+              <span className="text-[11px] text-white opacity-90">
                 Encerrar sessão
               </span>
             </div>
