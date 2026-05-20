@@ -68,7 +68,7 @@ export function ImageModal({ image, open, onClose, postId, authorId }: Props) {
         className="h-1 w-full"
         style={{
           background:
-            "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+            "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
         }}
       />
 

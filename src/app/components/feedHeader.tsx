@@ -196,7 +196,7 @@ export function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#F5F5F5] backdrop-blur-md border-b border-[#F5F5F5] shadow-sm md:sticky md:top-0 md:left-auto md:right-auto md:w-full">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-neutral-200 shadow-sm md:sticky md:top-0 md:left-auto md:right-auto md:w-full">
       <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
         <div
           onClick={() =>
@@ -204,7 +204,7 @@ export function Header() {
           }
           className="flex items-center gap-3 cursor-pointer shrink-0"
         >
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm bg-[var(--primary-dark)]">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm bg-[var(--primary)]">
             <img
               src="../icons/redikma_logo.png"
               alt="logotipo ReDikma"
@@ -341,7 +341,7 @@ export function Header() {
                 }
                 className={`w-9 h-9 flex items-center justify-center rounded-full relative transition ${
                   unreadCount > 0
-                    ? "text-orange-500 bg-orange-50"
+                    ? "text-[var(--accent)] bg-orange-50"
                     : "text-neutral-500 hover:bg-neutral-100"
                 }`}
               >

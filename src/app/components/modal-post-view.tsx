@@ -175,7 +175,7 @@ export function PostViewModal({ postId, onClose }: Props) {
             className="h-1 w-full sticky top-0 z-10"
             style={{
               background:
-                "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+                "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
             }}
           />
 
@@ -183,7 +183,7 @@ export function PostViewModal({ postId, onClose }: Props) {
           <button
             onClick={onClose}
             className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition"
-            style={{ backgroundColor: "var(--primary-dark)", color: "var(--white)" }}
+            style={{ backgroundColor: "var(--primary)", color: "var(--white)" }}
           >
             <X size={16} />
           </button>
@@ -324,7 +324,7 @@ export function PostViewModal({ postId, onClose }: Props) {
 
                   <span
                     className="text-sm font-semibold"
-                    style={{ color: liked ? "var(--warning)" : "var(--gray)" }}
+                    style={{ color: liked ? "var(--accent)" : "var(--gray)" }}
                   >
                     {likesCount}
                   </span>

@@ -100,7 +100,7 @@ export function EditPostModal({ postId, currentText, onClose, onSaved }: EditPos
             onClick={handleSave}
             disabled={saving}
             className="px-4 py-2 rounded-xl text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: "var(--primary-dark)" }}
+            style={{ backgroundColor: "var(--primary)" }}
           >
             {saving ? "Salvando..." : "Salvar"}
           </button>

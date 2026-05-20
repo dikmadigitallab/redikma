@@ -109,7 +109,7 @@ export function Sidebar() {
             className="h-1 w-full"
             style={{
               background:
-                "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+                "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
             }}
           />
 
@@ -130,15 +130,15 @@ export function Sidebar() {
                 }}
               >
                 {/* Ícone */}
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
-                  style={{
-                    backgroundColor: "var(--background)",
-                    color: "var(--primary-dark)",
-                  }}
-                >
-                  <item.icon size={18} />
-                </div>
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                    style={{
+                      backgroundColor: "var(--surface)",
+                      color: "var(--primary)",
+                    }}
+                  >
+                    <item.icon size={18} />
+                  </div>
 
                 {/* Texto */}
                 <div className="flex flex-col items-start min-w-0">
@@ -165,16 +165,16 @@ export function Sidebar() {
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-opacity hover:opacity-85 cursor-pointer"
             style={{
-              backgroundColor: "rgba(251, 176, 75, 0.10)",
-              color: "var(--warning)",
+              backgroundColor: "rgba(241, 90, 36, 0.10)",
+              color: "var(--accent)",
             }}
           >
             {/* Ícone */}
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{
-                backgroundColor: "rgba(251, 176, 75, 0.15)",
-                color: "var(--warning)",
+                backgroundColor: "rgba(241, 90, 36, 0.15)",
+                color: "var(--accent)",
               }}
             >
               <LogOut size={18} />
@@ -209,7 +209,7 @@ export function Sidebar() {
           className="h-1.5 w-full flex-shrink-0"
           style={{
             background:
-              "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+              "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
           }}
         />
 
@@ -226,7 +226,7 @@ export function Sidebar() {
             <div className="relative">
               <div
                 className="absolute -inset-1 rounded-xl opacity-20 blur-sm"
-                style={{ backgroundColor: "var(--secondary)" }}
+                style={{ backgroundColor: "var(--primary)" }}
               />
 
               <div
@@ -248,7 +248,7 @@ export function Sidebar() {
             <div className="min-w-0">
               <h1
                 className="text-[100%] font-bold tracking-tight"
-                style={{ color: "var(--primary-dark)" }}
+                style={{ color: "var(--primary)" }}
               >
                 ReDikma
               </h1>

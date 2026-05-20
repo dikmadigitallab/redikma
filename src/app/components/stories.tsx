@@ -225,7 +225,7 @@ export function RightSidebar() {
             <div>
               <h2
                 className="text-lg font-bold"
-                style={{ color: "var(--primary-dark)" }}
+                style={{ color: "var(--primary)" }}
               >
                 Atualizações
               </h2>
@@ -241,7 +241,7 @@ export function RightSidebar() {
               className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide"
               style={{
                 backgroundColor: "var(--accent)",
-                color: "var(--primary-dark)",
+                color: "var(--primary)",
               }}
             >
               Novo
@@ -262,7 +262,7 @@ export function RightSidebar() {
             className="h-1.5 w-full"
             style={{
               background:
-                "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+                "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
             }}
           />
 
@@ -305,7 +305,7 @@ export function RightSidebar() {
                           ? "var(--background)"
                           : "var(--secondary)",
                         color: story.visto
-                          ? "var(--primary-dark)"
+                          ? "var(--primary)"
                           : "var(--white)",
                       }}
                     >
@@ -320,7 +320,7 @@ export function RightSidebar() {
                         style={{
                           color: story.visto
                             ? "var(--black)"
-                            : "var(--primary-dark)",
+                            : "var(--primary)",
                         }}
                       >
                         {story.nome}

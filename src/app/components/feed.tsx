@@ -361,7 +361,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
             style={{
               backgroundColor: "var(--white)",
               borderColor: "var(--border)",
-              boxShadow: "0 4px 16px rgba(10, 69, 84, 0.04)",
+              boxShadow: "0 4px 16px rgba(39, 38, 98, 0.04)",
             }}
           >
             {/* Barra decorativa superior */}
@@ -369,7 +369,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               className="h-1 w-full"
               style={{
                 background:
-                  "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+                  "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
               }}
             />
 
@@ -624,7 +624,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                         className="text-sm font-semibold"
                         style={{
                           color: liked
-                            ? "var(--warning)"
+                            ? "var(--accent)"
                             : "var(--gray)",
                         }}
                       >

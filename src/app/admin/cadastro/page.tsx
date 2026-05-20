@@ -157,7 +157,7 @@ export default function CadastroPage() {
             <div className="flex items-center gap-4">
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-md"
-                style={{ backgroundColor: "var(--primary-dark)" }}
+                style={{ backgroundColor: "var(--primary)" }}
               >
                 <UserPlus size={26} />
               </div>
@@ -193,7 +193,7 @@ export default function CadastroPage() {
                 style={{
                   backgroundColor:
                     tab === "individual"
-                      ? "var(--primary-dark)"
+                      ? "var(--primary)"
                       : "transparent",
                   color:
                     tab === "individual"
@@ -214,7 +214,7 @@ export default function CadastroPage() {
                 style={{
                   backgroundColor:
                     tab === "lote"
-                      ? "var(--primary-dark)"
+                      ? "var(--primary)"
                       : "transparent",
                   color:
                     tab === "lote"
@@ -364,7 +364,7 @@ export default function CadastroPage() {
                   type="submit"
                   disabled={loading}
                   className="w-full md:w-auto px-8 py-3 rounded-xl text-white font-semibold text-sm transition hover:opacity-90 disabled:opacity-50 shadow-md"
-                  style={{ backgroundColor: "var(--primary-dark)" }}
+                  style={{ backgroundColor: "var(--primary)" }}
                 >
                   {loading ? "Cadastrando..." : "Cadastrar Usuário"}
                 </button>
@@ -421,7 +421,7 @@ export default function CadastroPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center mt-4 px-4 py-2 rounded-xl text-sm font-medium transition hover:opacity-90"
                 style={{
-                  backgroundColor: "var(--primary-dark)",
+                  backgroundColor: "var(--primary)",
                   color: "#ffffff",
                   textDecoration: "none",
                 }}
@@ -461,7 +461,7 @@ export default function CadastroPage() {
               <label
                 htmlFor="file-upload"
                 className="inline-flex items-center px-5 py-3 rounded-xl text-sm font-medium cursor-pointer text-white transition hover:opacity-90 shadow-sm"
-                style={{ backgroundColor: "var(--primary-dark)" }}
+                style={{ backgroundColor: "var(--primary)" }}
               >
                 Selecionar Arquivo
               </label>
@@ -497,7 +497,7 @@ export default function CadastroPage() {
               style={{
                 backgroundColor: !file
                   ? "var(--gray)"
-                  : "var(--primary-dark)",
+                  : "var(--primary)",
               }}
             >
               {loading ? "Processando..." : "Importar Usuários"}

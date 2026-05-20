@@ -47,7 +47,7 @@ export default function Feed() {
               backgroundColor: "var(--white)",
               borderColor: "var(--border)",
               boxShadow:
-                "0 4px 20px rgba(10, 69, 84, 0.04)",
+                "0 4px 20px rgba(39, 38, 98, 0.04)",
             }}
           >
             {/* Barra decorativa superior */}
@@ -55,7 +55,7 @@ export default function Feed() {
               className="h-1 w-full flex-shrink-0"
               style={{
                 background:
-                  "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+                  "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
               }}
             />
 

@@ -182,7 +182,7 @@ function handleSaveEditedImage(blob: Blob) {
   {showEditor && image && (
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center p-4 backdrop-blur-sm"
-      style={{ backgroundColor: "rgba(10, 69, 84, 0.55)" }}
+      style={{ backgroundColor: "rgba(39, 38, 98, 0.55)" }}
     >
       <EditorDesktop
         imageFile={image}
@@ -200,7 +200,7 @@ function handleSaveEditedImage(blob: Blob) {
       backgroundColor: "var(--white)",
       borderColor: open ? "var(--secondary)" : "var(--border)",
       boxShadow: open
-        ? "0 12px 32px rgba(10, 69, 84, 0.08)"
+        ? "0 12px 32px rgba(39, 38, 98, 0.08)"
         : "0 2px 8px rgba(0, 0, 0, 0.03)",
     }}
   >
@@ -209,7 +209,7 @@ function handleSaveEditedImage(blob: Blob) {
       className="h-1 w-full"
       style={{
         background:
-          "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+          "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
       }}
     />
 
@@ -392,7 +392,7 @@ function handleSaveEditedImage(blob: Blob) {
               }
               className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                backgroundColor: "var(--primary-dark)",
+                backgroundColor: "var(--primary)",
                 color: "var(--white)",
               }}
             >

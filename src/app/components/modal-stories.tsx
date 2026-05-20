@@ -26,7 +26,7 @@ export const StoriesModal = ({
       {/* Backdrop */}
       <div
         className="absolute inset-0 backdrop-blur-sm"
-        style={{ backgroundColor: "rgba(10, 69, 84, 0.55)" }}
+        style={{ backgroundColor: "rgba(39, 38, 98, 0.55)" }}
       />
 
       {/* Modal */}
@@ -43,7 +43,7 @@ export const StoriesModal = ({
           className="h-1.5 w-full"
           style={{
             background:
-              "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+              "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
           }}
         />
 
@@ -67,7 +67,7 @@ export const StoriesModal = ({
             <div className="min-w-0">
               <h3
                 className="text-base font-bold truncate"
-                style={{ color: "var(--primary-dark)" }}
+                style={{ color: "var(--primary)" }}
               >
                 {selectedStory.nome}
               </h3>
@@ -87,7 +87,7 @@ export const StoriesModal = ({
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-opacity hover:opacity-70"
             style={{
               backgroundColor: "var(--background)",
-              color: "var(--primary-dark)",
+              color: "var(--primary)",
             }}
           >
             ✕
@@ -107,7 +107,7 @@ export const StoriesModal = ({
             {selectedStory.titulo && (
               <h4
                 className="text-lg font-semibold mb-4"
-                style={{ color: "var(--primary-dark)" }}
+                style={{ color: "var(--primary)" }}
               >
                 {selectedStory.titulo}
               </h4>
@@ -158,7 +158,7 @@ export const StoriesModal = ({
             onClick={closeStory}
             className="px-4 py-2 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80"
             style={{
-              backgroundColor: "var(--primary-dark)",
+              backgroundColor: "var(--primary)",
               color: "var(--white)",
             }}
           >

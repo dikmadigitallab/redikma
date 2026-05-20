@@ -148,7 +148,7 @@ if (!trimmedText && !image) {
                 type="button"
                 onClick={() => handleImageChange(null)}
                 className="text-xs hover:underline transition"
-                style={{ color: 'var(--warning)' }}
+                style={{ color: 'var(--accent)' }}
               >
                 Remover imagem
               </button>
@@ -164,7 +164,7 @@ if (!trimmedText && !image) {
               type="checkbox"
               checked={isRecurring}
               onChange={(e) => setIsRecurring(e.target.checked)}
-              style={{ accentColor: 'var(--primary-dark)' }}
+              style={{ accentColor: 'var(--primary)' }}
             />
           </label>
 
@@ -174,7 +174,7 @@ if (!trimmedText && !image) {
               type="checkbox"
               checked={isFixed}
               onChange={(e) => setIsFixed(e.target.checked)}
-              style={{ accentColor: 'var(--primary-dark)' }}
+              style={{ accentColor: 'var(--primary)' }}
             />
           </label>
 
@@ -214,7 +214,7 @@ if (!trimmedText && !image) {
             onClick={handleSubmit}
             disabled={loading}
             className="px-4 py-2 rounded-xl text-white text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: 'var(--primary-dark)' }}
+            style={{ backgroundColor: 'var(--primary)' }}
           >
             {loading ? "Postando..." : "Postar"}
           </button>
