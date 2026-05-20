@@ -28,7 +28,7 @@ export default function Feed() {
       {/* Conteúdo principal */}
       <div className="flex-1 flex overflow-hidden relative min-h-0">
         {/* Layout central */}
-        <div className="flex-1 flex w-full px-3 sm:px-4 md:px-[5%] py-4 md:py-6 gap-4 md:gap-6 overflow-hidden min-h-0">
+        <div className="flex-1 flex w-full px-0 sm:px-4 md:px-[5%] py-0 md:py-6 gap-4 md:gap-6 overflow-hidden min-h-0">
           {/* Feed principal */}
           <main className="flex-1 min-w-0 h-full overflow-y-auto pb-24 md:pb-6 scrollbar-hide">
             <div className="w-full max-w-3xl mx-auto">

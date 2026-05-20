@@ -78,11 +78,10 @@ export function PhotoPost({
             background: 'linear-gradient(135deg, rgba(39, 38, 98, 0.06) 0%, rgba(241, 90, 36, 0.04) 100%)',
           }}
         />
-        <div className="px-2 pt-2 pb-1">
+        <div className="pt-2 pb-1">
           <div
-            className="relative w-full max-w-sm mx-auto aspect-[9/16] max-h-[70vh] rounded-2xl overflow-hidden shadow-xl"
+            className="relative w-full mx-auto aspect-[9/16] max-h-[75vh] overflow-hidden shadow-xl"
             style={{
-              borderRadius: '20px',
               boxShadow: '0 8px 40px rgba(39, 38, 98, 0.2)',
             }}
           >
@@ -131,9 +130,6 @@ export function PhotoPost({
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 z-10">
               <div className="space-y-2">
-                {post.label && (
-                  <p className="text-white text-xs font-medium line-clamp-2">{post.label}</p>
-                )}
                 <div className="flex gap-3 text-[11px] text-white/80">
                   <span className="font-semibold">{likesCount} curtidas</span>
                   <span className="font-semibold">{commentsCount} comentários</span>
@@ -176,6 +172,14 @@ export function PhotoPost({
               </div>
             </div>
           </div>
+
+          {post.label && (
+            <div className="px-3 py-2">
+              <p className="text-sm leading-6 whitespace-pre-wrap break-words" style={{ color: "var(--black)" }}>
+                {post.label}
+              </p>
+            </div>
+          )}
 
           {likesCount > 0 && (
             <div className="text-[10px] text-neutral-400 leading-tight mt-1 px-1">
