@@ -245,7 +245,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
             className="h-1 w-full"
             style={{
               background:
-                "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+                "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
             }}
           />
 
@@ -259,7 +259,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
           >
             <p
               className="text-xs font-semibold uppercase tracking-[0.18em]"
-              style={{ color: "var(--primary-dark)" }}
+              style={{ color: "var(--primary)" }}
             >
               Comentários
             </p>
@@ -312,7 +312,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                     <img
                       src={
                         comment.author.foto ||
-                        "../photoProfile/userDefault.png"
+                        "/photoProfile/userDefault.png"
                       }
                       className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                       alt={comment.author.nome}
@@ -399,7 +399,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                               delComents(comment.id)
                             }
                             className="ml-auto transition-opacity hover:opacity-80"
-                            style={{ color: "var(--warning)" }}
+                            style={{ color: "var(--accent)" }}
                           >
                             <FaTrash size={10} />
                           </button>
@@ -438,7 +438,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                         className="w-9 h-9 rounded-xl flex items-center justify-center"
                         style={{
                           backgroundColor:
-                            "var(--primary-dark)",
+                            "var(--primary)",
                           color: "var(--white)",
                         }}
                       >
@@ -456,7 +456,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                         className="pl-11 mt-2"
                       >
                         <div
-                          className="relative rounded-2xl border border-neutral-200 bg-gradient-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm"
+                          className="relative rounded-2xl border border-[var(--primary)] bg-gradient-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm"
                         >
                           {/* Linha lateral para destacar que é uma resposta */}
                           <div className="absolute -left-5 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-300 to-cyan-100" />
@@ -468,18 +468,18 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                               <img
                                 src={
                                   reply.author?.foto ||
-                                  "../photoProfile/userDefault.png"
+                                  "/photoProfile/userDefault.png"
                                 }
                                 alt={
                                   reply.author?.nome || "Usuário"
                                 }
-                                className="w-5 h-5 rounded-full object-cover border border-neutral-200 shadow-sm flex-shrink-0"
+                                className="w-5 h-5 rounded-full object-cover border border-[var(--primary)] shadow-sm flex-shrink-0"
                               />
 
                               <span
                                 className="text-[11px] font-semibold truncate"
                                 style={{
-                                  color: "var(--primary-dark)",
+                                  color: "var(--primary)",
                                 }}
                               >
                                 {reply.author?.nome || "Usuário"}
@@ -493,7 +493,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                                 }
                                 className="p-1 rounded-full hover:bg-red-50 transition-colors flex-shrink-0"
                                 style={{
-                                  color: "var(--warning)",
+                                  color: "var(--accent)",
                                 }}
                               >
                                 <FaTrash size={8} />

@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Editor } from "@/app/components/photo-editor-mobile"
 // Importe um ícone de troca se tiver (ex: lucide-react) ou use texto
-import { RefreshCw } from "lucide-react" 
-import { clear } from "console"
+import { ImagePlus, Camera, RefreshCw } from "lucide-react"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -20,11 +19,11 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const [image, setImage] = useState<File | null>(null)
   const [finalBlob, setFinalBlob] = useState<Blob | null>(null)
   const [showEditor, setShowEditor] = useState(false)
-  
+
   const [isFixed, setIsFixed] = useState(false)
   const [duration, setDuration] = useState<DurationType>("24h")
   const [loading, setLoading] = useState(false)
-  
+
   // NOVO: Estado para controlar qual câmera usar
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
 
@@ -37,18 +36,22 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
 
-  // Gerenciamento da Câmera - Adicionado facingMode como dependência
+  const [showCamera, setShowCamera] = useState(false)
+
   useEffect(() => {
-    if (!finalBlob && !showEditor) {
-      startCamera()
-    }
     return () => stopCamera()
-  }, [finalBlob, showEditor, facingMode])
+  }, [])
+
+  useEffect(() => {
+    if (showCamera && !finalBlob && !showEditor) {
+      startCamera()
+    } else if (!showCamera) {
+      stopCamera()
+    }
+  }, [showCamera, finalBlob, showEditor, facingMode])
 
   async function startCamera() {
-    // Para o stream anterior antes de iniciar um novo
-    stopCamera() 
-    
+    stopCamera()
     try {
       const s = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: facingMode } },
@@ -56,8 +59,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
       })
       setStream(s)
       if (videoRef.current) videoRef.current.srcObject = s
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error("Erro ao acessar câmera")
     }
   }
@@ -69,7 +71,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
     }
   }
 
-  // NOVO: Função para alternar a câmera
   function toggleCamera() {
     setFacingMode(prev => prev === "environment" ? "user" : "environment")
   }
@@ -141,14 +142,16 @@ export default function CreatePostPage({ onRefresh }: Props) {
     }
   }
 
-return (
-<main className="h-[100dvh] bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
-      
-      {/* HEADER FIXO */}
-      <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 py-3 safe-top flex items-center justify-between">
+  return (
+    <main className="h-[100dvh] bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
+
+
+
+      {/* 
+      <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-[var(--primary)] px-4 py-3 safe-top flex items-center justify-between">
         <button
           onClick={() => window.history.back()}
-          className="text-sm text-neutral-500 hover:text-black transition min-w-14 text-left"
+          className="text-sm text-[var(--primary)] hover:text-black transition min-w-14 text-left"
         >
           Voltar
         </button>
@@ -158,12 +161,14 @@ return (
         <div className="min-w-14" />
       </header>
 
+ */}
+
       {/* ÁREA ROLÁVEL COM ESPAÇAMENTO MÁXIMO (pb-24) */}
       <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-24">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
-          
+
           {/* TEXTAREA */}
-          <div className="rounded-2xl bg-white border border-neutral-200 p-4 shadow-sm">
+          <div className="rounded-2xl bg-white border border-[var(--primary)] p-4 shadow-sm">
             <textarea
               placeholder="Compartilhe algo..."
               value={text}
@@ -173,8 +178,8 @@ return (
           </div>
 
           {/* ÁREA DE MÍDIA (CÂMERA / PREVIEW / EDITOR) */}
-          <div className="rounded-2xl bg-white border border-neutral-200 p-3 shadow-sm space-y-4">
-            
+          <div className="rounded-2xl bg-white border border-[var(--primary)] p-3 shadow-sm space-y-4">
+
             {showEditor && image && (
               <div className="w-full overflow-hidden rounded-2xl">
                 <Editor
@@ -193,48 +198,76 @@ return (
 
             {!showEditor && !finalBlob && (
               <>
-                <div className="relative rounded-2xl overflow-hidden bg-black border border-neutral-200">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full aspect-[3/4] max-h-[40vh] sm:max-h-[60vh] object-cover"
-                  />
-                  
-                  {/* BOTÃO PARA VIRAR CÂMERA */}
-                  <button 
-                    onClick={toggleCamera}
-                    className="absolute bottom-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white active:scale-90 transition"
-                    title="Alternar Câmera"
-                  >
-                    <RefreshCw size={20} />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={takePhoto}
-                    className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
-                  >
-                    Tirar foto
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
-                  >
-                    Galeria
-                  </button>
-                </div>
+                {showCamera ? (
+                  <>
+                    <div className="relative rounded-2xl overflow-hidden bg-black border border-[var(--primary)]">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="w-full aspect-[3/4] max-h-[40vh] sm:max-h-[60vh] object-cover"
+                      />
+                      <button
+                        onClick={toggleCamera}
+                        className="absolute bottom-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white active:scale-90 transition"
+                        title="Alternar Câmera"
+                      >
+                        <RefreshCw size={20} />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={takePhoto}
+                        className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
+                      >
+                        Tirar foto
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCamera(false)}
+                        className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center gap-4 py-8">
+                    <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center">
+                      <ImagePlus size={32} className="text-neutral-400" />
+                    </div>
+                    <p className="text-sm text-[var(--primary)] text-center max-w-[200px]">
+                      Adicione uma imagem ao seu post
+                    </p>
+                    <div className="flex flex-col w-full gap-2.5 max-w-[260px]">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition flex items-center justify-center gap-2"
+                      >
+                        <ImagePlus size={18} />
+                        Abrir galeria
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCamera(true)}
+                        className="w-full py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition flex items-center justify-center gap-2"
+                      >
+                        <Camera size={18} />
+                        Usar câmera
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
               </>
             )}
 
             {!showEditor && finalBlob && (
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-100">
+                <div className="rounded-2xl overflow-hidden border border-[var(--primary)] bg-neutral-100">
                   <img
                     src={URL.createObjectURL(finalBlob)}
                     alt="Final"

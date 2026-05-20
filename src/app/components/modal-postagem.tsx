@@ -103,21 +103,26 @@ if (!trimmedText && !image) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-xl p-6 space-y-5 shadow-xl" style={{ backgroundColor: 'var(--white)' }}>
+      <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: 'var(--white)' }}>
+        
+        {/* Header com cor primária */}
+        <div className="p-6 border-b-2" style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--accent)' }}>
+          <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'Red Hat Display', sans-serif" }}>
+            Criar postagem
+          </h2>
+        </div>
 
-        <h2 className="text-xl font-semibold" style={{ color: 'var(--black)' }}>
-          Criar postagem
-        </h2>
+        <div className="p-6 space-y-5">
 
         <textarea
           placeholder="Escreva algo..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="w-full rounded-xl p-3 resize-none h-28 outline-none text-sm"
-          style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
+          className="w-full rounded-xl p-4 resize-none h-28 outline-none text-sm font-medium transition focus:shadow-lg"
+          style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)', fontFamily: "'Red Hat Text', sans-serif" }}
         />
 
-        <div className="rounded-xl p-4 text-center space-y-3" style={{ border: `2px dashed var(--border)` }}>
+        <div className="rounded-xl p-4 text-center space-y-3 transition hover:bg-[var(--primary-10)]" style={{ border: `3px dashed var(--primary)` }}>
 
           {!preview && (
             <>
@@ -148,7 +153,7 @@ if (!trimmedText && !image) {
                 type="button"
                 onClick={() => handleImageChange(null)}
                 className="text-xs hover:underline transition"
-                style={{ color: 'var(--warning)' }}
+                style={{ color: 'var(--accent)' }}
               >
                 Remover imagem
               </button>
@@ -164,7 +169,7 @@ if (!trimmedText && !image) {
               type="checkbox"
               checked={isRecurring}
               onChange={(e) => setIsRecurring(e.target.checked)}
-              style={{ accentColor: 'var(--primary-dark)' }}
+              style={{ accentColor: 'var(--primary)' }}
             />
           </label>
 
@@ -174,7 +179,7 @@ if (!trimmedText && !image) {
               type="checkbox"
               checked={isFixed}
               onChange={(e) => setIsFixed(e.target.checked)}
-              style={{ accentColor: 'var(--primary-dark)' }}
+              style={{ accentColor: 'var(--primary)' }}
             />
           </label>
 
@@ -184,8 +189,8 @@ if (!trimmedText && !image) {
               <select
                 value={duration}
                 onChange={(e) => setDuration(e.target.value as DurationType)}
-                className="w-full rounded-xl p-2 text-sm outline-none"
-                style={{ backgroundColor: 'var(--background)', border: `1px solid var(--border)`, color: 'var(--black)' }}
+                className="w-full rounded-xl p-2 text-sm outline-none font-medium"
+                style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)' }}
               >
                 <option value="1h">1 hora</option>
                 <option value="6h">6 horas</option>
@@ -199,12 +204,12 @@ if (!trimmedText && !image) {
 
         </div>
 
-        <div className="flex justify-end gap-2 pt-4" style={{ borderTop: `1px solid var(--border)` }}>
+        <div className="flex justify-end gap-2 p-6 pt-4 border-t-2" style={{ borderColor: 'var(--primary-10)' }}>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-sm font-medium transition hover:opacity-70"
-            style={{ backgroundColor: 'var(--background)', color: 'var(--black)', border: `1px solid var(--border)` }}
+            className="px-5 py-2.5 rounded-xl text-sm font-bold transition hover:shadow-md"
+            style={{ backgroundColor: 'var(--background)', color: 'var(--primary)', border: `2px solid var(--primary)` }}
           >
             Cancelar
           </button>
@@ -213,13 +218,13 @@ if (!trimmedText && !image) {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="px-4 py-2 rounded-xl text-white text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: 'var(--primary-dark)' }}
+            className="px-5 py-2.5 rounded-xl text-white text-sm font-bold transition hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:scale-100"
+            style={{ backgroundColor: 'var(--accent)' }}
           >
             {loading ? "Postando..." : "Postar"}
           </button>
         </div>
-
+        </div>
       </div>
     </div>
   )

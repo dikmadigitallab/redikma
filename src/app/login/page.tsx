@@ -207,7 +207,7 @@ export default function LoginCPF() {
               <label className="block text-sm font-semibold mb-2" style={{ color: '#1A1A1A' }}>CPF</label>
               <div
                 className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent"
-                style={{ backgroundColor: '#F5F5F5', border: '1px solid #E0E0E0' }} // Fundo de input levemente cinza
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E0E0E0' }} // Fundo de input levemente cinza
                 onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
                 onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
               >
@@ -230,7 +230,7 @@ export default function LoginCPF() {
               <label className="block text-sm font-semibold mb-2" style={{ color: '#1A1A1A' }}>Senha</label>
               <div
                 className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent"
-                style={{ backgroundColor: '#F5F5F5', border: '1px solid #E0E0E0' }}
+                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E0E0E0' }}
                 onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
                 onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
               >

@@ -182,7 +182,7 @@ function handleSaveEditedImage(blob: Blob) {
   {showEditor && image && (
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center p-4 backdrop-blur-sm"
-      style={{ backgroundColor: "rgba(10, 69, 84, 0.55)" }}
+      style={{ backgroundColor: "rgba(39, 38, 98, 0.55)" }}
     >
       <EditorDesktop
         imageFile={image}
@@ -195,13 +195,13 @@ function handleSaveEditedImage(blob: Blob) {
 
   {/* Card principal */}
   <div
-    className="rounded-2xl border shadow-sm overflow-hidden transition-all duration-300"
+    className="rounded-2xl border-2 shadow-md overflow-hidden transition-all duration-300"
     style={{
       backgroundColor: "var(--white)",
-      borderColor: open ? "var(--secondary)" : "var(--border)",
+      borderColor: open ? "var(--accent)" : "var(--primary)",
       boxShadow: open
-        ? "0 12px 32px rgba(10, 69, 84, 0.08)"
-        : "0 2px 8px rgba(0, 0, 0, 0.03)",
+        ? "0 12px 32px rgba(241, 90, 36, 0.15)"
+        : "0 2px 12px rgba(39, 38, 98, 0.1)",
     }}
   >
     {/* Barra decorativa superior */}
@@ -209,7 +209,7 @@ function handleSaveEditedImage(blob: Blob) {
       className="h-1 w-full"
       style={{
         background:
-          "linear-gradient(90deg, var(--primary-dark) 0%, var(--secondary) 70%, var(--accent) 100%)",
+          "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
       }}
     />
 
@@ -239,11 +239,11 @@ function handleSaveEditedImage(blob: Blob) {
 
         {/* Campo fake */}
         <div
-          className="flex-1 rounded-full px-5 py-3 border text-sm font-medium"
+          className="flex-1 rounded-full px-5 py-3 border-2 text-sm font-semibold transition hover:border-[var(--accent)] hover:bg-[var(--primary-10)]"
           style={{
             backgroundColor: "var(--background)",
-            borderColor: "var(--border)",
-            color: "var(--gray)",
+            borderColor: "var(--primary)",
+            color: "var(--primary)",
           }}
         >
           No que você está pensando,{" "}
@@ -252,10 +252,10 @@ function handleSaveEditedImage(blob: Blob) {
 
         {/* Ícone */}
         <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition hover:bg-[var(--accent)] hover:text-white"
           style={{
-            backgroundColor: "rgba(79, 195, 217, 0.10)",
-            color: "var(--secondary)",
+            backgroundColor: "var(--primary-15)",
+            color: "var(--primary)",
           }}
         >
           <RiImageEditFill className="w-5 h-5" />
@@ -275,7 +275,7 @@ function handleSaveEditedImage(blob: Blob) {
             <img
               src={
                 session?.user?.foto ||
-                "../photoProfile/userDefault.png"
+                "/photoProfile/userDefault.png"
               }
               className="relative w-11 h-11 rounded-full object-cover border-2"
               style={{ borderColor: "var(--white)" }}
@@ -345,11 +345,11 @@ function handleSaveEditedImage(blob: Blob) {
               onClick={() =>
                 fileInputRef.current?.click()
               }
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-opacity hover:opacity-85"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition hover:shadow-md hover:border-[var(--accent)]"
               style={{
                 backgroundColor: "var(--background)",
-                borderColor: "var(--border)",
-                color: "var(--secondary)",
+                borderColor: "var(--primary)",
+                color: "var(--primary)",
               }}
             >
               <RiImageAddLine className="w-5 h-5" />
@@ -390,9 +390,9 @@ function handleSaveEditedImage(blob: Blob) {
                 loading ||
                 (!text.trim() && !finalBlob)
               }
-              className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
               style={{
-                backgroundColor: "var(--primary-dark)",
+                backgroundColor: "var(--accent)",
                 color: "var(--white)",
               }}
             >

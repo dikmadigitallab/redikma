@@ -69,7 +69,7 @@ export function EditPostModal({ postId, currentText, onClose, onSaved }: EditPos
       >
         <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: "var(--border)" }}>
           <h2 className="text-lg font-semibold" style={{ color: "var(--black)" }}>Editar post</h2>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-neutral-100 transition">
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-[var(--primary-10)] transition">
             <X size={20} />
           </button>
         </div>
@@ -100,7 +100,7 @@ export function EditPostModal({ postId, currentText, onClose, onSaved }: EditPos
             onClick={handleSave}
             disabled={saving}
             className="px-4 py-2 rounded-xl text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: "var(--primary-dark)" }}
+            style={{ backgroundColor: "var(--primary)" }}
           >
             {saving ? "Salvando..." : "Salvar"}
           </button>

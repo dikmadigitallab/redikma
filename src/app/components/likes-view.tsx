@@ -49,7 +49,7 @@ export function LikeView({ likers = [], totalLikes = 0 }: LikeViewProps) {
           <div 
             className="w-6 h-6 rounded-full border-2 border-white bg-neutral-100 flex items-center justify-center z-0 shadow-sm"
           >
-            <span className="text-[8px] font-bold text-neutral-500">
+            <span className="text-[8px] font-bold text-[var(--primary)]">
               +{totalLikes - 3}
             </span>
           </div>
@@ -57,7 +57,7 @@ export function LikeView({ likers = [], totalLikes = 0 }: LikeViewProps) {
       </div>
 
       {/* Texto descritivo lateral - Minimalista para celular */}
-      <div className="text-[11px] text-neutral-500 leading-tight">
+      <div className="text-[11px] text-[var(--primary)] leading-tight">
         {totalLikes === 1 ? (
           <span>Curtido por <b className="text-neutral-800">{likers[0]?.nome || "alguém"}</b></span>
         ) : (

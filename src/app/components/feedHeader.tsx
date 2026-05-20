@@ -196,7 +196,7 @@ export function Header() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#F5F5F5] backdrop-blur-md border-b border-[#F5F5F5] shadow-sm md:sticky md:top-0 md:left-auto md:right-auto md:w-full">
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b-2 shadow-lg md:sticky md:top-0 md:left-auto md:right-auto md:w-full" style={{background: 'var(--gradient-brand)', borderColor: 'var(--accent)'}}>
       <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
         <div
           onClick={() =>
@@ -204,20 +204,20 @@ export function Header() {
           }
           className="flex items-center gap-3 cursor-pointer shrink-0"
         >
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden shadow-sm bg-[var(--primary-dark)]">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shadow-lg bg-white border-2 border-white">
             <img
-              src="../icons/redikma_logo.png"
+              src="/icons/redikma_logo.png"
               alt="logotipo ReDikma"
               className="w-full h-full object-contain"
             />
           </div>
 
           <div className="leading-tight">
-            <h1 className="text-sm font-bold text-neutral-800">
+            <h1 className="text-sm font-bold text-white drop-shadow-md">
               ReDikma
             </h1>
 
-            <p className="text-[10px] text-neutral-500 uppercase">
+            <p className="text-[10px] text-white opacity-95 uppercase font-semibold tracking-wide drop-shadow-sm">
               Comunicação Interna
             </p>
           </div>
@@ -232,13 +232,13 @@ export function Header() {
               onClick={() =>
                 setOpenSearch(!openSearch)
               }
-              className="w-9 h-9 flex items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 transition"
+              className="w-9 h-9 flex items-center justify-center rounded-full text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
             >
               <Search size={18} />
             </button>
 
             {openSearch && (
-              <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] bg-white border border-neutral-200 rounded-2xl shadow-2xl overflow-hidden z-50">
+              <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] bg-white border border-[var(--primary)] rounded-2xl shadow-2xl overflow-hidden z-50">
                 <div className="p-3 border-b border-neutral-100">
                   <input
                     type="text"
@@ -247,13 +247,14 @@ export function Header() {
                     onChange={(e) =>
                       setSearch(e.target.value)
                     }
-                    className="w-full h-11 px-4 rounded-xl border border-neutral-200 outline-none text-sm focus:border-neutral-400"
+                    className="w-full h-11 px-4 rounded-xl border-2 border-[var(--primary)] outline-none text-sm focus:border-[var(--primary)] font-medium"
+                    style={{fontFamily: "'Red Hat Text', sans-serif"}}
                   />
                 </div>
 
                 <div className="max-h-[420px] overflow-y-auto">
                   {loading && (
-                    <div className="p-4 text-sm text-neutral-500">
+                    <div className="p-4 text-sm text-[var(--primary)]">
                       Buscando...
                     </div>
                   )}
@@ -261,7 +262,7 @@ export function Header() {
                   {!loading &&
                     results.length === 0 &&
                     search && (
-                      <div className="p-4 text-sm text-neutral-500">
+                      <div className="p-4 text-sm text-[var(--primary)]">
                         Nenhuma publicação
                         encontrada
                       </div>
@@ -339,10 +340,10 @@ export function Header() {
                 onClick={
                   handleToggleNotifications
                 }
-                className={`w-9 h-9 flex items-center justify-center rounded-full relative transition ${
+                className={`w-9 h-9 flex items-center justify-center rounded-full relative transition font-bold ${
                   unreadCount > 0
-                    ? "text-orange-500 bg-orange-50"
-                    : "text-neutral-500 hover:bg-neutral-100"
+                    ? "text-white bg-[var(--accent)] shadow-lg hover:shadow-xl"
+                    : "text-neutral-600 hover:bg-[var(--primary-10)] hover:text-[var(--primary)]"
                 }`}
               >
                 <Bell
@@ -381,12 +382,12 @@ export function Header() {
               onClick={() =>
                 setOpen(!open)
               }
-              className="w-9 h-9 rounded-full overflow-hidden border border-neutral-200"
+              className="w-9 h-9 rounded-full overflow-hidden border border-[var(--primary)]"
             >
               <img
                 src={
                   user?.foto ||
-                  "../photoProfile/userDefault.png"
+                  "/photoProfile/userDefault.png"
                 }
                 alt="Foto do usuário"
                 className="w-full h-full object-cover"
@@ -394,8 +395,8 @@ export function Header() {
             </button>
 
             {open && (
-              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border border-neutral-200 shadow-lg overflow-hidden z-50">
-                <div className="py-2">
+              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border-2 border-[var(--primary)] shadow-xl overflow-hidden z-50">
+                <div className="py-2 border-b-2 border-[var(--primary-10)]">
                   <button
                     onClick={() => {
                       setOpen(false)
@@ -403,7 +404,7 @@ export function Header() {
                         "/intern/profile"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
                   >
                     <User size={18} />
                     Perfil
@@ -416,14 +417,14 @@ export function Header() {
                         "/intern/feed"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
                   >
                     <Rss size={18} />
                     Feed
                   </button>
                 </div>
 
-                <div className="border-t py-2">
+                <div className="border-t-2 border-[var(--primary-10)] py-2">
                   <button
                     onClick={() => {
                       setOpen(false)
@@ -432,7 +433,7 @@ export function Header() {
                         "_blank"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
                   >
                     <FaUserDoctor size={18} />
                     Telemedicina
@@ -446,14 +447,14 @@ export function Header() {
                         "_blank"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm hover:bg-neutral-50 transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
                   >
                     <FaHeadset size={18} />
                     Ouvidoria Dikma
                   </button>
                 </div>
 
-                <div className="border-t py-2">
+                <div className="border-t-2 border-[var(--accent)] py-2">
                   <button
                     onClick={() => {
                       setOpen(false)
@@ -462,7 +463,7 @@ export function Header() {
                           "/login",
                       })
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-bold text-white bg-[var(--accent)] hover:shadow-lg transition"
                   >
                     <LogOut size={18} />
                     Sair
