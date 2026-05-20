@@ -130,18 +130,18 @@ export function NotificationsBox({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="w-80 bg-white border border-neutral-200 shadow-xl rounded-xl overflow-hidden">
+    <div className="w-80 bg-white border border-[var(--primary)] shadow-xl rounded-xl overflow-hidden">
       <div className="p-3 border-b font-medium text-neutral-800 bg-neutral-50 flex justify-between items-center">
         <span>Notificações</span>
       </div>
 
       <div className="max-h-96 overflow-y-auto">
         {loading ? (
-          <div className="p-6 flex justify-center text-sm text-neutral-500">
+          <div className="p-6 flex justify-center text-sm text-[var(--primary)]">
             Carregando notificações...
           </div>
         ) : notifications.length === 0 ? (
-          <div className="p-6 text-center text-sm text-neutral-500">
+          <div className="p-6 text-center text-sm text-[var(--primary)]">
             Nenhuma notificação por enquanto.
           </div>
         ) : (
@@ -170,7 +170,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
 
                   <div className="flex-1 min-w-0">
                     <div className="text-neutral-800 truncate">{n.title}</div>
-                    <div className="text-neutral-500 text-xs mt-0.5 truncate">
+                    <div className="text-[var(--primary)] text-xs mt-0.5 truncate">
                       {n.message}
                     </div>
                     <div className="text-neutral-400 text-[10px] mt-1">

@@ -240,7 +240,7 @@ export function PostViewModal({ postId, onClose }: Props) {
                   {user?.id === post.authorId && (
                     <button
                       onClick={() => setEditingPost({ id: post.id, label: post.label })}
-                      className="flex-shrink-0 p-2 rounded-full hover:bg-neutral-100 transition"
+                      className="flex-shrink-0 p-2 rounded-full hover:bg-[var(--primary-10)] transition"
                       title="Editar post"
                     >
                       <Edit3 size={16} />

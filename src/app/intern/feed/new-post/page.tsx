@@ -148,10 +148,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
 
       {/* 
-      <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-neutral-200 px-4 py-3 safe-top flex items-center justify-between">
+      <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-[var(--primary)] px-4 py-3 safe-top flex items-center justify-between">
         <button
           onClick={() => window.history.back()}
-          className="text-sm text-neutral-500 hover:text-black transition min-w-14 text-left"
+          className="text-sm text-[var(--primary)] hover:text-black transition min-w-14 text-left"
         >
           Voltar
         </button>
@@ -168,7 +168,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
 
           {/* TEXTAREA */}
-          <div className="rounded-2xl bg-white border border-neutral-200 p-4 shadow-sm">
+          <div className="rounded-2xl bg-white border border-[var(--primary)] p-4 shadow-sm">
             <textarea
               placeholder="Compartilhe algo..."
               value={text}
@@ -178,7 +178,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
           </div>
 
           {/* ÁREA DE MÍDIA (CÂMERA / PREVIEW / EDITOR) */}
-          <div className="rounded-2xl bg-white border border-neutral-200 p-3 shadow-sm space-y-4">
+          <div className="rounded-2xl bg-white border border-[var(--primary)] p-3 shadow-sm space-y-4">
 
             {showEditor && image && (
               <div className="w-full overflow-hidden rounded-2xl">
@@ -200,7 +200,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
               <>
                 {showCamera ? (
                   <>
-                    <div className="relative rounded-2xl overflow-hidden bg-black border border-neutral-200">
+                    <div className="relative rounded-2xl overflow-hidden bg-black border border-[var(--primary)]">
                       <video
                         ref={videoRef}
                         autoPlay
@@ -238,7 +238,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                     <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center">
                       <ImagePlus size={32} className="text-neutral-400" />
                     </div>
-                    <p className="text-sm text-neutral-500 text-center max-w-[200px]">
+                    <p className="text-sm text-[var(--primary)] text-center max-w-[200px]">
                       Adicione uma imagem ao seu post
                     </p>
                     <div className="flex flex-col w-full gap-2.5 max-w-[260px]">
@@ -267,7 +267,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
             {!showEditor && finalBlob && (
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-100">
+                <div className="rounded-2xl overflow-hidden border border-[var(--primary)] bg-neutral-100">
                   <img
                     src={URL.createObjectURL(finalBlob)}
                     alt="Final"

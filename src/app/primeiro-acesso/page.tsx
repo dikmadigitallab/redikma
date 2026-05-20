@@ -73,7 +73,7 @@ export default function PrimeiroAcessoPage() {
 
   return (
     <div className="min-h-screen bg-[#f6f7fb] flex flex-col">
-      <header className="bg-white border-b border-neutral-200 px-6 py-4">
+      <header className="bg-white border-b border-[var(--primary)] px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#0A4554] flex items-center justify-center text-white font-bold text-sm">
             <img src="./icons/redikma_logo.png" alt="" />
@@ -83,12 +83,12 @@ export default function PrimeiroAcessoPage() {
       </header>
 
       <main className="flex-1 flex items-start justify-center px-4 py-8">
-        <div className="w-full max-w-3xl bg-white rounded-[28px] border border-neutral-200 shadow-sm overflow-hidden">
+        <div className="w-full max-w-3xl bg-white rounded-[28px] border border-[var(--primary)] shadow-sm overflow-hidden">
           <div className="px-6 md:px-10 py-8 border-b border-neutral-100">
             <h1 className="text-2xl md:text-3xl font-bold text-neutral-900">
               Primeiro Acesso
             </h1>
-            <p className="text-neutral-500 mt-2 text-sm md:text-base">
+            <p className="text-[var(--primary)] mt-2 text-sm md:text-base">
               Bem-vindo, <span className="font-semibold text-neutral-700">{session.user.nome}</span>! Antes de acessar a plataforma, leia e aceite os termos abaixo.
             </p>
           </div>
@@ -99,7 +99,7 @@ export default function PrimeiroAcessoPage() {
             </div>
 
             <div className="space-y-4">
-              <label className="flex items-start gap-4 p-4 rounded-2xl border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+              <label className="flex items-start gap-4 p-4 rounded-2xl border border-[var(--primary)] hover:border-neutral-300 transition-colors cursor-pointer">
                 <input
                   type="checkbox"
                   checked={accepted.termos}
@@ -110,7 +110,7 @@ export default function PrimeiroAcessoPage() {
                   <p className="font-semibold text-neutral-900 text-sm">
                     Termos de Uso
                   </p>
-                  <p className="text-sm text-neutral-500 mt-0.5">
+                  <p className="text-sm text-[var(--primary)] mt-0.5">
                     Declaro que li e concordo com os{" "}
                     <Link href="/legais/termos-de-uso" target="_blank" className="text-[#0A4554] underline hover:no-underline">
                       Termos de Uso da plataforma ReDikma
@@ -120,7 +120,7 @@ export default function PrimeiroAcessoPage() {
                 {accepted.termos && <Check size={20} className="text-green-600 flex-shrink-0" />}
               </label>
 
-              <label className="flex items-start gap-4 p-4 rounded-2xl border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+              <label className="flex items-start gap-4 p-4 rounded-2xl border border-[var(--primary)] hover:border-neutral-300 transition-colors cursor-pointer">
                 <input
                   type="checkbox"
                   checked={accepted.lgpd}
@@ -131,7 +131,7 @@ export default function PrimeiroAcessoPage() {
                   <p className="font-semibold text-neutral-900 text-sm">
                     Política de Privacidade (LGPD)
                   </p>
-                  <p className="text-sm text-neutral-500 mt-0.5">
+                  <p className="text-sm text-[var(--primary)] mt-0.5">
                     Declaro que li e estou ciente da{" "}
                     <Link href="/legais/lgpd" target="_blank" className="text-[#0A4554] underline hover:no-underline">
                       Política de Privacidade e Proteção de Dados
@@ -141,7 +141,7 @@ export default function PrimeiroAcessoPage() {
                 {accepted.lgpd && <Check size={20} className="text-green-600 flex-shrink-0" />}
               </label>
 
-              <label className="flex items-start gap-4 p-4 rounded-2xl border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+              <label className="flex items-start gap-4 p-4 rounded-2xl border border-[var(--primary)] hover:border-neutral-300 transition-colors cursor-pointer">
                 <input
                   type="checkbox"
                   checked={accepted.cookies}
@@ -152,7 +152,7 @@ export default function PrimeiroAcessoPage() {
                   <p className="font-semibold text-neutral-900 text-sm">
                     Política de Cookies
                   </p>
-                  <p className="text-sm text-neutral-500 mt-0.5">
+                  <p className="text-sm text-[var(--primary)] mt-0.5">
                     Autorizo a utilização de cookies necessários para o funcionamento da plataforma, conforme descrito na Política de Privacidade.
                   </p>
                 </div>
