@@ -70,20 +70,20 @@ export function PhotoPost({
 
   return (
     <>
-      {/* Mobile: story-like fullscreen */}
-      <div className="min-h-screen w-full flex flex-col relative overflow-hidden snap-center md:hidden">
+      {/* Mobile: card layout */}
+      <div className="w-full relative overflow-hidden md:hidden">
         <div
           className="absolute inset-0 -z-10"
           style={{
-            background: 'linear-gradient(135deg, rgba(39, 38, 98, 0.08) 0%, rgba(241, 90, 36, 0.06) 100%)',
+            background: 'linear-gradient(135deg, rgba(39, 38, 98, 0.06) 0%, rgba(241, 90, 36, 0.04) 100%)',
           }}
         />
-        <div className="flex-1 flex items-center justify-center px-4 py-8 relative">
+        <div className="px-2 pt-2 pb-1">
           <div
-            className="relative w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl"
+            className="relative w-full max-w-sm mx-auto aspect-[9/16] max-h-[70vh] rounded-2xl overflow-hidden shadow-xl"
             style={{
-              borderRadius: '24px',
-              boxShadow: '0 20px 60px rgba(39, 38, 98, 0.3)',
+              borderRadius: '20px',
+              boxShadow: '0 8px 40px rgba(39, 38, 98, 0.2)',
             }}
           >
             <Image
@@ -97,50 +97,50 @@ export function PhotoPost({
               style={{ cursor: 'pointer' }}
             />
 
-            <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-4 z-10">
+            <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-3 z-10">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/50 bg-white/10 flex items-center justify-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/50 bg-white/10 flex items-center justify-center flex-shrink-0">
                     {post.author.foto && (post.author.foto.startsWith('http') || post.author.foto.startsWith('/')) ? (
                       <Image
                         src={post.author.foto}
                         alt={post.author.nome}
-                        width={40}
-                        height={40}
+                        width={32}
+                        height={32}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center">
-                        <span className="text-white font-bold text-xs">{post.author.nome.charAt(0).toUpperCase()}</span>
+                        <span className="text-white font-bold text-[10px]">{post.author.nome.charAt(0).toUpperCase()}</span>
                       </div>
                     )}
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-white font-bold text-sm">{post.author.nome}</p>
-                    <p className="text-white/70 text-xs">{post.author.cargo}</p>
+                    <p className="text-white font-bold text-xs">{post.author.nome}</p>
+                    <p className="text-white/70 text-[10px]">{post.author.cargo}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => onShowOptions(post.id)}
-                  className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition text-white"
+                  className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition text-white"
                 >
-                  <MoreHorizontal size={18} />
+                  <MoreHorizontal size={16} />
                 </button>
               </div>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 z-10">
-              <div className="space-y-3">
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 z-10">
+              <div className="space-y-2">
                 {post.label && (
-                  <p className="text-white text-sm font-medium line-clamp-3">{post.label}</p>
+                  <p className="text-white text-xs font-medium line-clamp-2">{post.label}</p>
                 )}
-                <div className="flex gap-4 text-xs text-white/80">
+                <div className="flex gap-3 text-[11px] text-white/80">
                   <span className="font-semibold">{likesCount} curtidas</span>
                   <span className="font-semibold">{commentsCount} comentários</span>
                 </div>
                 <button
                   onClick={onLike}
-                  className={`w-full py-2.5 rounded-xl font-bold transition transform hover:scale-105 flex items-center justify-center gap-2 ${
+                  className={`w-full py-2 rounded-xl font-bold transition transform hover:scale-105 flex items-center justify-center gap-2 text-sm ${
                     liked
                       ? 'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/50'
                       : 'bg-white/20 text-white hover:bg-white/30'
@@ -149,8 +149,8 @@ export function PhotoPost({
                   <Image
                     src="/icons/like.png"
                     alt="Curtir"
-                    width={18}
-                    height={18}
+                    width={16}
+                    height={16}
                     className={liked ? 'brightness-0 invert' : 'opacity-80'}
                   />
                   Curtir
@@ -164,17 +164,31 @@ export function PhotoPost({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') onComment(post.id)
                     }}
-                    className="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-sm font-medium"
+                    className="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-xs font-medium"
                   />
                   <button
                     onClick={() => onComment(post.id)}
-                    className="p-2 rounded-lg bg-[var(--accent)] text-white hover:shadow-lg transition"
+                    className="p-1.5 rounded-lg bg-[var(--accent)] text-white hover:shadow-lg transition"
                   >
-                    <Send size={16} />
+                    <Send size={14} />
                   </button>
                 </div>
               </div>
             </div>
+          </div>
+
+          {likesCount > 0 && (
+            <div className="text-[10px] text-neutral-400 leading-tight mt-1 px-1">
+              {(() => {
+                const shuffled = [...likers].sort(() => Math.random() - 0.5)
+                const names = shuffled.slice(0, 3).map((like) => like.nome)
+                return `curtido por: ${names.join(", ")}${likers.length > 3 ? ", ..." : ""}`
+              })()}
+            </div>
+          )}
+
+          <div className="overflow-visible mt-1">
+            <CommentsBox postId={post.id} postAuthorId={post.author.id} />
           </div>
         </div>
       </div>

@@ -336,7 +336,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }
 
   return (
-    <section className="w-full max-w-3xl space-y-4 md:space-y-1" style={{scrollSnapType: 'y mandatory', scrollBehavior: 'smooth'}}>
+    <section className="w-full max-w-3xl space-y-1" style={{scrollSnapType: 'y mandatory', scrollBehavior: 'smooth'}}>
 
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
