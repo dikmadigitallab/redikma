@@ -13,6 +13,7 @@ import { LikeView } from "./likes-view"
 import { EditPostModal } from "./modal-edit-post"
 import { containsBadWords } from "@/lib/ofensivas"
 import { MoreHorizontal, Send } from "lucide-react"
+import { PhotoPost } from "./photo-post"
 
 type Post = {
   id: string
@@ -335,7 +336,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }
 
   return (
-    <section className="w-full max-w-3xl space-y-4 md:space-y-1">
+    <section className="w-full max-w-3xl space-y-4 md:space-y-1" style={{scrollSnapType: 'y mandatory', scrollBehavior: 'smooth'}}>
 
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
@@ -352,6 +353,32 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
         const liked = likedPosts[post.id] || false
         const postLikesCount = likesCount[post.id] || 0
         const isTooltipOpen = activeTooltip === post.id
+
+        // Renderizar PhotoPost se houver imagem, senão renderizar TextPost (atual)
+        if (post.image) {
+          return (
+            <PhotoPost
+              key={post.id}
+              post={post}
+              liked={liked}
+              likesCount={postLikesCount}
+              commentsCount={commentsCount[post.id] || 0}
+              currentComment={comments[post.id] || ''}
+              onLike={() => curtir(post.id, post.authorId)}
+              onComment={comentar}
+              onCommentChange={(postId, text) => setComments(prev => ({ ...prev, [postId]: text }))}
+              onOpenImage={handleOpenImage}
+              onShowOptions={(postId) => {
+                if (session?.user?.id === post.authorId) {
+                  // Aqui você pode abrir o menu de opções
+                  setActiveTooltip(postId)
+                } else {
+                  toast.info('Somente o criador do post poderá editá-lo')
+                }
+              }}
+            />
+          )
+        }
 
         return (
           <div
