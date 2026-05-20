@@ -364,6 +364,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               likesCount={postLikesCount}
               commentsCount={commentsCount[post.id] || 0}
               currentComment={comments[post.id] || ''}
+              likers={listOfLikes[post.id] || []}
               onLike={() => curtir(post.id, post.authorId)}
               onComment={comentar}
               onCommentChange={(postId, text) => setComments(prev => ({ ...prev, [postId]: text }))}
