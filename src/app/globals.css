@@ -1,6 +1,6 @@
-@import "tailwindcss";
 
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700;800;900&family=Red+Hat+Text:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
 :root {
   /* Cores Brand Dikma */

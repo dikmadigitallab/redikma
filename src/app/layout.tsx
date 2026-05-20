@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { Geist_Mono, Red_Hat_Display, Red_Hat_Text } from "next/font/google";
 import { Providers } from "@/components/Providers";
