@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useSession } from "next-auth/react"
-import Image from "next/image"
 import { Heart } from "lucide-react"
 
 type Props = {
