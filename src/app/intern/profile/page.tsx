@@ -1,13 +1,14 @@
 "use client"
 
 import { User } from "next-auth"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useEffect, useState, useRef } from "react"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Sidebar } from "@/app/components/sidebar"
 import {
   Camera,
+  ImagePlus,
   Mail,
   Phone,
   Lock,
@@ -31,6 +32,9 @@ function PerfilPageContent() {
   })
 
   const [preview, setPreview] = useState("")
+  const [showSourceOptions, setShowSourceOptions] = useState(false)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     async function fetchUser() {
@@ -64,6 +68,8 @@ function PerfilPageContent() {
     const file = e.target.files?.[0]
 
     if (!file) return
+
+    setShowSourceOptions(false)
 
     const previewUrl = URL.createObjectURL(file)
 
@@ -199,7 +205,7 @@ function PerfilPageContent() {
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 {/* Perfil */}
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="relative group flex-shrink-0">
+                  <div className="relative flex-shrink-0">
                     <img
                       src={
                         preview ||
@@ -211,22 +217,52 @@ function PerfilPageContent() {
                     />
 
                     <input
+                      ref={cameraInputRef}
                       type="file"
-                      id="upload-foto"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleFile}
+                      className="hidden"
+                    />
+                    <input
+                      ref={galleryInputRef}
+                      type="file"
                       accept="image/*"
                       onChange={handleFile}
                       className="hidden"
                     />
 
-                    <label
-                      htmlFor="upload-foto"
+                    <button
+                      type="button"
+                      onClick={() => setShowSourceOptions((prev) => !prev)}
                       className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-white border border-[var(--primary)] flex items-center justify-center cursor-pointer hover:bg-neutral-50 transition-all"
                     >
                       <Camera
                         size={16}
                         className="text-neutral-600"
                       />
-                    </label>
+                    </button>
+
+                    {showSourceOptions && (
+                      <div className="absolute bottom-12 right-0 bg-white border border-[var(--primary)] rounded-2xl shadow-xl p-2 z-50 min-w-[180px]">
+                        <button
+                          type="button"
+                          onClick={() => cameraInputRef.current?.click()}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold"
+                        >
+                          <Camera size={16} className="text-[var(--primary)]" />
+                          Câmera
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => galleryInputRef.current?.click()}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold"
+                        >
+                          <ImagePlus size={16} className="text-[var(--primary)]" />
+                          Galeria
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="text-center sm:text-left min-w-0">
