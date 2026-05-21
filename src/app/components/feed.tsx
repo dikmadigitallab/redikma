@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import Image from "next/image"
 import { CommentsBox } from "./comentarios"
 import { PostBar } from "./posts-bar"
 import { useSession } from "next-auth/react"
@@ -12,7 +11,7 @@ import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view"
 import { EditPostModal } from "./modal-edit-post"
 import { containsBadWords } from "@/lib/ofensivas"
-import { MoreHorizontal, Send } from "lucide-react"
+import { Heart, MessageCircle, MoreHorizontal, Send } from "lucide-react"
 import { PhotoPost } from "./photo-post"
 
 type Post = {
@@ -44,11 +43,9 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [refreshKey, setRefreshKey] = useState(0)
   const pathname = usePathname()
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null)
-  const [isTouchDevice, setIsTouchDevice] = useState(false)
-
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(() =>
+    typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  )
 
   const [editingPost, setEditingPost] = useState<{ id: string; label: string } | null>(null)
 
@@ -336,7 +333,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }
 
   return (
-    <section className="w-full max-w-3xl space-y-1" style={{scrollSnapType: 'y mandatory', scrollBehavior: 'smooth'}}>
+    <section className="w-full max-w-3xl space-y-1" style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth' }}>
 
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
@@ -365,18 +362,13 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               commentsCount={commentsCount[post.id] || 0}
               currentComment={comments[post.id] || ''}
               likers={listOfLikes[post.id] || []}
+              currentUserId={session?.user?.id}
               onLike={() => curtir(post.id, post.authorId)}
               onComment={comentar}
               onCommentChange={(postId, text) => setComments(prev => ({ ...prev, [postId]: text }))}
               onOpenImage={handleOpenImage}
-              onShowOptions={(postId) => {
-                if (session?.user?.id === post.authorId) {
-                  // Aqui você pode abrir o menu de opções
-                  setActiveTooltip(postId)
-                } else {
-                  toast.info('Somente o criador do post poderá editá-lo')
-                }
-              }}
+              onDelete={handleDeletePost}
+              onEdit={handleEditPost}
             />
           )
         }
@@ -403,25 +395,27 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
             {/* Menu de opções */}
             {session?.user?.id === post.author.id ? (
-              <div className="absolute top-4 right-4 z-20">
-                <PostOptions
-                  postId={post.id}
-                  onDelete={handleDeletePost}
-                  onEdit={handleEditPost}
-                />
-              </div>
-
-            ) : (
-              <>
-                <div className="absolute top-4 right-4 z-20">
-                  <button
-                    className="text-[var(--primary)] hover:bg-[var(--primary-10)] p-1 rounded-full transition-colors flex items-center justify-center select-none"
-                    onClick={() => { toast.info('Somente o criador do post poderá edita-lo') }}
-                  >
-                    <MoreHorizontal size={24} />
-                  </button>
+              <div className="absolute top-4 right-4 z-50 overflow-visible">
+                <div onClick={(e) => e.stopPropagation()}>
+                  <PostOptions
+                    postId={post.id}
+                    onDelete={handleDeletePost}
+                    onEdit={handleEditPost}
+                  />
                 </div>
-              </>
+              </div>
+            ) : (
+              <div className="absolute top-4 right-4 z-50 overflow-visible">
+                <button
+                  className="text-[var(--primary)] hover:bg-[var(--primary-10)] p-1 rounded-full transition-colors flex items-center justify-center select-none"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toast.info("Somente o criador do post poderá editá-lo")
+                  }}
+                >
+                  <MoreHorizontal size={24} />
+                </button>
+              </div>
             )}
 
 
@@ -628,7 +622,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       className="flex items-center gap-2 transition-all hover:opacity-80"
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 font-bold ${liked ? "scale-110 bg-[var(--accent)]" : "bg-[var(--primary-10)]"
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${liked ? "scale-110 bg-[var(--accent)]" : "bg-[var(--primary-10)]"
                           }`}
                         style={{
                           backgroundColor: liked
@@ -636,15 +630,12 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                             : "var(--primary-10)",
                         }}
                       >
-                        <Image
-                          src="/icons/like.png"
-                          alt="Curtir"
-                          width={18}
-                          height={18}
-                          className={`transition-all duration-300 ${liked
-                            ? "opacity-100 scale-110"
-                            : "opacity-60"
+                        <Heart
+                          size={18}
+                          className={`transition-all duration-300 ${liked ? "scale-110" : "opacity-60"
                             }`}
+                          color={liked ? "var(--white)" : "var(--gray)"}
+                          fill={liked ? "var(--white)" : "transparent"}
                         />
                       </div>
 
@@ -661,7 +652,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     </button>
 
                     <>
-                    {/* Tooltip - exibe apenas em telas >= 768px */ }
+                      {/* Tooltip - exibe apenas em telas >= 768px */}
                       {typeof window !== "undefined" &&
                         window.innerWidth >= 768 &&
                         isTooltipOpen &&
@@ -708,12 +699,10 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                           "var(--primary-10)",
                       }}
                     >
-                      <Image
-                        src="/icons/coments.png"
-                        alt="Comentários"
-                        width={18}
-                        height={18}
+                      <MessageCircle
+                        size={18}
                         className="opacity-70"
+                        color="var(--gray)"
                       />
                     </div>
 
