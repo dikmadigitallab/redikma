@@ -47,7 +47,7 @@ export function ImageModal({ image, open, onClose, postId, authorId }: Props) {
       if (!res.ok) return
 
       setHeartBurst(true)
-      setTimeout(() => setHeartBurst(false), 800)
+      setTimeout(() => setHeartBurst(false), 500)
     } catch {}
   }
 
@@ -103,8 +103,8 @@ export function ImageModal({ image, open, onClose, postId, authorId }: Props) {
             <div className="animate-heart-burst">
               <Heart
                 size={80}
-                className="opacity-90 text-white"
-                fill="white"
+                className="opacity-90 text-[#EF5C28]"
+                fill="#EF5C28"
               />
             </div>
           </div>
