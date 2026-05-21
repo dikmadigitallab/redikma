@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useSession } from "next-auth/react"
-import Image from "next/image"
+import { Heart } from "lucide-react"
 
 type Props = {
   image: string | null
@@ -46,7 +46,7 @@ export function ImageModal({ image, open, onClose, postId, authorId }: Props) {
       if (!res.ok) return
 
       setHeartBurst(true)
-      setTimeout(() => setHeartBurst(false), 800)
+      setTimeout(() => setHeartBurst(false), 500)
     } catch {}
   }
 
@@ -100,12 +100,10 @@ export function ImageModal({ image, open, onClose, postId, authorId }: Props) {
         {heartBurst && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
             <div className="animate-heart-burst">
-              <Image
-                src="/icons/like.png"
-                alt="Curtir"
-                width={80}
-                height={80}
-                className="opacity-90"
+              <Heart
+                size={80}
+                className="opacity-90 text-[#EF5C28]"
+                fill="#EF5C28"
               />
             </div>
           </div>

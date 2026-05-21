@@ -1,10 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import { MoreHorizontal, Send } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Heart, MessageCircle, Send } from 'lucide-react'
+import { useEffect, useState, type SyntheticEvent } from 'react'
 import { LikeView } from './likes-view'
 import { CommentsBox } from './comentarios'
+import { PostOptions } from './postDelete'
 
 type Liker = {
   id: string
@@ -35,7 +36,9 @@ type PhotoPostProps = {
   onComment: (postId: string) => void
   onCommentChange: (postId: string, text: string) => void
   onOpenImage: (image: string, postId: string, authorId: string) => void
-  onShowOptions: (postId: string) => void
+  currentUserId?: string
+  onDelete: (postId: string) => void
+  onEdit?: (postId: string) => void
 }
 
 export function PhotoPost({
@@ -45,20 +48,25 @@ export function PhotoPost({
   commentsCount,
   currentComment,
   likers,
+  currentUserId,
   onLike,
   onComment,
   onCommentChange,
   onOpenImage,
-  onShowOptions,
+  onDelete,
+  onEdit,
 }: PhotoPostProps) {
+  const isAuthor = currentUserId === post.author.id
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
   const [tooltipOpen, setTooltipOpen] = useState(false)
-  const [isTouchDevice, setIsTouchDevice] = useState(false)
-
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
+  const [isTouchDevice] = useState<boolean>(() => {
+    try {
+      return typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+    } catch (e) {
+      return false
+    }
+  })
 
   const handleImageLoad = (e: any) => {
     setImageLoaded(true)
@@ -119,57 +127,63 @@ export function PhotoPost({
                     <p className="text-white/70 text-[10px]">{post.author.cargo}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => onShowOptions(post.id)}
-                  className="p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition text-white"
-                >
-                  <MoreHorizontal size={16} />
-                </button>
+                {isAuthor ? (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <PostOptions
+                      postId={post.id}
+                      onDelete={onDelete}
+                      onEdit={onEdit}
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 z-10">
-              <div className="space-y-2">
-                <div className="flex gap-3 text-[11px] text-white/80">
-                  <span className="font-semibold">{likesCount} curtidas</span>
-                  <span className="font-semibold">{commentsCount} comentários</span>
-                </div>
-                <button
-                  onClick={onLike}
-                  className={`w-full py-2 rounded-xl font-bold transition transform hover:scale-105 flex items-center justify-center gap-2 text-sm ${
-                    liked
-                      ? 'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/50'
-                      : 'bg-white/20 text-white hover:bg-white/30'
-                  }`}
-                >
-                  <Image
-                    src="/icons/like.png"
-                    alt="Curtir"
-                    width={16}
-                    height={16}
-                    className={liked ? 'brightness-0 invert' : 'opacity-80'}
-                  />
-                  Curtir
-                </button>
-                <div className="flex gap-2 bg-white/20 rounded-xl p-1.5 backdrop-blur-sm">
-                  <input
-                    type="text"
-                    placeholder="Comentar..."
-                    value={currentComment}
-                    onChange={(e) => onCommentChange(post.id, e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') onComment(post.id)
-                    }}
-                    className="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-xs font-medium"
-                  />
-                  <button
-                    onClick={() => onComment(post.id)}
-                    className="p-1.5 rounded-lg bg-[var(--accent)] text-white hover:shadow-lg transition"
-                  >
-                    <Send size={14} />
-                  </button>
-                </div>
-              </div>
+<div className="space-y-2">
+  <div className="flex gap-3 text-[11px] text-white/80">
+    <span className="font-semibold">{likesCount} curtidas</span>
+    <span className="font-semibold">{commentsCount} comentários</span>
+  </div>
+
+  <div className="flex gap-2 items-stretch">
+    <button
+      onClick={onLike}
+      className={`h-auto px-4 rounded-xl font-bold transition transform hover:scale-105 flex items-center justify-center ${
+        liked
+          ? "bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/50"
+          : "bg-white/20 text-white hover:bg-white/30"
+      }`}
+    >
+      <Heart
+        size={16}
+        className={liked ? "" : "opacity-80"}
+        color="white"
+        fill={liked ? "white" : "transparent"}
+      />
+    </button>
+
+    <div className="flex-1 flex gap-2 bg-white/20 rounded-xl p-1.5 backdrop-blur-sm">
+      <input
+        type="text"
+        placeholder="Comentar..."
+        value={currentComment}
+        onChange={(e) => onCommentChange(post.id, e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") onComment(post.id)
+        }}
+        className="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-xs font-medium"
+      />
+
+      <button
+        onClick={() => onComment(post.id)}
+        className="p-1.5 rounded-lg bg-[var(--accent)] text-white hover:shadow-lg transition"
+      >
+        <Send size={14} />
+      </button>
+    </div>
+  </div>
+</div>
             </div>
           </div>
 
@@ -213,14 +227,15 @@ export function PhotoPost({
               "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
           }}
         />
-        <div className="absolute top-4 right-4 z-20">
-          <button
-            onClick={() => onShowOptions(post.id)}
-            className="p-1 rounded-full hover:bg-[var(--primary-10)] transition-colors"
-          >
-            <MoreHorizontal size={20} />
-          </button>
-        </div>
+        {isAuthor ? (
+          <div className="absolute top-4 right-4 z-20" onClick={(e) => e.stopPropagation()}>
+            <PostOptions
+              postId={post.id}
+              onDelete={onDelete}
+              onEdit={onEdit}
+            />
+          </div>
+        ) : null}
         <div className="p-4 md:p-5 space-y-4">
           <div className="flex items-start gap-3 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
             <div className="relative flex-shrink-0">
@@ -338,12 +353,10 @@ export function PhotoPost({
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 font-bold ${liked ? "scale-110 bg-[var(--accent)]" : "bg-[var(--primary-10)]"}`}
                   >
-                    <Image
-                      src="/icons/like.png"
-                      alt="Curtir"
-                      width={18}
-                      height={18}
-                      className={`transition-all duration-300 ${liked ? "opacity-100 scale-110" : "opacity-60"}`}
+                    <Heart
+                      size={18}
+                      className={`transition-all duration-300 ${liked ? "opacity-100 scale-110 text-white" : "opacity-60"}`}
+                      fill={liked ? "white" : "transparent"}
                     />
                   </div>
                   <span
@@ -384,11 +397,8 @@ export function PhotoPost({
                   className="w-10 h-10 rounded-full flex items-center justify-center transition hover:bg-[var(--primary-20)]"
                   style={{ backgroundColor: "var(--primary-10)" }}
                 >
-                  <Image
-                    src="/icons/coments.png"
-                    alt="Comentários"
-                    width={18}
-                    height={18}
+                  <MessageCircle
+                    size={18}
                     className="opacity-70"
                   />
                 </div>

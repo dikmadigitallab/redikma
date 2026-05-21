@@ -91,6 +91,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
     canvas.height = video.videoHeight
     const ctx = canvas.getContext("2d")
     if (!ctx) return
+    if (facingMode === "user") {
+      ctx.translate(canvas.width, 0)
+      ctx.scale(-1, 1)
+    }
     ctx.drawImage(video, 0, 0)
 
     canvas.toBlob(blob => {
@@ -207,6 +211,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         playsInline
                         muted
                         className="w-full aspect-[3/4] max-h-[40vh] sm:max-h-[60vh] object-cover"
+                        style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
                       />
                       <button
                         onClick={toggleCamera}

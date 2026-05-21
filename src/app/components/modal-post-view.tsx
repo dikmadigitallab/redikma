@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Edit3 } from "lucide-react";
+import { X, Edit3, MessageCircle, Heart } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 
@@ -103,7 +103,7 @@ export function PostViewModal({ postId, onClose }: Props) {
         if (user?.id && data.likes) {
           setLiked(data.likes.some((l: { userId: string }) => l.userId === user.id));
         }
-      } catch {}
+      } catch { }
     }
 
     async function loadLikers() {
@@ -112,7 +112,7 @@ export function PostViewModal({ postId, onClose }: Props) {
         if (!res.ok) return;
         const data = await res.json();
         setLikers(data.likers || []);
-      } catch {}
+      } catch { }
     }
 
     async function loadCommentsCount() {
@@ -121,7 +121,7 @@ export function PostViewModal({ postId, onClose }: Props) {
         if (!res.ok) return;
         const data = await res.json();
         setCommentsCount(data.total || data.count || 0);
-      } catch {}
+      } catch { }
     }
 
     loadLikes();
@@ -142,7 +142,7 @@ export function PostViewModal({ postId, onClose }: Props) {
 
       setLiked(!liked);
       setLikesCount((prev) => (liked ? Math.max(prev - 1, 0) : prev + 1));
-    } catch {}
+    } catch { }
   }
 
   function renderTextWithLinks(text: string) {
@@ -220,33 +220,33 @@ export function PostViewModal({ postId, onClose }: Props) {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate" style={{ color: "var(--black)" }}>
-                      {post.author.nome}
+                  <p className="text-sm font-semibold truncate" style={{ color: "var(--black)" }}>
+                    {post.author.nome}
+                  </p>
+                  <p className="text-xs truncate mt-0.5" style={{ color: "var(--gray)" }}>
+                    {post.postador}
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{ backgroundColor: "var(--success)" }}
+                    />
+                    <p className="text-[11px] font-medium" style={{ color: "var(--gray)" }}>
+                      {new Date(post.createdAt).toLocaleString("pt-BR")}
                     </p>
-                    <p className="text-xs truncate mt-0.5" style={{ color: "var(--gray)" }}>
-                      {post.postador}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{ backgroundColor: "var(--success)" }}
-                      />
-                      <p className="text-[11px] font-medium" style={{ color: "var(--gray)" }}>
-                        {new Date(post.createdAt).toLocaleString("pt-BR")}
-                      </p>
-                    </div>
                   </div>
-
-                  {user?.id === post.authorId && (
-                    <button
-                      onClick={() => setEditingPost({ id: post.id, label: post.label })}
-                      className="flex-shrink-0 p-2 rounded-full hover:bg-[var(--primary-10)] transition"
-                      title="Editar post"
-                    >
-                      <Edit3 size={16} />
-                    </button>
-                  )}
                 </div>
+
+                {user?.id === post.authorId && (
+                  <button
+                    onClick={() => setEditingPost({ id: post.id, label: post.label })}
+                    className="flex-shrink-0 p-2 rounded-full hover:bg-[var(--primary-10)] transition"
+                    title="Editar post"
+                  >
+                    <Edit3 size={16} />
+                  </button>
+                )}
+              </div>
 
               {/* Texto */}
               {post.label && (
@@ -302,23 +302,19 @@ export function PostViewModal({ postId, onClose }: Props) {
                   className="flex items-center gap-2 transition-all hover:opacity-80"
                 >
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      liked ? "scale-105" : ""
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${liked ? "scale-105" : ""
+                      }`}
                     style={{
                       backgroundColor: liked
                         ? "rgba(255, 0, 85, 0.12)"
                         : "rgba(79, 195, 217, 0.08)",
                     }}
                   >
-                    <Image
-                      src="/icons/like.png"
-                      alt="Curtir"
-                      width={18}
-                      height={18}
-                      className={`transition-all duration-300 ${
-                        liked ? "opacity-100 scale-110" : "opacity-60"
-                      }`}
+                    <Heart
+                      size={18}
+                      className={`transition-all duration-300 ${liked ? "opacity-100 scale-110 text-[var(--accent)]" : "opacity-60"
+                        }`}
+                      fill={liked ? "var(--accent)" : "transparent"}
                     />
                   </div>
 
@@ -336,12 +332,9 @@ export function PostViewModal({ postId, onClose }: Props) {
                     className="w-10 h-10 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: "rgba(79, 195, 217, 0.08)" }}
                   >
-                    <Image
-                      src="/icons/coments.png"
-                      alt="Comentários"
-                      width={18}
-                      height={18}
-                      className="opacity-70"
+                    <MessageCircle
+                      size={18}
+                      className="text-gray-400 opacity-70"
                     />
                   </div>
                   <span className="text-sm font-semibold" style={{ color: "var(--gray)" }}>
