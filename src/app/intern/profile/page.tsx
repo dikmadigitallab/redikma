@@ -199,7 +199,7 @@ function PerfilPageContent() {
 
       <main className="flex-1 overflow-y-auto px-3 py-4 md:px-8 md:py-8 pb-24 sm:pb-8">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white border border-[var(--primary)] rounded-[28px] overflow-hidden shadow-sm">
+          <div className="bg-white border border-[var(--primary)] rounded-[28px] shadow-sm">
             {/* Topo */}
             <div className="px-5 md:px-8 py-7 border-b border-neutral-100 bg-[#fafcff]">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
