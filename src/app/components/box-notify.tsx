@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { usePostModal } from "../providers/PostModalContext";
+import Image from "next/image";
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -14,13 +15,16 @@ function timeAgo(dateStr: string): string {
   if (diffSec < 60) return `há ${diffSec} segundos atrás`;
 
   const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return diffMin === 1 ? "há 1 minuto atrás" : `há ${diffMin} minutos atrás`;
+  if (diffMin < 60)
+    return diffMin === 1 ? "há 1 minuto atrás" : `há ${diffMin} minutos atrás`;
 
   const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return diffH === 1 ? "há 1 hora atrás" : `há ${diffH} horas atrás`;
+  if (diffH < 24)
+    return diffH === 1 ? "há 1 hora atrás" : `há ${diffH} horas atrás`;
 
   const diffD = Math.floor(diffH / 24);
-  if (diffD < 7) return diffD === 1 ? "há 1 dia atrás" : `há ${diffD} dias atrás`;
+  if (diffD < 7)
+    return diffD === 1 ? "há 1 dia atrás" : `há ${diffD} dias atrás`;
 
   if (diffD === 7) return "há 1 semana atrás";
 
@@ -68,7 +72,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
           setNotifications(parsed);
           setLoading(false);
         }
-      } catch { }
+      } catch {}
     }
 
     // 2. Busca notificações da API (sem deletar do banco)
@@ -99,7 +103,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
           // 3. Após salvar no localStorage, deleta do banco
           fetch(`/api/notifications?clearAll=true&userId=${userId}`, {
             method: "DELETE",
-          }).catch(() => { });
+          }).catch(() => {});
         } else {
           localStorage.setItem(lastSeenKey, new Date().toISOString());
         }
@@ -130,18 +134,18 @@ export function NotificationsBox({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="w-80 bg-white border border-[var(--primary)] shadow-xl rounded-xl overflow-hidden">
+    <div className="w-80 bg-white border border-primary shadow-xl rounded-xl overflow-hidden">
       <div className="p-3 border-b font-medium text-neutral-800 bg-neutral-50 flex justify-between items-center">
         <span>Notificações</span>
       </div>
 
       <div className="max-h-96 overflow-y-auto">
         {loading ? (
-          <div className="p-6 flex justify-center text-sm text-[var(--primary)]">
+          <div className="p-6 flex justify-center text-sm text-primary">
             Carregando notificações...
           </div>
         ) : notifications.length === 0 ? (
-          <div className="p-6 text-center text-sm text-[var(--primary)]">
+          <div className="p-6 text-center text-sm text-primary">
             Nenhuma notificação por enquanto.
           </div>
         ) : (
@@ -159,18 +163,20 @@ export function NotificationsBox({ userId }: { userId: string }) {
                   }}
                   className="flex items-start gap-3 flex-1 min-w-0 text-left"
                 >
-                  <img
-                    src={
-                      n.actor?.foto ||
-                      "/photoProfile/userDefault.png"
-                    }
+                  <Image
+                    src={n.actor?.foto || "/photoProfile/userDefault.png"}
                     alt={n.actor?.nome || "Usuário"}
+                    width={32}
+                    height={32}
+                    loading="lazy"
+                    quality={100}
+                    draggable={false}
                     className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
                   />
 
                   <div className="flex-1 min-w-0">
                     <div className="text-neutral-800 truncate">{n.title}</div>
-                    <div className="text-[var(--primary)] text-xs mt-0.5 truncate">
+                    <div className="text-primary text-xs mt-0.5 truncate">
                       {n.message}
                     </div>
                     <div className="text-neutral-400 text-[10px] mt-1">

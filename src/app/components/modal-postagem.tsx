@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
+import Image from "next/image"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -122,7 +123,7 @@ if (!trimmedText && !image) {
           style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)', fontFamily: "'Red Hat Text', sans-serif" }}
         />
 
-        <div className="rounded-xl p-4 text-center space-y-3 transition hover:bg-[var(--primary-10)]" style={{ border: `3px dashed var(--primary)` }}>
+        <div className="rounded-xl p-4 text-center space-y-3 transition hover:bg-primary-10" style={{ border: `3px dashed var(--primary)` }}>
 
           {!preview && (
             <>
@@ -143,11 +144,16 @@ if (!trimmedText && !image) {
 
           {preview && (
             <div className="space-y-2">
-              <img
-                src={preview}
-                alt="preview"
-                className="w-full h-56 object-cover rounded-xl"
-              />
+             <Image
+  src={preview}
+  alt="preview"
+  width={1200}
+  height={600}
+  loading="lazy"
+  quality={100}
+  draggable={false}
+  className="w-full h-56 object-cover rounded-xl"
+/>
 
               <button
                 type="button"

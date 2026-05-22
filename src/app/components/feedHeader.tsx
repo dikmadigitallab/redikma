@@ -13,6 +13,7 @@ import { signOut, useSession } from "next-auth/react"
 import { NotificationsBox } from "./box-notify"
 import { FaUserDoctor } from "react-icons/fa6"
 import { FaHeadset } from "react-icons/fa"
+import Image from "next/image"
 
 type SessionUser = {
   id?: string
@@ -205,11 +206,16 @@ export function Header() {
           className="flex items-center gap-3 cursor-pointer shrink-0"
         >
           <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shadow-lg bg-white border-2 border-white">
-            <img
-              src="/icons/redikma_logo.png"
-              alt="logotipo ReDikma"
-              className="w-full h-full object-contain"
-            />
+<Image
+  src="/icons/redikma_logo.png"
+  alt="logotipo ReDikma"
+  width={300}
+  height={300}
+  priority
+  quality={100}
+  draggable={false}
+  className="w-full h-full object-contain"
+/>
           </div>
 
           <div className="leading-tight">
@@ -232,13 +238,13 @@ export function Header() {
               onClick={() =>
                 setOpenSearch(!openSearch)
               }
-              className="w-9 h-9 flex items-center justify-center rounded-full text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
+              className="w-9 h-9 flex items-center justify-center rounded-full text-primary hover:bg-primary-10 transition"
             >
               <Search size={18} />
             </button>
 
             {openSearch && (
-              <div className="absolute right-0 mt-3 w-[360px] max-w-[calc(100vw-2rem)] bg-white border border-[var(--primary)] rounded-2xl shadow-2xl overflow-hidden z-50">
+              <div className="absolute right-0 mt-3 w-360p] max-w-[calc(100vw-2rem)] bg-white border border-primary rounded-2xl shadow-2xl overflow-hidden z-50">
                 <div className="p-3 border-b border-neutral-100">
                   <input
                     type="text"
@@ -247,14 +253,14 @@ export function Header() {
                     onChange={(e) =>
                       setSearch(e.target.value)
                     }
-                    className="w-full h-11 px-4 rounded-xl border-2 border-[var(--primary)] outline-none text-sm focus:border-[var(--primary)] font-medium"
+                    className="w-full h-11 px-4 rounded-xl border-2 border-primary outline-none text-sm focus:border-primary font-medium"
                     style={{fontFamily: "'Red Hat Text', sans-serif"}}
                   />
                 </div>
 
-                <div className="max-h-[420px] overflow-y-auto">
+                <div className="max-h-420px overflow-y-auto">
                   {loading && (
-                    <div className="p-4 text-sm text-[var(--primary)]">
+                    <div className="p-4 text-sm text-[varprimary">
                       Buscando...
                     </div>
                   )}
@@ -262,7 +268,7 @@ export function Header() {
                   {!loading &&
                     results.length === 0 &&
                     search && (
-                      <div className="p-4 text-sm text-[var(--primary)]">
+                      <div className="p-4 text-sm text-primary">
                         Nenhuma publicação
                         encontrada
                       </div>
@@ -315,11 +321,16 @@ export function Header() {
                             }}
                             className="relative aspect-square overflow-hidden bg-neutral-100 group"
                           >
-                            <img
-                              src={post.image}
-                              alt=""
-                              className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                            />
+<Image
+  src={post.image}
+  alt=""
+  width={600}
+  height={600}
+  loading="lazy"
+  quality={100}
+  draggable={false}
+  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+/>
 
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition" />
                           </button>
@@ -342,8 +353,8 @@ export function Header() {
                 }
                 className={`w-9 h-9 flex items-center justify-center rounded-full relative transition font-bold ${
                   unreadCount > 0
-                    ? "text-white bg-[var(--accent)] shadow-lg hover:shadow-xl"
-                    : "text-neutral-600 hover:bg-[var(--primary-10)] hover:text-[var(--primary)]"
+                    ? "text-white bg-accent shadow-lg hover:shadow-xl"
+                    : "text-neutral-600 hover:bg-[varprimary-10 hover:text-primary"
                 }`}
               >
                 <Bell
@@ -382,21 +393,26 @@ export function Header() {
               onClick={() =>
                 setOpen(!open)
               }
-              className="w-9 h-9 rounded-full overflow-hidden border border-[var(--primary)]"
+              className="w-9 h-9 rounded-full overflow-hidden border border-primary"
             >
-              <img
-                src={
-                  user?.foto ||
-                  "/photoProfile/userDefault.png"
-                }
-                alt="Foto do usuário"
-                className="w-full h-full object-cover"
-              />
+<Image
+  src={
+    user?.foto ||
+    "/photoProfile/userDefault.png"
+  }
+  alt="Foto do usuário"
+  width={200}
+  height={200}
+  loading="lazy"
+  quality={100}
+  draggable={false}
+  className="w-full h-full object-cover"
+/>
             </button>
 
             {open && (
-              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border-2 border-[var(--primary)] shadow-xl overflow-hidden z-50">
-                <div className="py-2 border-b-2 border-[var(--primary-10)]">
+              <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl border-2 border-primary shadow-xl overflow-hidden z-50">
+                <div className="py-2 border-b-2 border-primary-10">
                   <button
                     onClick={() => {
                       setOpen(false)
@@ -404,7 +420,7 @@ export function Header() {
                         "/intern/profile"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-10 transition"
                   >
                     <User size={18} />
                     Perfil
@@ -417,14 +433,14 @@ export function Header() {
                         "/intern/feed"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-10 transition"
                   >
                     <Rss size={18} />
                     Feed
                   </button>
                 </div>
 
-                <div className="border-t-2 border-[var(--primary-10)] py-2">
+                <div className="border-t-2 border-primary-10 py-2">
                   <button
                     onClick={() => {
                       setOpen(false)
@@ -433,7 +449,7 @@ export function Header() {
                         "_blank"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-10 transition"
                   >
                     <FaUserDoctor size={18} />
                     Telemedicina
@@ -447,14 +463,14 @@ export function Header() {
                         "_blank"
                       )
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-[var(--primary-10)] transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-10 transition"
                   >
                     <FaHeadset size={18} />
                     Ouvidoria Dikma
                   </button>
                 </div>
 
-                <div className="border-t-2 border-[var(--accent)] py-2">
+                <div className="border-t-2 border-accent py-2">
                   <button
                     onClick={() => {
                       setOpen(false)
@@ -463,7 +479,7 @@ export function Header() {
                           "/login",
                       })
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-bold text-white bg-[var(--accent)] hover:shadow-lg transition"
+                    className="flex items-center gap-3 w-full px-4 py-2 text-sm font-bold text-white bg-accent hover:shadow-lg transition"
                   >
                     <LogOut size={18} />
                     Sair

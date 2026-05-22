@@ -58,7 +58,10 @@ export function PostViewModal({ postId, onClose }: Props) {
   const [showLikers, setShowLikers] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [editingPost, setEditingPost] = useState<{ id: string; label: string } | null>(null);
+  const [editingPost, setEditingPost] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -96,32 +99,40 @@ export function PostViewModal({ postId, onClose }: Props) {
 
     async function loadLikes() {
       try {
-        const res = await fetch(`/api/posts/posts-likes?postId=${pid}`, { cache: "no-store" });
+        const res = await fetch(`/api/posts/posts-likes?postId=${pid}`, {
+          cache: "no-store",
+        });
         if (!res.ok) return;
         const data = await res.json();
         setLikesCount(data.total || 0);
         if (user?.id && data.likes) {
-          setLiked(data.likes.some((l: { userId: string }) => l.userId === user.id));
+          setLiked(
+            data.likes.some((l: { userId: string }) => l.userId === user.id),
+          );
         }
-      } catch { }
+      } catch {}
     }
 
     async function loadLikers() {
       try {
-        const res = await fetch(`/api/posts/list-likes?postId=${pid}`, { cache: "no-store" });
+        const res = await fetch(`/api/posts/list-likes?postId=${pid}`, {
+          cache: "no-store",
+        });
         if (!res.ok) return;
         const data = await res.json();
         setLikers(data.likers || []);
-      } catch { }
+      } catch {}
     }
 
     async function loadCommentsCount() {
       try {
-        const res = await fetch(`/api/posts/comments-count?postId=${pid}`, { cache: "no-store" });
+        const res = await fetch(`/api/posts/comments-count?postId=${pid}`, {
+          cache: "no-store",
+        });
         if (!res.ok) return;
         const data = await res.json();
         setCommentsCount(data.total || data.count || 0);
-      } catch { }
+      } catch {}
     }
 
     loadLikes();
@@ -142,19 +153,25 @@ export function PostViewModal({ postId, onClose }: Props) {
 
       setLiked(!liked);
       setLikesCount((prev) => (liked ? Math.max(prev - 1, 0) : prev + 1));
-    } catch { }
+    } catch {}
   }
 
   function renderTextWithLinks(text: string) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return text.split(urlRegex).map((part, i) =>
       urlRegex.test(part) ? (
-        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all hover:text-blue-800">
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline break-all hover:text-blue-800"
+        >
           {part}
         </a>
       ) : (
         <span key={i}>{part}</span>
-      )
+      ),
     );
   }
 
@@ -162,12 +179,15 @@ export function PostViewModal({ postId, onClose }: Props) {
     <>
       <style>{scrollStyles}</style>
       <div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+        className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
         onClick={onClose}
       >
         <div
           className="modal-scroll relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border shadow-2xl animate-in fade-in zoom-in-95 duration-200"
-          style={{ backgroundColor: "var(--white)", borderColor: "var(--border)" }}
+          style={{
+            backgroundColor: "var(--white)",
+            borderColor: "var(--border)",
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Barra decorativa */}
@@ -196,7 +216,10 @@ export function PostViewModal({ postId, onClose }: Props) {
               />
             </div>
           ) : !post ? (
-            <div className="text-center py-20 text-sm" style={{ color: "var(--gray)" }}>
+            <div
+              className="text-center py-20 text-sm"
+              style={{ color: "var(--gray)" }}
+            >
               Post não encontrado
             </div>
           ) : (
@@ -206,24 +229,40 @@ export function PostViewModal({ postId, onClose }: Props) {
                 className="flex items-start gap-3 pb-4 border-b"
                 style={{ borderColor: "var(--border)" }}
               >
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <div
                     className="absolute -inset-1 rounded-full opacity-15"
                     style={{ backgroundColor: "var(--secondary)" }}
                   />
-                  <img
-                    src={post.author.foto || "/photoProfile/userDefault.png"}
-                    alt={post.author.nome}
-                    className="relative w-10 h-10 rounded-full object-cover border-2"
-                    style={{ borderColor: "var(--white)" }}
-                  />
+<Image
+  src={
+    post.author.foto ||
+    "/photoProfile/userDefault.png"
+  }
+  alt={post.author.nome}
+  width={40}
+  height={40}
+  loading="lazy"
+  quality={100}
+  draggable={false}
+  className="relative w-10 h-10 rounded-full object-cover border-2"
+  style={{
+    borderColor: "var(--white)",
+  }}
+/>
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate" style={{ color: "var(--black)" }}>
+                  <p
+                    className="text-sm font-semibold truncate"
+                    style={{ color: "var(--black)" }}
+                  >
                     {post.author.nome}
                   </p>
-                  <p className="text-xs truncate mt-0.5" style={{ color: "var(--gray)" }}>
+                  <p
+                    className="text-xs truncate mt-0.5"
+                    style={{ color: "var(--gray)" }}
+                  >
                     {post.postador}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
@@ -231,7 +270,10 @@ export function PostViewModal({ postId, onClose }: Props) {
                       className="w-1.5 h-1.5 rounded-full"
                       style={{ backgroundColor: "var(--success)" }}
                     />
-                    <p className="text-[11px] font-medium" style={{ color: "var(--gray)" }}>
+                    <p
+                      className="text-[11px] font-medium"
+                      style={{ color: "var(--gray)" }}
+                    >
                       {new Date(post.createdAt).toLocaleString("pt-BR")}
                     </p>
                   </div>
@@ -239,8 +281,10 @@ export function PostViewModal({ postId, onClose }: Props) {
 
                 {user?.id === post.authorId && (
                   <button
-                    onClick={() => setEditingPost({ id: post.id, label: post.label })}
-                    className="flex-shrink-0 p-2 rounded-full hover:bg-[var(--primary-10)] transition"
+                    onClick={() =>
+                      setEditingPost({ id: post.id, label: post.label })
+                    }
+                    className="shrink-0 p-2 rounded-full hover:bg-primary-10 transition"
                     title="Editar post"
                   >
                     <Edit3 size={16} />
@@ -251,7 +295,10 @@ export function PostViewModal({ postId, onClose }: Props) {
               {/* Texto */}
               {post.label && (
                 <div className="px-1">
-                  <p className="text-sm leading-7 whitespace-pre-wrap break-words" style={{ color: "white" }}>
+                  <p
+                    className="text-sm leading-7 whitespace-pre-wrap wrap-break-words"
+                    style={{ color: "white" }}
+                  >
                     {renderTextWithLinks(post.label)}
                   </p>
                 </div>
@@ -261,14 +308,24 @@ export function PostViewModal({ postId, onClose }: Props) {
               {post.image && (
                 <div
                   className="rounded-2xl overflow-hidden border"
-                  style={{ backgroundColor: "var(--background)", borderColor: "var(--border)" }}
+                  style={{
+                    backgroundColor: "var(--background)",
+                    borderColor: "var(--border)",
+                  }}
                 >
-                  <img
-                    src={post.image}
-                    onClick={() => setSelectedImage(post.image)}
-                    className="w-full max-h-[300px] object-cover cursor-pointer transition-opacity hover:opacity-95"
-                    alt=""
-                  />
+<Image
+  src={post.image}
+  alt=""
+  width={1200}
+  height={800}
+  loading="lazy"
+  quality={100}
+  draggable={false}
+  onClick={() =>
+    setSelectedImage(post.image)
+  }
+  className="w-full max-h-300px object-cover cursor-pointer transition-opacity hover:opacity-95"
+/>
                 </div>
               )}
 
@@ -284,7 +341,13 @@ export function PostViewModal({ postId, onClose }: Props) {
                   </button>
 
                   {showLikers && likers.length > 0 && (
-                    <div className="mt-2 p-2 rounded-xl border" style={{ backgroundColor: "var(--background)", borderColor: "var(--border)" }}>
+                    <div
+                      className="mt-2 p-2 rounded-xl border"
+                      style={{
+                        backgroundColor: "var(--background)",
+                        borderColor: "var(--border)",
+                      }}
+                    >
                       <LikeView likers={likers} totalLikes={likers.length} />
                     </div>
                   )}
@@ -302,8 +365,9 @@ export function PostViewModal({ postId, onClose }: Props) {
                   className="flex items-center gap-2 transition-all hover:opacity-80"
                 >
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${liked ? "scale-105" : ""
-                      }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      liked ? "scale-105" : ""
+                    }`}
                     style={{
                       backgroundColor: liked
                         ? "rgba(255, 0, 85, 0.12)"
@@ -312,8 +376,11 @@ export function PostViewModal({ postId, onClose }: Props) {
                   >
                     <Heart
                       size={18}
-                      className={`transition-all duration-300 ${liked ? "opacity-100 scale-110 text-[var(--accent)]" : "opacity-60"
-                        }`}
+                      className={`transition-all duration-300 ${
+                        liked
+                          ? "opacity-100 scale-110 text-accent"
+                          : "opacity-60"
+                      }`}
                       fill={liked ? "var(--accent)" : "transparent"}
                     />
                   </div>
@@ -337,7 +404,10 @@ export function PostViewModal({ postId, onClose }: Props) {
                       className="text-gray-400 opacity-70"
                     />
                   </div>
-                  <span className="text-sm font-semibold" style={{ color: "var(--gray)" }}>
+                  <span
+                    className="text-sm font-semibold"
+                    style={{ color: "var(--gray)" }}
+                  >
                     {commentsCount}
                   </span>
                 </div>
@@ -366,8 +436,8 @@ export function PostViewModal({ postId, onClose }: Props) {
           currentText={editingPost.label}
           onClose={() => setEditingPost(null)}
           onSaved={() => {
-            setEditingPost(null)
-            onClose()
+            setEditingPost(null);
+            onClose();
           }}
         />
       )}

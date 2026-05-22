@@ -1,146 +1,160 @@
-"use client"
+"use client";
 
-import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
-import { CommentsBox } from "./comentarios"
-import { PostBar } from "./posts-bar"
-import { useSession } from "next-auth/react"
-import { toast } from "sonner"
-import { ImageModal } from "./modal-view-photo"
-import { PostOptions } from "./postDelete"
-import { LikeView } from "./likes-view"
-import { EditPostModal } from "./modal-edit-post"
-import { containsBadWords } from "@/lib/ofensivas"
-import { Heart, MessageCircle, MoreHorizontal, Send } from "lucide-react"
-import { PhotoPost } from "./photo-post"
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { CommentsBox } from "./comentarios";
+import { PostBar } from "./posts-bar";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { ImageModal } from "./modal-view-photo";
+import { PostOptions } from "./postDelete";
+import { LikeView } from "./likes-view";
+import { EditPostModal } from "./modal-edit-post";
+import { containsBadWords } from "@/lib/ofensivas";
+import { Heart, MessageCircle, MoreHorizontal, Send } from "lucide-react";
+import { PhotoPost } from "./photo-post";
+import Image from "next/image";
 
 type Post = {
-  id: string
-  label: string
-  createdAt: string
-  authorId: string
-  image: string
+  id: string;
+  label: string;
+  createdAt: string;
+  authorId: string;
+  image: string;
   author: {
-    id: string
-    nome: string
-    foto: string
-    cargo: string
-    role: string
-  }
-  postador: string
-  comentarios: []
-}
+    id: string;
+    nome: string;
+    foto: string;
+    cargo: string;
+    role: string;
+  };
+  postador: string;
+  comentarios: [];
+};
 
 export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
-  const { data: session } = useSession()
-  const user = session?.user
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({})
-  const [comments, setComments] = useState<Record<string, string>>({})
-  const [commentsCount, setCommentsCount] = useState<Record<string, number>>({})
-  const [likesCount, setLikesCount] = useState<Record<string, number>>({})
-  const [refreshKey, setRefreshKey] = useState(0)
-  const pathname = usePathname()
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null)
-  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(() =>
-    typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  )
+  const { data: session } = useSession();
+  const user = session?.user;
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+  const [comments, setComments] = useState<Record<string, string>>({});
+  const [commentsCount, setCommentsCount] = useState<Record<string, number>>(
+    {},
+  );
+  const [likesCount, setLikesCount] = useState<Record<string, number>>({});
+  const [refreshKey, setRefreshKey] = useState(0);
+  const pathname = usePathname();
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(
+    () =>
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0),
+  );
 
-  const [editingPost, setEditingPost] = useState<{ id: string; label: string } | null>(null)
+  const [editingPost, setEditingPost] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
-  const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null)
-  const [openModal, setOpenModal] = useState(false)
-
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null);
+  const [openModal, setOpenModal] = useState(false);
 
   type Liker = {
-    id: string
-    nome: string
-    foto: string
-  }
+    id: string;
+    nome: string;
+    foto: string;
+  };
 
-  const [listOfLikes, setListOfLikes] = useState<Record<string, Liker[]>>({})
+  const [listOfLikes, setListOfLikes] = useState<Record<string, Liker[]>>({});
 
   function handleOpenImage(image: string, postId: string, authorId: string) {
-    setSelectedImage(image)
-    setSelectedPostId(postId)
-    setSelectedAuthorId(authorId)
-    setOpenModal(true)
+    setSelectedImage(image);
+    setSelectedPostId(postId);
+    setSelectedAuthorId(authorId);
+    setOpenModal(true);
   }
 
   function handleCloseImage() {
-    setOpenModal(false)
-    setSelectedImage(null)
-    setSelectedPostId(null)
-    setSelectedAuthorId(null)
+    setOpenModal(false);
+    setSelectedImage(null);
+    setSelectedPostId(null);
+    setSelectedAuthorId(null);
   }
 
   useEffect(() => {
     async function loadPosts() {
-      setLoading(true)
+      setLoading(true);
       try {
-        const res = await fetch("/api/posts", { cache: "no-store" })
-        const data = await res.json()
+        const res = await fetch("/api/posts", { cache: "no-store" });
+        const data = await res.json();
 
-        setPosts(Array.isArray(data) ? data : data?.posts ?? [])
+        setPosts(Array.isArray(data) ? data : (data?.posts ?? []));
       } catch (err) {
-        console.error(err)
+        console.error(err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    loadPosts()
-
-  }, [pathname, refreshKey])
+    loadPosts();
+  }, [pathname, refreshKey]);
 
   function handleRefresh() {
-    setRefreshKey(k => k + 1)
-    onRefresh?.()
+    setRefreshKey((k) => k + 1);
+    onRefresh?.();
   }
 
   //consolidado: carrega likes, likers, status do user e contagem de comentários
   useEffect(() => {
-    if (!posts.length) return
+    if (!posts.length) return;
 
     async function loadFeedData() {
-      const postIds = posts.map(p => p.id)
+      const postIds = posts.map((p) => p.id);
       try {
         const res = await fetch("/api/posts/feed-data", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ postIds, userId: user?.id }),
-        })
-        if (!res.ok) return
-        const data = await res.json()
+        });
+        if (!res.ok) return;
+        const data = await res.json();
 
-        const newLikedPosts: Record<string, boolean> = {}
-        const newLikesCount: Record<string, number> = {}
-        const newCommentsCount: Record<string, number> = {}
-        const newListOfLikes: Record<string, Liker[]> = {}
+        const newLikedPosts: Record<string, boolean> = {};
+        const newLikesCount: Record<string, number> = {};
+        const newCommentsCount: Record<string, number> = {};
+        const newListOfLikes: Record<string, Liker[]> = {};
 
-        for (const [postId, info] of Object.entries(data) as [string, { liked: boolean; likesCount: number; commentsCount: number; likers: Liker[] }][]) {
-          newLikedPosts[postId] = info.liked
-          newLikesCount[postId] = info.likesCount
-          newCommentsCount[postId] = info.commentsCount
-          newListOfLikes[postId] = info.likers
+        for (const [postId, info] of Object.entries(data) as [
+          string,
+          {
+            liked: boolean;
+            likesCount: number;
+            commentsCount: number;
+            likers: Liker[];
+          },
+        ][]) {
+          newLikedPosts[postId] = info.liked;
+          newLikesCount[postId] = info.likesCount;
+          newCommentsCount[postId] = info.commentsCount;
+          newListOfLikes[postId] = info.likers;
         }
 
-        setLikedPosts(newLikedPosts)
-        setLikesCount(newLikesCount)
-        setCommentsCount(newCommentsCount)
-        setListOfLikes(newListOfLikes)
+        setLikedPosts(newLikedPosts);
+        setLikesCount(newLikesCount);
+        setCommentsCount(newCommentsCount);
+        setListOfLikes(newListOfLikes);
       } catch (error) {
-        console.error("Erro ao carregar dados do feed:", error)
+        console.error("Erro ao carregar dados do feed:", error);
       }
     }
 
-    loadFeedData()
+    loadFeedData();
 
-    const interval = setInterval(loadFeedData, 30000)
-    return () => clearInterval(interval)
-  }, [posts, user])
+    const interval = setInterval(loadFeedData, 30000);
+    return () => clearInterval(interval);
+  }, [posts, user]);
 
   //realiza o curtir
   async function curtir(postId: string, autorPostId: string) {
@@ -178,32 +192,27 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
           ? Math.max((prev[postId] || 1) - 1, 0)
           : (prev[postId] || 0) + 1,
       }));
-
-
     } catch (error) {
       console.error(error);
     }
   }
 
-
-
-
   //comentar
   async function comentar(postId: string) {
-    if (!user) return
+    if (!user) return;
 
-    const texto = comments[postId]?.trim()
+    const texto = comments[postId]?.trim();
 
-    if (!texto) return
+    if (!texto) return;
 
     if (containsBadWords(texto)) {
       setComments((prev) => ({
         ...prev,
         [postId]: "",
-      }))
+      }));
 
-      toast.error("Comentário ofensivo não pode ser enviado")
-      return
+      toast.error("Comentário ofensivo não pode ser enviado");
+      return;
     }
 
     try {
@@ -215,23 +224,23 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
           postId,
           authorId: user.id,
         }),
-      })
+      });
 
-      if (!res.ok) throw new Error("Erro ao comentar")
+      if (!res.ok) throw new Error("Erro ao comentar");
 
       setComments((prev) => ({
         ...prev,
         [postId]: "",
-      }))
+      }));
 
       setCommentsCount((prev) => ({
         ...prev,
         [postId]: (prev[postId] || 0) + 1,
-      }))
+      }));
 
-      toast.success("Comentário postado!")
+      toast.success("Comentário postado!");
     } catch {
-      toast.error("Erro ao postar comentário")
+      toast.error("Erro ao postar comentário");
     }
   }
 
@@ -262,11 +271,9 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
       toast.success("Postagem excluída com sucesso!");
       await handleRefresh();
 
-
       // Atualiza o feed após a exclusão
 
       // ou handleRefresh(), dependendo de como está nomeado no seu componente
-
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -278,15 +285,15 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   }
   //editar post
   function handleEditPost(postId: string) {
-    const post = posts.find(p => p.id === postId)
+    const post = posts.find((p) => p.id === postId);
     if (post) {
-      setEditingPost({ id: post.id, label: post.label })
+      setEditingPost({ id: post.id, label: post.label });
     }
   }
 
   function renderTextWithLinks(text: string) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g
-    const parts = text.split(urlRegex)
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
 
     return parts.map((part, index) => {
       if (urlRegex.test(part)) {
@@ -300,56 +307,57 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
           >
             {part}
           </a>
-        )
+        );
       }
 
-      return <span key={index}>{part}</span>
-    })
+      return <span key={index}>{part}</span>;
+    });
   }
 
-
   function toggleComments(id: string): void {
-    const commentInput = document.getElementById(`comment-input-${id}`)
-    const toggleBtn = document.querySelector(`[data-comment-toggle="${id}"]`)
+    const commentInput = document.getElementById(`comment-input-${id}`);
+    const toggleBtn = document.querySelector(`[data-comment-toggle="${id}"]`);
     if (toggleBtn instanceof HTMLButtonElement) {
-      const isOpen = toggleBtn.textContent?.includes("Esconder")
-      if (!isOpen) toggleBtn.click()
+      const isOpen = toggleBtn.textContent?.includes("Esconder");
+      if (!isOpen) toggleBtn.click();
     }
     if (commentInput instanceof HTMLInputElement) {
       if (document.activeElement === commentInput) {
-        commentInput.blur()
+        commentInput.blur();
       } else {
-        commentInput.focus()
+        commentInput.focus();
         setTimeout(() => {
-          const postEl = document.getElementById(`post-${id}`)
+          const postEl = document.getElementById(`post-${id}`);
           if (postEl) {
-            postEl.scrollIntoView({ behavior: "smooth", block: "start" })
+            postEl.scrollIntoView({ behavior: "smooth", block: "start" });
           } else {
-            commentInput.scrollIntoView({ behavior: "smooth", block: "center" })
+            commentInput.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
           }
-        }, 400)
+        }, 400);
       }
     }
   }
 
   return (
-    <section className="w-full max-w-3xl space-y-1" style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth' }}>
-
+    <section
+      className="w-full max-w-3xl space-y-1"
+      style={{ scrollSnapType: "y mandatory", scrollBehavior: "smooth" }}
+    >
       <PostBar onCreated={handleRefresh} onRefresh={handleRefresh} />
 
       {loading && (
-        <p
-          className="text-sm px-2"
-          style={{ color: "var(--gray)" }}
-        >
+        <p className="text-sm px-2" style={{ color: "var(--gray)" }}>
           Carregando posts...
         </p>
       )}
 
       {posts.map((post) => {
-        const liked = likedPosts[post.id] || false
-        const postLikesCount = likesCount[post.id] || 0
-        const isTooltipOpen = activeTooltip === post.id
+        const liked = likedPosts[post.id] || false;
+        const postLikesCount = likesCount[post.id] || 0;
+        const isTooltipOpen = activeTooltip === post.id;
 
         // Renderizar PhotoPost se houver imagem, senão renderizar TextPost (atual)
         if (post.image) {
@@ -360,24 +368,26 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               liked={liked}
               likesCount={postLikesCount}
               commentsCount={commentsCount[post.id] || 0}
-              currentComment={comments[post.id] || ''}
+              currentComment={comments[post.id] || ""}
               likers={listOfLikes[post.id] || []}
               currentUserId={session?.user?.id}
               onLike={() => curtir(post.id, post.authorId)}
               onComment={comentar}
-              onCommentChange={(postId, text) => setComments(prev => ({ ...prev, [postId]: text }))}
+              onCommentChange={(postId, text) =>
+                setComments((prev) => ({ ...prev, [postId]: text }))
+              }
               onOpenImage={handleOpenImage}
               onDelete={handleDeletePost}
               onEdit={handleEditPost}
             />
-          )
+          );
         }
 
         return (
           <div
             id={`post-${post.id}`}
             key={post.id}
-            className="relative rounded-2xl border-2 shadow-md overflow-visible transition-all duration-500 hover:shadow-lg hover:border-[var(--accent)]"
+            className="relative rounded-2xl border-2 shadow-md overflow-visible transition-all duration-500 hover:shadow-lg hover:border-accent"
             style={{
               backgroundColor: "var(--white)",
               borderColor: "var(--primary)",
@@ -407,10 +417,10 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
             ) : (
               <div className="absolute top-4 right-4 z-50 overflow-visible">
                 <button
-                  className="text-[var(--primary)] hover:bg-[var(--primary-10)] p-1 rounded-full transition-colors flex items-center justify-center select-none"
+                  className="text-primary hover:bg-primary-10 p-1 rounded-full transition-colors flex items-center justify-center select-none"
                   onClick={(e) => {
-                    e.stopPropagation()
-                    toast.info("Somente o criador do post poderá editá-lo")
+                    e.stopPropagation();
+                    toast.info("Somente o criador do post poderá editá-lo");
                   }}
                 >
                   <MoreHorizontal size={24} />
@@ -418,38 +428,41 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               </div>
             )}
 
-
             <div className="p-4 md:p-5 space-y-4 overflow-visible">
               {/* Cabeçalho */}
               <div
                 className="flex items-start gap-3 pb-4 border-b"
                 style={{ borderColor: "var(--border)" }}
               >
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <div
                     className="absolute -inset-1 rounded-full opacity-15"
                     style={{ backgroundColor: "var(--secondary)" }}
                   />
 
-                  <img
-                    src={
-                      post.author.foto ||
-                      "/photoProfile/userDefault.png"
-                    }
+                  <Image
+                    src={post.author.foto || "/photoProfile/userDefault.png"}
                     alt={post.author.nome}
+                    width={44}
+                    height={44}
+                    loading="lazy"
+                    quality={100}
+                    draggable={false}
                     className="relative w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2"
-                    style={{ borderColor: "var(--white)" }}
+                    style={{
+                      borderColor: "var(--white)",
+                    }}
                   />
                 </div>
 
                 <div className="flex-1 min-w-0 pr-8">
                   {/* Linha do Autor e Cargo */}
                   <div className="flex items-baseline gap-2 flex-wrap">
-                    <h3 className="text-sm md:text-base font-bold text-[var(--primary)] truncate">
+                    <h3 className="text-sm md:text-base font-bold text-primary truncate">
                       {post.author.nome}
                     </h3>
                     {post.author.cargo && (
-                      <span className="text-[10px] md:text-xs font-normal text-[var(--gray)] truncate">
+                      <span className="text-[10px] md:text-xs font-normal text-gray truncate">
                         • {post.author.cargo}
                       </span>
                     )}
@@ -457,24 +470,24 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
                   {/* Quem postou (se for diferente do autor, ganha um contexto sutil) */}
                   {post.postador && post.postador !== post.author.nome && (
-                    <p className="text-xs text-[var(--gray)]/80 mt-0.5 truncate">
+                    <p className="text-xs text-gray /80 mt-0.5 truncate">
                       via {post.postador}
                     </p>
                   )}
 
                   {/* Metadados: Status e Data */}
-                  <div className="flex items-center gap-1.5 mt-1.5 text-[11px] md:text-xs font-medium text-[var(--gray)]">
+                  <div className="flex items-center gap-1.5 mt-1.5 text-[11px] md:text-xs font-medium text-gray">
                     <span
-                      className="w-2 h-2 rounded-full bg-[var(--success)]"
+                      className="w-2 h-2 rounded-full bg-success"
                       aria-hidden="true"
                     />
                     <time dateTime={post.createdAt}>
                       {new Date(post.createdAt).toLocaleDateString(undefined, {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </time>
                   </div>
@@ -484,7 +497,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
               {/* Texto */}
               <div className="px-1">
                 <div
-                  className="text-sm leading-7 whitespace-pre-wrap break-words"
+                  className="text-sm leading-7 whitespace-pre-wrap wrap-break-words"
                   style={{ color: "var(--black)" }}
                 >
                   {renderTextWithLinks(post.label)}
@@ -500,44 +513,46 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     borderColor: "var(--border)",
                   }}
                 >
-                  <img
+                  <Image
                     src={post.image}
+                    alt="Imagem da postagem"
+                    width={1200}
+                    height={800}
+                    loading="lazy"
+                    quality={100}
+                    draggable={false}
                     onClick={() =>
                       handleOpenImage(post.image, post.id, post.authorId)
                     }
                     onDoubleClick={() => curtir(post.id, post.authorId)}
-                    className="w-full max-h-[300px] md:max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
-                    alt="Imagem da postagem"
+                    className="w-full max-h-300px md:max-h-520px object-cover cursor-pointer transition-opacity hover:opacity-95"
                   />
                 </div>
               )}
 
               {/* Área interação */}
 
-
-
               <div
                 className="pt-4 border-t space-y-4 overflow-visible"
                 style={{ borderColor: "var(--border)" }}
               >
-
-
                 {/* Campo comentário */}
                 <div
-                  className="flex items-center gap-3 rounded-full px-3 py-2 border-2 relative transition focus-within:border-[var(--accent)]"
+                  className="flex items-center gap-3 rounded-full px-3 py-2 border-2 relative transition focus-within:border-accent"
                   style={{
-                    backgroundColor:
-                      "var(--background)",
+                    backgroundColor: "var(--background)",
                     borderColor: "var(--primary)",
                   }}
                 >
-                  <img
-                    src={
-                      user?.foto ||
-                      "/photoProfile/userDefault.png"
-                    }
-                    className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                  <Image
+                    src={user?.foto || "/photoProfile/userDefault.png"}
                     alt="Comentador"
+                    width={28}
+                    height={28}
+                    loading="lazy"
+                    quality={100}
+                    draggable={false}
+                    className="w-7 h-7 rounded-full object-cover shrink-0"
                   />
 
                   <input
@@ -547,21 +562,16 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     onChange={(e) =>
                       setComments((prev) => ({
                         ...prev,
-                        [post.id]:
-                          e.target.value,
+                        [post.id]: e.target.value,
                       }))
                     }
                     onKeyDown={(e) => {
                       if (
                         e.key === "Enter" &&
                         !e.shiftKey &&
-                        (
-                          comments[
-                          post.id
-                          ] || ""
-                        ).trim() !== ""
+                        (comments[post.id] || "").trim() !== ""
                       ) {
-                        comentar(post.id)
+                        comentar(post.id);
                       }
                     }}
                     placeholder="Escreva um comentário..."
@@ -571,59 +581,52 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     }}
                   />
 
-                  {(comments[post.id] || "")
-                    .trim() !== "" && (
-                      <button
-                        type="button"
-                        onClick={() => comentar(post.id)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-[var(--accent)] transition-all duration-200 hover:shadow-md hover:scale-110 active:scale-95 focus:outline-none disabled:opacity-40 disabled:pointer-events-none"
-                      >
-                        <Send
-                          size={16}
-                          color="white"
-                          className="translate-x-[1px] -translate-y-[0.5px]"
-                        />
-                      </button>
-                    )}
+                  {(comments[post.id] || "").trim() !== "" && (
+                    <button
+                      type="button"
+                      onClick={() => comentar(post.id)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-accent transition-all duration-200 hover:shadow-md hover:scale-110 active:scale-95 focus:outline-none disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                      <Send
+                        size={16}
+                        color="white"
+                        className="translate-x-1px -translate-y-0.5px"
+                      />
+                    </button>
+                  )}
                 </div>
-
-
 
                 {/* Botões */}
                 <div className="flex items-center gap-6 relative overflow-visible">
-
                   {/* Likes */}
                   <div
                     className="relative"
                     onMouseEnter={() => {
                       if (!isTouchDevice && postLikesCount > 0) {
-                        setActiveTooltip(post.id)
+                        setActiveTooltip(post.id);
                       }
                     }}
                     onMouseLeave={() => {
                       if (!isTouchDevice) {
-                        setActiveTooltip(null)
+                        setActiveTooltip(null);
                       }
                     }}
                   >
                     <button
                       type="button"
                       onClick={() => {
-                        curtir(post.id, post.authorId)
+                        curtir(post.id, post.authorId);
 
                         if (isTouchDevice) {
-                          setActiveTooltip(
-                            isTooltipOpen
-                              ? null
-                              : post.id
-                          )
+                          setActiveTooltip(isTooltipOpen ? null : post.id);
                         }
                       }}
                       className="flex items-center gap-2 transition-all hover:opacity-80"
                     >
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${liked ? "scale-110 bg-[var(--accent)]" : "bg-[var(--primary-10)]"
-                          }`}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          liked ? "scale-110 bg-accent" : "bg-primary-10"
+                        }`}
                         style={{
                           backgroundColor: liked
                             ? "var(--accent)"
@@ -632,8 +635,9 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       >
                         <Heart
                           size={18}
-                          className={`transition-all duration-300 ${liked ? "scale-110" : "opacity-60"
-                            }`}
+                          className={`transition-all duration-300 ${
+                            liked ? "scale-110" : "opacity-60"
+                          }`}
                           color={liked ? "var(--white)" : "var(--gray)"}
                           fill={liked ? "var(--white)" : "transparent"}
                         />
@@ -642,9 +646,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                       <span
                         className="text-sm font-semibold"
                         style={{
-                          color: liked
-                            ? "var(--accent)"
-                            : "var(--gray)",
+                          color: liked ? "var(--accent)" : "var(--gray)",
                         }}
                       >
                         {postLikesCount}
@@ -659,7 +661,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                         postLikesCount > 0 && (
                           <div className="absolute bottom-full left-0 mb-3 z-20 animate-in fade-in zoom-in-95 duration-200">
                             <div
-                              className="relative rounded-2xl border shadow-2xl p-2 min-w-[200px]"
+                              className="relative rounded-2xl border shadow-2xl p-2 min-w-200px"
                               style={{
                                 backgroundColor: "var(--white)",
                                 borderColor: "var(--border)",
@@ -680,23 +682,19 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                             </div>
                           </div>
                         )}
-
                     </>
                   </div>
 
                   {/* Comentários */}
                   <button
                     type="button"
-                    onClick={() =>
-                      toggleComments(post.id)
-                    }
+                    onClick={() => toggleComments(post.id)}
                     className="flex items-center gap-2 transition-all hover:opacity-80"
                   >
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center transition hover:bg-[var(--primary-20)]"
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition hover:bg-primary-20"
                       style={{
-                        backgroundColor:
-                          "var(--primary-10)",
+                        backgroundColor: "var(--primary-10)",
                       }}
                     >
                       <MessageCircle
@@ -720,29 +718,26 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 {postLikesCount > 0 && (
                   <div className="sm:hidden text-[10px] text-neutral-400 leading-tight -mt-2">
                     {(() => {
-                      const likes = listOfLikes[post.id] || []
-                      const shuffled = [...likes].sort(() => Math.random() - 0.5)
-                      const names = shuffled.slice(0, 3).map((like) => like.nome)
-                      return `curtido por: ${names.join(", ")}${likes.length > 3 ? ", ..." : ""}`
+                      const likes = listOfLikes[post.id] || [];
+                      const shuffled = [...likes].sort(
+                        () => Math.random() - 0.5,
+                      );
+                      const names = shuffled
+                        .slice(0, 3)
+                        .map((like) => like.nome);
+                      return `curtido por: ${names.join(", ")}${likes.length > 3 ? ", ..." : ""}`;
                     })()}
                   </div>
                 )}
 
-
-
                 {/* Comentários */}
                 <div className="overflow-visible">
-                  <CommentsBox
-                    postId={post.id}
-                    postAuthorId={
-                      post.author.id
-                    }
-                  />
+                  <CommentsBox postId={post.id} postAuthorId={post.author.id} />
                 </div>
               </div>
             </div>
           </div>
-        )
+        );
       })}
 
       <ImageModal
@@ -762,5 +757,5 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
         />
       )}
     </section>
-  )
+  );
 }

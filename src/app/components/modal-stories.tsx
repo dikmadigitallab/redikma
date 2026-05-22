@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type Story = {
   id: number | string;
   nome: string;
@@ -124,14 +126,18 @@ export const StoriesModal = ({
 
             {/* Imagem opcional */}
             {selectedStory.imagem && (
-              <img
+              <Image
                 src={selectedStory.imagem}
                 alt={selectedStory.nome}
-                className="w-full rounded-2xl mt-6 object-cover max-h-[420px]"
+                width={1200}
+                height={800}
+                loading="lazy"
+                quality={100}
+                draggable={false}
+                className="w-full rounded-2xl mt-6 object-cover max-h-420px"
               />
             )}
           </div>
-        </div>
 
         {/* Rodapé */}
         <div
@@ -167,5 +173,6 @@ export const StoriesModal = ({
         </div>
       </div>
     </div>
-  );
+    </div>
+    );
 };

@@ -1,96 +1,97 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { FaTrash } from "react-icons/fa"
-import { Heart, Reply, Send } from "lucide-react"
-import { toast } from "sonner"
-import { useSession } from "next-auth/react"
-
+import { useEffect, useRef, useState } from "react";
+import { FaTrash } from "react-icons/fa";
+import { Heart, Reply, Send } from "lucide-react";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 type Comment = {
-  id: string
-  texto: string
-  createdAt: string
-  parentId: string | null
+  id: string;
+  texto: string;
+  createdAt: string;
+  parentId: string | null;
   author: {
-    id: string
-    nome: string
-    foto?: string | null
-  }
-  likes?: { userId: string }[]
-  _count?: { likes: number }
-}
+    id: string;
+    nome: string;
+    foto?: string | null;
+  };
+  likes?: { userId: string }[];
+  _count?: { likes: number };
+};
 
 type CommentWithDelete = Comment & {
-  deletable: boolean
-}
+  deletable: boolean;
+};
 
 type Props = {
-  postId: string
-  postAuthorId: string
-}
+  postId: string;
+  postAuthorId: string;
+};
 
 export function CommentsBox({ postId, postAuthorId }: Props) {
-  const [open, setOpen] = useState(false)
-  const [comments, setComments] = useState<CommentWithDelete[]>([])
-  const [loading, setLoading] = useState(false)
-  const [replyingTo, setReplyingTo] = useState<string | null>(null)
-  const [replyText, setReplyText] = useState("")
-  const { data: session } = useSession()
-  const user = session?.user
-  const boxRef = useRef<HTMLDivElement>(null)
-  const isFetching = useRef(false)
+  const [open, setOpen] = useState(false);
+  const [comments, setComments] = useState<CommentWithDelete[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const { data: session } = useSession();
+  const user = session?.user;
+  const boxRef = useRef<HTMLDivElement>(null);
+  const isFetching = useRef(false);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
-        setOpen(false)
+        setOpen(false);
       }
     }
 
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside)
-      loadComments()
+      document.addEventListener("mousedown", handleClickOutside);
+      loadComments();
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [open])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
   async function loadComments() {
-    if (isFetching.current) return
-    isFetching.current = true
+    if (isFetching.current) return;
+    isFetching.current = true;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       const res = await fetch(`/api/posts/posts-comments?postId=${postId}`, {
         cache: "no-store",
-      })
+      });
 
-      if (!res.ok) return
+      if (!res.ok) return;
 
-      const data = await res.json()
+      const data = await res.json();
 
-      const canDelete: CommentWithDelete[] = (data || []).map((comment: Comment) => {
-        const isOwner = comment.author.id === user?.id
-        const isPostAuthor = postAuthorId === user?.id
-        const isAdmin =
-          user?.role === "ADMIN" || user?.role === "SYSTEM_ADM"
+      const canDelete: CommentWithDelete[] = (data || []).map(
+        (comment: Comment) => {
+          const isOwner = comment.author.id === user?.id;
+          const isPostAuthor = postAuthorId === user?.id;
+          const isAdmin = user?.role === "ADMIN" || user?.role === "SYSTEM_ADM";
 
-        return {
-          ...comment,
-          deletable: isOwner || isPostAuthor || isAdmin,
-        }
-      })
+          return {
+            ...comment,
+            deletable: isOwner || isPostAuthor || isAdmin,
+          };
+        },
+      );
 
-      setComments(canDelete)
+      setComments(canDelete);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setLoading(false)
-      isFetching.current = false
+      setLoading(false);
+      isFetching.current = false;
     }
   }
 
@@ -100,35 +101,35 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data?.error || "Erro ao deletar comentário")
-        return
+        toast.error(data?.error || "Erro ao deletar comentário");
+        return;
       }
 
-      await loadComments()
-      toast.success("Comentário deletado")
+      await loadComments();
+      toast.success("Comentário deletado");
     } catch (err) {
-      console.error(err)
-      toast.error("Erro de conexão")
+      console.error(err);
+      toast.error("Erro de conexão");
     }
   }
 
   async function likeComment(commentId: string) {
-    if (!user?.id) return
+    if (!user?.id) return;
 
-    setComments(prev =>
-      prev.map(c => {
-        if (c.id !== commentId) return c
+    setComments((prev) =>
+      prev.map((c) => {
+        if (c.id !== commentId) return c;
 
-        const alreadyLiked = c.likes?.some(l => l.userId === user.id)
+        const alreadyLiked = c.likes?.some((l) => l.userId === user.id);
 
         const updatedLikes = alreadyLiked
-          ? (c.likes?.filter(l => l.userId !== user.id) || [])
-          : [...(c.likes || []), { userId: user.id }]
+          ? c.likes?.filter((l) => l.userId !== user.id) || []
+          : [...(c.likes || []), { userId: user.id }];
 
         return {
           ...c,
@@ -136,49 +137,49 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
           _count: {
             likes: updatedLikes.length,
           },
-        }
-      })
-    )
+        };
+      }),
+    );
 
     try {
       await fetch("/api/posts/comments-likes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ commentId, userId: user.id }),
-      })
+      });
     } catch {
-      toast.error("Erro ao curtir")
+      toast.error("Erro ao curtir");
     }
   }
 
   async function unlikeComment(commentId: string) {
-    if (!user?.id) return
+    if (!user?.id) return;
 
-    setComments(prev =>
-      prev.map(c => {
-        if (c.id !== commentId) return c
+    setComments((prev) =>
+      prev.map((c) => {
+        if (c.id !== commentId) return c;
         return {
           ...c,
-          likes: c.likes?.filter(l => l.userId !== user.id) || [],
+          likes: c.likes?.filter((l) => l.userId !== user.id) || [],
           _count: { likes: Math.max((c._count?.likes || 0) - 1, 0) },
-        }
-      })
-    )
+        };
+      }),
+    );
 
     try {
       await fetch("/api/posts/comments-likes", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ commentId, userId: user.id }),
-      })
+      });
     } catch {
-      toast.error("Erro ao remover curtida")
+      toast.error("Erro ao remover curtida");
     }
   }
 
   //enviar resposta
   async function submitReply(commentId: string) {
-    if (!user?.id || !replyText.trim()) return
+    if (!user?.id || !replyText.trim()) return;
 
     try {
       await fetch("/api/posts/posts-comments", {
@@ -190,25 +191,25 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
           authorId: user.id,
           parentId: commentId,
         }),
-      })
+      });
 
-      setReplyText("")
-      setReplyingTo(null)
+      setReplyText("");
+      setReplyingTo(null);
 
-      await loadComments()
-      toast.success("Resposta enviada!")
+      await loadComments();
+      toast.success("Resposta enviada!");
     } catch {
-      toast.error("Erro ao enviar resposta")
+      toast.error("Erro ao enviar resposta");
     }
   }
 
   // Verificar se o usuário curtiu um comentário
   function hasUserLiked(comment: Comment): boolean {
-    return comment.likes?.some(like => like.userId === user?.id) || false
+    return comment.likes?.some((like) => like.userId === user?.id) || false;
   }
 
   function getLikesCount(comment: Comment): number {
-    return comment._count?.likes || comment.likes?.length || 0
+    return comment._count?.likes || comment.likes?.length || 0;
   }
 
   return (
@@ -223,9 +224,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
         <span
           className="w-2 h-2 rounded-full"
           style={{
-            backgroundColor: open
-              ? "var(--success)"
-              : "var(--gray)",
+            backgroundColor: open ? "var(--success)" : "var(--gray)",
           }}
         />
         {open ? "Esconder comentários" : "Ver comentários"}
@@ -289,10 +288,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                 className="rounded-xl px-4 py-6 text-center"
                 style={{ backgroundColor: "var(--background)" }}
               >
-                <p
-                  className="text-xs"
-                  style={{ color: "var(--gray)" }}
-                >
+                <p className="text-xs" style={{ color: "var(--gray)" }}>
                   Nenhum comentário por aqui.
                 </p>
               </div>
@@ -309,13 +305,17 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                 >
                   {/* Comentário principal */}
                   <div className="flex gap-3">
-                    <img
+                    <Image
                       src={
-                        comment.author.foto ||
-                        "/photoProfile/userDefault.png"
+                        comment.author.foto || "/photoProfile/userDefault.png"
                       }
-                      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                       alt={comment.author.nome}
+                      width={32}
+                      height={32}
+                      loading="lazy"
+                      quality={100}
+                      draggable={false}
+                      className="w-8 h-8 rounded-full object-cover shrink-0"
                     />
 
                     <div className="flex-1 min-w-0">
@@ -337,14 +337,12 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                             className="text-[9px]"
                             style={{ color: "var(--gray)" }}
                           >
-                            {new Date(
-                              comment.createdAt
-                            ).toLocaleDateString()}
+                            {new Date(comment.createdAt).toLocaleDateString()}
                           </span>
                         </div>
 
                         <p
-                          className="text-xs leading-5 break-words"
+                          className="text-xs leading-5 wrap-break-word"
                           style={{ color: "var(--black)" }}
                         >
                           {comment.texto}
@@ -364,15 +362,9 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                         >
                           <Heart
                             size={12}
-                            fill={
-                              hasUserLiked(comment)
-                                ? "#E53935"
-                                : "none"
-                            }
+                            fill={hasUserLiked(comment) ? "#E53935" : "none"}
                             color={
-                              hasUserLiked(comment)
-                                ? "#E53935"
-                                : "currentColor"
+                              hasUserLiked(comment) ? "#E53935" : "currentColor"
                             }
                           />
                           <span>{getLikesCount(comment)}</span>
@@ -381,9 +373,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                         <button
                           onClick={() =>
                             setReplyingTo(
-                              replyingTo === comment.id
-                                ? null
-                                : comment.id
+                              replyingTo === comment.id ? null : comment.id,
                             )
                           }
                           className="flex items-center gap-1 text-[10px] font-medium transition-opacity hover:opacity-80"
@@ -395,16 +385,13 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
 
                         {comment.deletable && (
                           <button
-                            onClick={() =>
-                              delComents(comment.id)
-                            }
+                            onClick={() => delComents(comment.id)}
                             className="ml-auto transition-opacity hover:opacity-80"
                             style={{ color: "var(--accent)" }}
                           >
                             <FaTrash size={10} />
                           </button>
                         )}
-
                       </div>
                     </div>
                   </div>
@@ -415,12 +402,9 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                       <input
                         type="text"
                         value={replyText}
-                        onChange={(e) =>
-                          setReplyText(e.target.value)
-                        }
+                        onChange={(e) => setReplyText(e.target.value)}
                         onKeyDown={(e) =>
-                          e.key === "Enter" &&
-                          submitReply(comment.id)
+                          e.key === "Enter" && submitReply(comment.id)
                         }
                         placeholder="Escreva uma resposta..."
                         className="flex-1 px-3 py-2 text-xs rounded-xl border outline-none"
@@ -432,13 +416,10 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                       />
 
                       <button
-                        onClick={() =>
-                          submitReply(comment.id)
-                        }
+                        onClick={() => submitReply(comment.id)}
                         className="w-9 h-9 rounded-xl flex items-center justify-center"
                         style={{
-                          backgroundColor:
-                            "var(--primary)",
+                          backgroundColor: "var(--primary)",
                           color: "var(--white)",
                         }}
                       >
@@ -451,31 +432,28 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                   {comments
                     .filter((reply) => reply.parentId === comment.id)
                     .map((reply) => (
-                      <div
-                        key={reply.id}
-                        className="pl-11 mt-2"
-                      >
-                        <div
-                          className="relative rounded-2xl border border-[var(--primary)] bg-gradient-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm"
-                        >
+                      <div key={reply.id} className="pl-11 mt-2">
+                        <div className="relative rounded-2xl border border-primary bg-linear-to-br from-white to-slate-50 px-3 py-2.5 shadow-sm">
                           {/* Linha lateral para destacar que é uma resposta */}
-                          <div className="absolute -left-5 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-300 to-cyan-100" />
-                          <div className="absolute -left-[22px] top-4 w-3 h-3 rounded-full bg-cyan-400 border-2 border-white shadow-sm" />
+                          <div className="absolute -left-5 top-0 bottom-0 w-px bg-linear-to-b from-cyan-300 to-cyan-100" />
+                          <div className="absolute -left-22px top-4 w-3 h-3 rounded-full bg-cyan-400 border-2 border-white shadow-sm" />
 
                           {/* Cabeçalho */}
                           <div className="flex items-center justify-between gap-2 mb-1.5">
                             <div className="flex items-center gap-2 min-w-0">
-                              <img
+                              <Image
                                 src={
                                   reply.author?.foto ||
                                   "/photoProfile/userDefault.png"
                                 }
-                                alt={
-                                  reply.author?.nome || "Usuário"
-                                }
-                                className="w-5 h-5 rounded-full object-cover border border-[var(--primary)] shadow-sm flex-shrink-0"
+                                alt={reply.author?.nome || "Usuário"}
+                                width={20}
+                                height={20}
+                                loading="lazy"
+                                quality={100}
+                                draggable={false}
+                                className="w-5 h-5 rounded-full object-cover border border-primary shadow-sm shrink-0"
                               />
-
                               <span
                                 className="text-[11px] font-semibold truncate"
                                 style={{
@@ -488,10 +466,8 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
 
                             {reply.deletable && (
                               <button
-                                onClick={() =>
-                                  delComents(reply.id)
-                                }
-                                className="p-1 rounded-full hover:bg-red-50 transition-colors flex-shrink-0"
+                                onClick={() => delComents(reply.id)}
+                                className="p-1 rounded-full hover:bg-red-50 transition-colors shrink-0"
                                 style={{
                                   color: "var(--accent)",
                                 }}
@@ -503,7 +479,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
 
                           {/* Texto */}
                           <p
-                            className="text-[12px] leading-5 whitespace-pre-wrap break-words"
+                            className="text-[12px] leading-5 whitespace-pre-wrap wrap-break-words"
                             style={{
                               color: "var(--black)",
                             }}
@@ -519,5 +495,5 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
         </div>
       )}
     </div>
-  )
+  );
 }
