@@ -251,7 +251,7 @@ export function PostViewModal({ postId, onClose }: Props) {
               {/* Texto */}
               {post.label && (
                 <div className="px-1">
-                  <p className="text-sm leading-7 whitespace-pre-wrap break-words" style={{ color: "var(--black)" }}>
+                  <p className="text-sm leading-7 whitespace-pre-wrap break-words" style={{ color: "white" }}>
                     {renderTextWithLinks(post.label)}
                   </p>
                 </div>

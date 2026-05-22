@@ -14,6 +14,7 @@ import {
   Lock,
   AlertTriangle,
 } from "lucide-react"
+import Image from "next/image"
 
 function PerfilPageContent() {
   const { update } = useSession()
@@ -134,11 +135,11 @@ function PerfilPageContent() {
       setUser((prev) =>
         prev
           ? {
-              ...prev,
-              ...(form.email ? { email: form.email } : {}),
-              ...(form.telefone ? { telefone: form.telefone } : {}),
-              foto: data.user.foto,
-            }
+            ...prev,
+            ...(form.email ? { email: form.email } : {}),
+            ...(form.telefone ? { telefone: form.telefone } : {}),
+            foto: data.user.foto,
+          }
           : prev
       )
 
@@ -180,7 +181,7 @@ function PerfilPageContent() {
 
         <main className="flex-1 overflow-y-auto px-3 py-4 md:px-8 md:py-8">
           <div className="max-w-5xl mx-auto">
-            <div className="bg-white border border-[var(--primary)] rounded-[28px] shadow-sm p-8">
+            <div className="bg-white border border-var-primary rounded-[28px] shadow-sm p-8">
               <div className="animate-pulse space-y-4">
                 <div className="h-24 w-24 rounded-full bg-neutral-200 mx-auto" />
                 <div className="h-6 w-48 bg-neutral-200 rounded mx-auto" />
@@ -199,20 +200,22 @@ function PerfilPageContent() {
 
       <main className="flex-1 overflow-y-auto px-3 py-4 md:px-8 md:py-8 pb-24 sm:pb-8">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white border border-[var(--primary)] rounded-[28px] shadow-sm">
+          <div className="bg-white border border-primary rounded-[28px] shadow-sm">
             {/* Topo */}
             <div className="px-5 md:px-8 py-7 border-b border-neutral-100 bg-[#fafcff]">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 {/* Perfil */}
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="relative flex-shrink-0">
-                    <img
+                  <div className="relative shrink-0">
+                    <Image
                       src={
                         preview ||
                         user.foto ||
                         "/photoProfile/userDefault.png"
                       }
                       alt="Foto"
+                      width={96}
+                      height={96}
                       className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-sm"
                     />
 
@@ -244,21 +247,22 @@ function PerfilPageContent() {
                     </button>
 
                     {showSourceOptions && (
-                      <div className="absolute bottom-12 right-0 bg-white border border-[var(--primary)] rounded-2xl shadow-xl p-2 z-50 min-w-[180px]">
+                      <div className="absolute bottom-8 right-0 bg-white border border---primary rounded-2xl shadow-xl p-2 z-99999 min-w-45">
                         <button
                           type="button"
                           onClick={() => cameraInputRef.current?.click()}
                           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold"
                         >
-                          <Camera size={16} className="text-[var(--primary)]" />
+                          <Camera size={16} className="text-var--primary" />
                           Câmera
                         </button>
+
                         <button
                           type="button"
                           onClick={() => galleryInputRef.current?.click()}
                           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold"
                         >
-                          <ImagePlus size={16} className="text-[var(--primary)]" />
+                          <ImagePlus size={16} className="text-var--primary" />
                           Galeria
                         </button>
                       </div>
@@ -288,12 +292,12 @@ function PerfilPageContent() {
                     </p>
                   </div>
 
-                  <div className="bg-white border border-[var(--primary)] rounded-2xl px-4 py-3 w-full sm:min-w-[160px] sm:w-auto">
+                  <div className="bg-white border border--primary rounded-2xl px-4 py-3 w-full sm:min-w-[160px] sm:w-auto">
                     <p className="text-[10px] uppercase font-semibold text-neutral-400">
                       Cargo
                     </p>
 
-                    <p className="text-sm font-semibold text-neutral-700 mt-1 break-words">
+                    <p className="text-sm font-semibold text-neutral-700 mt-1 wrap-break-word">
                       {user.cargo}
                     </p>
                   </div>
@@ -303,7 +307,7 @@ function PerfilPageContent() {
 
             {isFirstAccess && (
               <div className="mx-5 md:mx-8 mt-5 md:mt-8 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-start gap-3">
-                <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                <AlertTriangle size={20} className="text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-amber-800 text-sm">
                     Primeiro Acesso

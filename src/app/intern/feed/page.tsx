@@ -11,7 +11,7 @@ import { FloatButtonMobile } from "@/app/components/floatButtonMobile"
 
 export default function Feed() {
   const [openModal, setOpenModal] = useState(false)
-  const [refreshFeed, setRefreshFeed] = useState(0)
+  const [, setRefreshFeed] = useState(0)
 
 
 
@@ -52,7 +52,7 @@ export default function Feed() {
           >
             {/* Barra decorativa superior */}
             <div
-              className="h-1 w-full flex-shrink-0"
+              className="h-1 w-full shrink-0"
               style={{
                 background:
                   "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",

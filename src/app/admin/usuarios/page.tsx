@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Users, Search, Edit2, Trash2, X, AlertTriangle, Eye, EyeOff } from "lucide-react"
+import { Users, Search, Edit2, Trash2, X, AlertTriangle } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 
@@ -47,7 +47,6 @@ export default function UsuariosPage() {
     senhaAtual: "",
     novaSenha: "",
   })
-  const [showNovaSenha, setShowNovaSenha] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -245,9 +244,9 @@ export default function UsuariosPage() {
                             className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium"
                             style={{ backgroundColor: "var(--primary)" }}
                           >
-                           
+
                             <img
-                              src={usuario.foto||"/photoProfile/userDefault.png"}
+                              src={usuario.foto || "/photoProfile/userDefault.png"}
                               alt={usuario.nome}
                               className="w-full h-full object-cover"
                             />

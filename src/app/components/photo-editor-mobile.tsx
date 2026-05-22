@@ -288,9 +288,8 @@ export function Editor({
 
   const getFilterString = useCallback((s?: Settings) => {
     const st = s || currentSettings
-    return `brightness(${st.brightness}%) contrast(${st.contrast}%) saturate(${st.saturation}%) blur(${
-      st.sharpness < 0 ? Math.abs(st.sharpness) / 10 : 0
-    }px)`
+    return `brightness(${st.brightness}%) contrast(${st.contrast}%) saturate(${st.saturation}%) blur(${st.sharpness < 0 ? Math.abs(st.sharpness) / 10 : 0
+      }px)`
   }, [currentSettings])
 
   const generateResult = async () => {
@@ -379,8 +378,8 @@ export function Editor({
 
   return (
     <div className="flex flex-col gap-2 w-full bg-white rounded-3xl shadow-xl overflow-hidden">
-      <div className="px-4 pt-4 pb-0 flex items-center justify-between" style={{background: 'linear-gradient(135deg, var(--primary) 0%, rgba(39, 38, 98, 0.8) 100%)'}}>
-        <h2 className="text-lg font-bold tracking-tight text-white" style={{fontFamily: "'Red Hat Display', sans-serif"}}>Editar Foto</h2>
+      <div className="px-4 pt-4 pb-0 flex items-center justify-between" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, rgba(39, 38, 98, 0.8) 100%)' }}>
+        <h2 className="text-lg font-bold tracking-tight text-white" style={{ fontFamily: "'Red Hat Display', sans-serif" }}>Editar Foto</h2>
         <div className="flex items-center gap-2">
           <button type="button" onClick={undo} disabled={historyIndex <= 0}
             className="p-2 rounded-lg hover:bg-white/20 disabled:opacity-30 transition text-white" title="Desfazer">
@@ -449,14 +448,14 @@ export function Editor({
           </div>
 
           {showOverlay && (
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/85 to-transparent pt-6 pb-4 px-4 z-10 rounded-t-3xl animate-in slide-in-from-bottom-2" style={{backdropFilter: 'blur(10px)'}}>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/85 to-transparent pt-6 pb-4 px-4 z-10 rounded-t-3xl animate-in slide-in-from-bottom-2" style={{ backdropFilter: 'blur(10px)' }}>
               {/* Drag Handle */}
               <div className="flex justify-center mb-4">
-                <div className="w-10 h-1 rounded-full bg-white/40 hover:bg-white/60 transition cursor-grab active:cursor-grabbing"/>
+                <div className="w-10 h-1 rounded-full bg-white/40 hover:bg-white/60 transition cursor-grab active:cursor-grabbing" />
               </div>
-              
+
               <div className="flex items-center justify-between mb-4">
-                <span className="text-white text-sm font-bold uppercase tracking-wider" style={{fontFamily: "'Red Hat Display', sans-serif"}}>
+                <span className="text-white text-sm font-bold uppercase tracking-wider" style={{ fontFamily: "'Red Hat Display', sans-serif" }}>
                   {overlayTool === "adjust" ? "Ajustes" : overlayTool === "filters" ? "Filtros" : "Cortar"}
                 </span>
                 <button onClick={() => setShowOverlay(false)}
@@ -479,7 +478,7 @@ export function Editor({
                         onMouseUp={commitSettings}
                         onTouchEnd={commitSettings}
                         className="w-full h-2 rounded-full appearance-none cursor-pointer accent-[var(--accent)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-track]:bg-[var(--primary-20)] [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5"
-                        style={{background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(255,255,255,0.1) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(255,255,255,0.1) 100%)`}}
+                        style={{ background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(255,255,255,0.1) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(255,255,255,0.1) 100%)` }}
                       />
                     </div>
                   ))}
@@ -491,9 +490,8 @@ export function Editor({
                   {FILTER_PRESETS.map((preset) => (
                     <button key={preset.name} type="button"
                       onClick={() => { applyFilter(preset); setShowOverlay(false) }}
-                      className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition transform hover:scale-105 ${
-                        selectedFilter === preset.name ? "ring-3 ring-[var(--accent)] shadow-lg shadow-[var(--accent)]/50" : "ring-1 ring-white/20"
-                      }`}
+                      className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition transform hover:scale-105 ${selectedFilter === preset.name ? "ring-3 ring-[var(--accent)] shadow-lg shadow-[var(--accent)]/50" : "ring-1 ring-white/20"
+                        }`}
                     >
                       <div className="w-full aspect-square rounded-lg border-2 bg-cover bg-center overflow-hidden shadow-md"
                         style={{
@@ -517,11 +515,10 @@ export function Editor({
                     <div className="flex flex-wrap gap-2">
                       {ASPECT_RATIOS.map((ar) => (
                         <button key={ar.value} type="button" onClick={() => setCropAspect(ar.value)}
-                          className={`px-4 py-2 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${
-                            cropAspect === ar.value
+                          className={`px-4 py-2 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${cropAspect === ar.value
                               ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[var(--accent)]/50"
                               : "bg-white/10 text-white/80 border-white/20 hover:bg-white/20"
-                          }`}>
+                            }`}>
                           {ar.label}
                         </button>
                       ))}
@@ -534,16 +531,14 @@ export function Editor({
                       Rotacionar
                     </button>
                     <button type="button" onClick={() => setFlipX((prev) => !prev)}
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${
-                        flipX ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[var(--accent)]/50" : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
-                      }`}>
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${flipX ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[var(--accent)]/50" : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
+                        }`}>
                       <TbFlipHorizontal size={14} />
                       Flip H
                     </button>
                     <button type="button" onClick={() => setFlipY((prev) => !prev)}
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${
-                        flipY ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[var(--accent)]/50" : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
-                      }`}>
+                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${flipY ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[var(--accent)]/50" : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
+                        }`}>
                       <TbFlipVertical size={14} />
                       Flip V
                     </button>
@@ -556,7 +551,7 @@ export function Editor({
                     <input type="range" min={1} max={3} step={0.01} value={zoom}
                       onChange={(e) => setZoom(Number(e.target.value))}
                       className="w-full h-2 rounded-full appearance-none cursor-pointer accent-[var(--accent)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing"
-                      style={{background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${((zoom - 1) / 2) * 100}%, rgba(255,255,255,0.1) ${((zoom - 1) / 2) * 100}%, rgba(255,255,255,0.1) 100%)`}}
+                      style={{ background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${((zoom - 1) / 2) * 100}%, rgba(255,255,255,0.1) ${((zoom - 1) / 2) * 100}%, rgba(255,255,255,0.1) 100%)` }}
                     />
                   </div>
                 </div>
@@ -582,31 +577,28 @@ export function Editor({
         </div>
       </div>
 
-      <div className="flex gap-2 px-4 py-2" style={{background: 'rgba(0,0,0,0.3)'}}>
+      <div className="flex gap-2 px-4 py-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
         <button type="button" onClick={() => openTool("adjust")}
-          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            showOverlay && overlayTool === "adjust"
+          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${showOverlay && overlayTool === "adjust"
               ? "bg-[var(--primary)] text-white border-2 border-[var(--accent)] shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
-          }`}>
+            }`}>
           <SlidersHorizontal size={20} />
           <span className="text-xs">Ajustes</span>
         </button>
         <button type="button" onClick={() => openTool("filters")}
-          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            showOverlay && overlayTool === "filters"
+          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${showOverlay && overlayTool === "filters"
               ? "bg-[var(--primary)] text-white border-2 border-[var(--accent)] shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
-          }`}>
+            }`}>
           <ImageIcon size={20} />
           <span className="text-xs">Filtros</span>
         </button>
         <button type="button" onClick={() => openTool("crop")}
-          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            showOverlay && overlayTool === "crop"
+          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${showOverlay && overlayTool === "crop"
               ? "bg-[var(--primary)] text-white border-2 border-[var(--accent)] shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
-          }`}>
+            }`}>
           <Crop size={20} />
           <span className="text-xs">Cortar</span>
         </button>
@@ -618,20 +610,37 @@ export function Editor({
             className="w-full py-2.5 text-xs font-bold border rounded-2xl hover:bg-neutral-50 transition">
             Escolher foto
           </button>
+
+  {/*         
           {showSourceOptions && (
-            <div className="absolute bottom-full mb-2 left-0 right-0 bg-white border border-[var(--primary)] rounded-2xl shadow-xl p-2 z-50">
-              <button type="button" onClick={() => { setShowSourceOptions(false); cameraInputRef.current?.click() }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold">
+            <div className="absolute bottom-full mb-2 left-0 right-0 bg-white border border-[var(--primary)] rounded-2xl shadow-xl p-2 z-[999999]">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSourceOptions(false)
+                  cameraInputRef.current?.click()
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold"
+              >
                 <FaCamera className="text-[var(--primary)]" />
                 Câmera
               </button>
-              <button type="button" onClick={() => { setShowSourceOptions(false); galleryInputRef.current?.click() }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold">
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSourceOptions(false)
+                  galleryInputRef.current?.click()
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-neutral-50 transition text-sm font-semibold"
+              >
                 <FaImages className="text-[var(--primary)]" />
                 Galeria
               </button>
             </div>
           )}
+ */}
+
           <input ref={cameraInputRef} type="file" accept="image/*" capture={cameraFacing} onChange={handleSelectImage} className="hidden" />
           <input ref={galleryInputRef} type="file" accept="image/*" onChange={handleSelectImage} className="hidden" />
         </div>
