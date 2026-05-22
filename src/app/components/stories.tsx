@@ -220,7 +220,7 @@ export function RightSidebar() {
     <>
       <div className="hidden lg:flex flex-col h-full">
         {/* Cabeçalho */}
-        <div className="flex-shrink-0 mb-4">
+        <div className="shrink-0 mb-4">
           <div className="flex items-center justify-between">
             <div>
               <h2
@@ -290,7 +290,7 @@ export function RightSidebar() {
                       : "rgba(79, 195, 217, 0.06)",
                   }}
                 >
-                  <div className="relative flex-shrink-0">
+                  <div className="relative shrink-0">
                     {!story.visto && (
                       <div
                         className="absolute -inset-1 rounded-2xl opacity-20 blur-sm"
@@ -328,7 +328,7 @@ export function RightSidebar() {
 
                       {!story.visto && (
                         <span
-                          className="w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0"
+                          className="w-2.5 h-2.5 rounded-full mt-1 shrink-0"
                           style={{
                             backgroundColor: "var(--success)",
                             boxShadow:

@@ -313,7 +313,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                       width={32}
                       height={32}
                       loading="lazy"
-                      quality={100}
+                      
                       draggable={false}
                       className="w-8 h-8 rounded-full object-cover shrink-0"
                     />
@@ -450,7 +450,6 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                                 width={20}
                                 height={20}
                                 loading="lazy"
-                                quality={100}
                                 draggable={false}
                                 className="w-5 h-5 rounded-full object-cover border border-primary shadow-sm shrink-0"
                               />

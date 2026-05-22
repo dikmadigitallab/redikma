@@ -150,7 +150,6 @@ if (!trimmedText && !image) {
   width={1200}
   height={600}
   loading="lazy"
-  quality={100}
   draggable={false}
   className="w-full h-56 object-cover rounded-xl"
 />

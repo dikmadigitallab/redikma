@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "jzwkaxziwimnjxzzupyr.supabase.co",
       },
+        {
+        protocol: "https",
+        hostname: "i.pravatar.cc",
+      },
 
       // Ou, para aceitar qualquer projeto do Supabase:
       // {

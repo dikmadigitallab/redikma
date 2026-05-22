@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { signIn, useSession } from "next-auth/react"
 import { toast } from "sonner"
+import Image from "next/image"
 
 export default function LoginCPF() {
   const [cpf, setCpf] = useState("")
@@ -19,13 +20,13 @@ export default function LoginCPF() {
   useEffect(() => {
     if (status === "loading") return
 
-      if (session?.user) {
-        if (session.user.first_acess) {
-          router.replace("/primeiro-acesso")
-        } else {
-          router.replace("/intern/feed")
-        }
+    if (session?.user) {
+      if (session.user.first_acess) {
+        router.replace("/primeiro-acesso")
+      } else {
+        router.replace("/intern/feed")
       }
+    }
   }, [session, status, router])
 
   function formatCPF(value: string) {
@@ -77,7 +78,7 @@ export default function LoginCPF() {
           className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
         />
         {/* Camada translúcida estilo glassmorphism puxando para o verde da marca */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/80 to-[#047857]/90 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-linear-to-br from-black/80 to-[#047857]/90 mix-blend-multiply" />
 
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -95,12 +96,42 @@ export default function LoginCPF() {
 
           {/* Elemento de Prova Social / Avatares */}
           <div className="flex -space-x-4 justify-center">
-            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=68" alt="Usuário 1" />
-            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=47" alt="Usuário 2" />
-            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=33" alt="Usuário 3" />
-            <img className="w-12 h-12 rounded-full border-2 border-green-900 object-cover" src="https://i.pravatar.cc/100?img=12" alt="Usuário 4" />
-            <div className="w-12 h-12 rounded-full border-2 border-green-900 bg-gray-800 flex items-center justify-center text-xs font-medium text-white shadow-lg">
-              +99
+            <div className="flex -space-x-4 justify-center">
+              <Image
+                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                src="https://i.pravatar.cc/100?img=68"
+                alt="Usuário 1"
+                width={48}
+                height={48}
+              />
+
+              <Image
+                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                src="https://i.pravatar.cc/100?img=47"
+                alt="Usuário 2"
+                width={48}
+                height={48}
+              />
+
+              <Image
+                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                src="https://i.pravatar.cc/100?img=33"
+                alt="Usuário 3"
+                width={48}
+                height={48}
+              />
+
+              <Image
+                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                src="https://i.pravatar.cc/100?img=12"
+                alt="Usuário 4"
+                width={48}
+                height={48}
+              />
+
+              <div className="w-12 h-12 rounded-full border-2 border-green-900 bg-gray-800 flex items-center justify-center text-xs font-medium text-white shadow-lg">
+                +99
+              </div>
             </div>
           </div>
         </motion.div>
@@ -133,7 +164,7 @@ export default function LoginCPF() {
 
         {/* Linha Informe 2: Forma orgânica sobreposta, mais fina e com outra opacidade */}
         <div
-          className="absolute border-[1px] pointer-events-none"
+          className="absolute border pointer-events-none"
           style={{
             borderColor: '#4FC3D9',
             opacity: 0.3,
@@ -148,7 +179,7 @@ export default function LoginCPF() {
 
         {/* Forma Geométrica 1: Círculo Perfeito no fundo esquerdo */}
         <div
-          className="absolute rounded-full border-[4px] pointer-events-none"
+          className="absolute rounded-full border-4 pointer-events-none"
           style={{
             borderColor: '#4FC3D9',
             opacity: 0.08,
@@ -161,7 +192,7 @@ export default function LoginCPF() {
 
         {/* Forma Geométrica 2: Quadrado Rotacionado (Losango) flutuando */}
         <div
-          className="absolute border-[2px] pointer-events-none"
+          className="absolute border-2 pointer-events-none"
           style={{
             borderColor: '#FDE205', // Toque sutil do Accent (Amarelo Forte)
             opacity: 0.1,

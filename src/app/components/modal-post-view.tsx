@@ -243,7 +243,7 @@ export function PostViewModal({ postId, onClose }: Props) {
   width={40}
   height={40}
   loading="lazy"
-  quality={100}
+  
   draggable={false}
   className="relative w-10 h-10 rounded-full object-cover border-2"
   style={{
@@ -319,7 +319,7 @@ export function PostViewModal({ postId, onClose }: Props) {
   width={1200}
   height={800}
   loading="lazy"
-  quality={100}
+  
   draggable={false}
   onClick={() =>
     setSelectedImage(post.image)

@@ -446,7 +446,6 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     width={44}
                     height={44}
                     loading="lazy"
-                    quality={100}
                     draggable={false}
                     className="relative w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border-2"
                     style={{
@@ -519,7 +518,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                     width={1200}
                     height={800}
                     loading="lazy"
-                    quality={100}
+                   
                     draggable={false}
                     onClick={() =>
                       handleOpenImage(post.image, post.id, post.authorId)
@@ -545,12 +544,12 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                   }}
                 >
                   <Image
-                    src={user?.foto || "/photoProfile/userDefault.png"}
+                    src={post.author?.foto || "/photoProfile/userDefault.png"}
                     alt="Comentador"
                     width={28}
                     height={28}
                     loading="lazy"
-                    quality={100}
+                    quality={10}
                     draggable={false}
                     className="w-7 h-7 rounded-full object-cover shrink-0"
                   />

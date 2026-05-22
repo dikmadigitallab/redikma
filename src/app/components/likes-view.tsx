@@ -31,7 +31,7 @@ export function LikeView({ likers = [], totalLikes = 0 }: LikeViewProps) {
               width={24}
               height={24}
               loading="lazy"
-              quality={100}
+              
               draggable={false}
               className="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm"
               style={{ zIndex: 3 - index }}

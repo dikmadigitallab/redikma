@@ -212,7 +212,7 @@ export function Header() {
   width={300}
   height={300}
   priority
-  quality={100}
+  
   draggable={false}
   className="w-full h-full object-contain"
 />
@@ -327,7 +327,7 @@ export function Header() {
   width={600}
   height={600}
   loading="lazy"
-  quality={100}
+  
   draggable={false}
   className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
 />
@@ -404,7 +404,7 @@ export function Header() {
   width={200}
   height={200}
   loading="lazy"
-  quality={100}
+  
   draggable={false}
   className="w-full h-full object-cover"
 />

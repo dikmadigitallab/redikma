@@ -169,7 +169,7 @@ export function NotificationsBox({ userId }: { userId: string }) {
                     width={32}
                     height={32}
                     loading="lazy"
-                    quality={100}
+                 
                     draggable={false}
                     className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
                   />

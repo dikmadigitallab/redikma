@@ -1,5 +1,7 @@
 'use client'
 
+/* não mexer nessa agora
+ */
 import Image from 'next/image'
 import { Heart, MessageCircle, Send } from 'lucide-react'
 import { useEffect, useState, type SyntheticEvent } from 'react'
@@ -57,7 +59,7 @@ export function PhotoPost({
   onEdit,
 }: PhotoPostProps) {
   const isAuthor = currentUserId === post.author.id
-  const [imageLoaded, setImageLoaded] = useState(false)
+  const [, setImageLoaded] = useState(false)
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [isTouchDevice] = useState<boolean>(() => {
@@ -107,7 +109,7 @@ export function PhotoPost({
             <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-3 z-10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/50 bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/50 bg-white/10 flex items-center justify-center shrink-0">
                     {post.author.foto && (post.author.foto.startsWith('http') || post.author.foto.startsWith('/')) ? (
                       <Image
                         src={post.author.foto}
@@ -238,7 +240,7 @@ export function PhotoPost({
         ) : null}
         <div className="p-4 md:p-5 space-y-4">
           <div className="flex items-start gap-3 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
-            <div className="relative flex-shrink-0">
+            <div className="relative shrink-0">
               <div className="absolute -inset-1 rounded-full opacity-15" style={{ backgroundColor: "var(--secondary)" }} />
               <img
                 src={post.author.foto || "/photoProfile/userDefault.png"}
@@ -304,7 +306,7 @@ export function PhotoPost({
             >
               <img
                 src="/photoProfile/userDefault.png"
-                className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                className="w-7 h-7 rounded-full object-cover shrink-0"
                 alt="Comentador"
               />
               <input

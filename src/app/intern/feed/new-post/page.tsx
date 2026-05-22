@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Editor } from "@/app/components/photo-editor-mobile"
 // Importe um ícone de troca se tiver (ex: lucide-react) ou use texto
 import { ImagePlus, Camera, RefreshCw } from "lucide-react"
+import Image from "next/image"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -20,8 +21,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const [finalBlob, setFinalBlob] = useState<Blob | null>(null)
   const [showEditor, setShowEditor] = useState(false)
 
-  const [isFixed, setIsFixed] = useState(false)
-  const [duration, setDuration] = useState<DurationType>("24h")
+  const [isFixed,] = useState(false)
+  const [duration,] = useState<DurationType>("24h")
   const [loading, setLoading] = useState(false)
 
   // NOVO: Estado para controlar qual câmera usar
@@ -38,9 +39,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   const [showCamera, setShowCamera] = useState(false)
 
+
   useEffect(() => {
     return () => stopCamera()
-  }, [])
+  }, [stopCamera])
+
+
 
   useEffect(() => {
     if (showCamera && !finalBlob && !showEditor) {
@@ -48,7 +52,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
     } else if (!showCamera) {
       stopCamera()
     }
-  }, [showCamera, finalBlob, showEditor, facingMode])
+  }, [showCamera, finalBlob, showEditor, facingMode]) //resolver depois
+
+
+
+
+
+
 
   async function startCamera() {
     stopCamera()
@@ -69,7 +79,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
       stream.getTracks().forEach(t => t.stop())
       setStream(null)
     }
-  }
+  } //acertar depois
 
   function toggleCamera() {
     setFacingMode(prev => prev === "environment" ? "user" : "environment")
@@ -147,12 +157,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   return (
-    <main className="h-[100dvh] bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
+    <main className="h-dvh bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
 
 
 
       {/* 
-      <header className="flex-shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-[var(--primary)] px-4 py-3 safe-top flex items-center justify-between">
+      <header className="shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-[var(--primary)] px-4 py-3 safe-top flex items-center justify-between">
         <button
           onClick={() => window.history.back()}
           className="text-sm text-[var(--primary)] hover:text-black transition min-w-14 text-left"
@@ -172,7 +182,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
 
           {/* TEXTAREA */}
-          <div className="rounded-2xl bg-white border border-[var(--primary)] p-4 shadow-sm">
+          <div className="rounded-2xl bg-white border border-primary p-4 shadow-sm">
             <textarea
               placeholder="Compartilhe algo..."
               value={text}
@@ -182,7 +192,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
           </div>
 
           {/* ÁREA DE MÍDIA (CÂMERA / PREVIEW / EDITOR) */}
-          <div className="rounded-2xl bg-white border border-[var(--primary)] p-3 shadow-sm space-y-4">
+          <div className="rounded-2xl bg-white border border-primary p-3 shadow-sm space-y-4">
 
             {showEditor && image && (
               <div className="w-full overflow-hidden rounded-2xl">
@@ -204,13 +214,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
               <>
                 {showCamera ? (
                   <>
-                    <div className="relative rounded-2xl overflow-hidden bg-black border border-[var(--primary)]">
+                    <div className="relative rounded-2xl overflow-hidden bg-black border border-primary">
                       <video
                         ref={videoRef}
                         autoPlay
                         playsInline
                         muted
-                        className="w-full aspect-[3/4] max-h-[40vh] sm:max-h-[60vh] object-cover"
+                        className="w-full aspect-3/4 max-h-[40vh] sm:max-h-[60vh] object-cover"
                         style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
                       />
                       <button
@@ -243,10 +253,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
                     <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center">
                       <ImagePlus size={32} className="text-neutral-400" />
                     </div>
-                    <p className="text-sm text-[var(--primary)] text-center max-w-[200px]">
+                    <p className="text-sm text-primary text-center max-w-50">
                       Adicione uma imagem ao seu post
                     </p>
-                    <div className="flex flex-col w-full gap-2.5 max-w-[260px]">
+                    <div className="flex flex-col w-full gap-2.5 max-w-65">
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
@@ -272,10 +282,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
             {!showEditor && finalBlob && (
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden border border-[var(--primary)] bg-neutral-100">
-                  <img
+                <div className="rounded-2xl overflow-hidden border border-primary bg-neutral-100">
+                  <Image
                     src={URL.createObjectURL(finalBlob)}
                     alt="Final"
+                    width={1000}
+                    height={1000}
+                    unoptimized
                     className="w-full aspect-square max-h-[40vh] object-cover"
                   />
                 </div>

@@ -132,7 +132,7 @@ export const StoriesModal = ({
                 width={1200}
                 height={800}
                 loading="lazy"
-                quality={100}
+              
                 draggable={false}
                 className="w-full rounded-2xl mt-6 object-cover max-h-420px"
               />

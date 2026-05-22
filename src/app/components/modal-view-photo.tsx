@@ -87,7 +87,7 @@ export function ImageModal({ image, open, onClose, postId, authorId }: Props) {
               width={1920}
               height={1080}
               loading="lazy"
-              quality={100}
+           
               draggable={false}
               className="w-full h-auto max-h-[85vh] object-contain rounded-2xl"
               onDoubleClick={() => curtir()}
