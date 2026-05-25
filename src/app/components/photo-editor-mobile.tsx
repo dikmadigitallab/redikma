@@ -905,7 +905,7 @@ export function Editor({
             disabled={loading}
             className="flex-1 py-3 text-sm font-bold bg-accent text-white rounded-xl disabled:opacity-50 transition transform hover:scale-105 hover:shadow-lg shadow-lg shadow-accent)]/50"
           >
-            [var(--
+            
             {loading ? "Salvando..." : "Confirmar"}
           </button>
         </div>
