@@ -71,6 +71,34 @@ export async function uploadImage(
 
 
 
+export async function uploadVideo(
+  file: File,
+  bucket: string
+): Promise<string> {
+  const arrayBuffer = await file.arrayBuffer()
+  const buffer = Buffer.from(arrayBuffer)
+
+  const ext = file.name.split(".").pop() || "mp4"
+  const fileName = generateFileName(ext)
+  const filePath = `posts-video/${fileName}`
+
+  const { error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, buffer, {
+      contentType: file.type || "video/mp4",
+    })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  const { data } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath)
+
+  return data.publicUrl
+}
+
 // função específica para upload de imagem de perfil, que remove a imagem anterior (se existir) para evitar acúmulo de arquivos
 export async function uploadProfileImage(
   file: File,
