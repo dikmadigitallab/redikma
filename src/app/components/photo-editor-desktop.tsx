@@ -25,10 +25,26 @@ export function EditorDesktop({
   onCancel,
   aspectRatio = "1/1",
 }: EditorDesktopProps) {
-  const preview = useMemo(() => {
-    if (!imageFile) return null;
-    return URL.createObjectURL(imageFile);
-  }, [imageFile]);
+
+
+const [preview, setPreview] = useState<string | null>(null);
+
+useEffect(() => {
+  if (!imageFile) {
+    setPreview(null);
+    return;
+  }
+
+  const objectUrl = URL.createObjectURL(imageFile);
+
+  setPreview(objectUrl);
+
+  return () => {
+    URL.revokeObjectURL(objectUrl);
+  };
+}, [imageFile]);
+
+
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -64,13 +80,7 @@ export function EditorDesktop({
     return () => window.clearTimeout(timeoutId);
   }, [imageFile]);
 
-  useEffect(() => {
-    return () => {
-      if (preview) {
-        URL.revokeObjectURL(preview);
-      }
-    };
-  }, [preview]);
+
 
   useEffect(() => {
     function handleMove(e: MouseEvent) {
@@ -170,6 +180,7 @@ export function EditorDesktop({
       );
     } catch (error) {
       toast.error("Erro ao processar imagem");
+      console.error(error);
       setLoading(false);
     }
   }
@@ -195,7 +206,7 @@ export function EditorDesktop({
           alt="Preview"
           fill
           unoptimized
-          sizes="100vw"
+          sizes="100px"
           className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none"
           style={{
             transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
