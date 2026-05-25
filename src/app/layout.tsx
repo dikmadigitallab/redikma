@@ -39,7 +39,7 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${redHatDisplay.variable} ${redHatText.variable} ${geistMono.variable} h-full antialiased bg-white`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <Providers>
           <NotificationProvider>
           <PostModalProvider>

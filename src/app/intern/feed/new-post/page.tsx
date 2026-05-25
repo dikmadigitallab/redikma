@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Editor } from "@/app/components/photo-editor-mobile"
 // Importe um ícone de troca se tiver (ex: lucide-react) ou use texto
-import { ImagePlus, Camera, RefreshCw } from "lucide-react"
+import { ImagePlus, Camera, RefreshCw, Video } from "lucide-react"
 import Image from "next/image"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
@@ -20,6 +20,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const [image, setImage] = useState<File | null>(null)
   const [finalBlob, setFinalBlob] = useState<Blob | null>(null)
   const [showEditor, setShowEditor] = useState(false)
+
+  const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
 
   const [isFixed,] = useState(false)
   const [duration,] = useState<DurationType>("24h")
@@ -35,6 +38,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
   const [stream, setStream] = useState<MediaStream | null>(null)
 
   const [showCamera, setShowCamera] = useState(false)
@@ -93,6 +97,34 @@ export default function CreatePostPage({ onRefresh }: Props) {
     stopCamera()
   }
 
+  function handleVideoSelection(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const tempUrl = URL.createObjectURL(file)
+    const tempVideo = document.createElement("video")
+    tempVideo.preload = "metadata"
+
+    tempVideo.onloadedmetadata = () => {
+      const duration = tempVideo.duration
+      if (duration < 3 || duration > 10) {
+        toast.error("O vídeo deve ter entre 3 e 10 segundos")
+        URL.revokeObjectURL(tempUrl)
+        return
+      }
+      setVideo(file)
+      setVideoPreview(tempUrl)
+      stopCamera()
+    }
+
+    tempVideo.onerror = () => {
+      toast.error("Não foi possível ler o vídeo")
+      URL.revokeObjectURL(tempUrl)
+    }
+
+    tempVideo.src = tempUrl
+  }
+
   function takePhoto() {
     if (!videoRef.current || !canvasRef.current) return
     const video = videoRef.current
@@ -122,9 +154,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
     setShowEditor(false)
   }
 
+  function resetVideo() {
+    if (videoPreview) URL.revokeObjectURL(videoPreview)
+    setVideo(null)
+    setVideoPreview(null)
+  }
+
   async function handleSubmit() {
     if (!user?.id) return toast.error("Usuário não identificado")
-    if (!text && !finalBlob) return toast.warning("Adicione conteúdo")
+    if (!text && !finalBlob && !video) return toast.warning("Adicione conteúdo")
 
     setLoading(true)
     try {
@@ -137,6 +175,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
       if (finalBlob) {
         const finalFile = new File([finalBlob], "post.jpg", { type: "image/jpeg" })
         formData.append("image", finalFile)
+      }
+
+      if (video) {
+        formData.append("video", video)
       }
 
       const res = await fetch("/api/posts", {
@@ -210,7 +252,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
               </div>
             )}
 
-            {!showEditor && !finalBlob && (
+            {!showEditor && !finalBlob && !video && (
               <>
                 {showCamera ? (
                   <>
@@ -254,7 +296,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       <ImagePlus size={32} className="text-neutral-400" />
                     </div>
                     <p className="text-sm text-primary text-center max-w-50">
-                      Adicione uma imagem ao seu post
+                      Adicione mídia ao seu post
                     </p>
                     <div className="flex flex-col w-full gap-2.5 max-w-65">
                       <button
@@ -273,10 +315,19 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         <Camera size={18} />
                         Usar câmera
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => videoInputRef.current?.click()}
+                        className="w-full py-3 rounded-2xl border-2 border-black/20 bg-white text-sm font-medium active:scale-[0.98] transition flex items-center justify-center gap-2"
+                      >
+                        <Video size={18} />
+                        Adicionar Frash
+                      </button>
                     </div>
                   </div>
                 )}
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+                <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelection} className="hidden" />
               </>
             )}
 
@@ -302,6 +353,33 @@ export default function CreatePostPage({ onRefresh }: Props) {
                 </div>
               </div>
             )}
+
+            {!showEditor && video && videoPreview && (
+              <div className="space-y-4">
+                <div className="relative rounded-2xl overflow-hidden border border-primary bg-black">
+                  <video
+                    src={videoPreview}
+                    controls
+                    muted
+                    className="w-full max-h-[40vh]"
+                  />
+                  <div
+                    className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                    style={{
+                      backgroundColor: "var(--accent)",
+                      color: "var(--white)",
+                    }}
+                  >
+                    Frash
+                  </div>
+                </div>
+                <div className="flex justify-end items-center px-1">
+                  <button onClick={resetVideo} className="text-sm font-medium text-red-500">
+                    Remover
+                  </button>
+                </div>
+              </div>
+            )}
             <canvas ref={canvasRef} className="hidden" />
           </div>
 
@@ -318,7 +396,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={loading || (!text && !finalBlob)}
+              disabled={loading || (!text && !finalBlob && !video)}
               className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
             >
               {loading ? "Publicando..." : "Publicar"}

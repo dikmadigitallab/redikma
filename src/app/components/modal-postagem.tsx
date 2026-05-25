@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -18,6 +18,8 @@ export function CreatNewPost({ open, onClose, onSuccess, onRefresh }: Props) {
   const [text, setText] = useState("")
   const [image, setImage] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+  const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [isRecurring, setIsRecurring] = useState(false)
   const [isFixed, setIsFixed] = useState(false)
   const [duration, setDuration] = useState<DurationType>("24h")
@@ -25,15 +27,42 @@ export function CreatNewPost({ open, onClose, onSuccess, onRefresh }: Props) {
   const { data: session } = useSession()
   const user = session?.user
 
+  const videoInputRef = useRef<HTMLInputElement>(null)
+
   function handleImageChange(file: File | null) {
     setImage(file)
-
     if (file) {
       const url = URL.createObjectURL(file)
       setPreview(url)
     } else {
       setPreview(null)
     }
+  }
+
+  function handleVideoChange(file: File | null) {
+    if (!file) return
+
+    const tempUrl = URL.createObjectURL(file)
+    const tempVideo = document.createElement("video")
+    tempVideo.preload = "metadata"
+
+    tempVideo.onloadedmetadata = () => {
+      const duration = tempVideo.duration
+      if (duration < 3 || duration > 10) {
+        toast.error("O vídeo deve ter entre 3 e 10 segundos")
+        URL.revokeObjectURL(tempUrl)
+        return
+      }
+      setVideo(file)
+      setVideoPreview(tempUrl)
+    }
+
+    tempVideo.onerror = () => {
+      toast.error("Não foi possível ler o vídeo")
+      URL.revokeObjectURL(tempUrl)
+    }
+
+    tempVideo.src = tempUrl
   }
 
     async function handleSubmit() {
@@ -43,14 +72,8 @@ export function CreatNewPost({ open, onClose, onSuccess, onRefresh }: Props) {
     }
 const trimmedText = text.trim()
 
-// Permite:
-// - somente texto
-// - somente imagem
-// - texto + imagem
-// Impede:
-// - texto vazio e sem imagem
-if (!trimmedText && !image) {
-  toast.warning("Adicione um texto ou uma imagem para postar")
+if (!trimmedText && !image && !video) {
+  toast.warning("Adicione um texto, imagem ou vídeo para postar")
   return
 }
 
@@ -70,6 +93,10 @@ if (!trimmedText && !image) {
         formData.append("image", image)
       }
 
+      if (video) {
+        formData.append("video", video)
+      }
+
       const res = await fetch("/api/posts", {
         method: "POST",
         body: formData
@@ -86,6 +113,9 @@ if (!trimmedText && !image) {
       setText("")
       setImage(null)
       setPreview(null)
+      setVideo(null)
+      if (videoPreview) URL.revokeObjectURL(videoPreview)
+      setVideoPreview(null)
       setIsRecurring(false)
       setIsFixed(false)
       setDuration("24h")
@@ -125,21 +155,37 @@ if (!trimmedText && !image) {
 
         <div className="rounded-xl p-4 text-center space-y-3 transition hover:bg-primary-10" style={{ border: `3px dashed var(--primary)` }}>
 
-          {!preview && (
-            <>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  handleImageChange(e.target.files?.[0] || null)
-                }
-                className="w-full text-sm"
-                style={{ color: 'var(--gray)' }}
-              />
+          {!preview && !videoPreview && (
+            <div className="space-y-3">
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center justify-center gap-2 cursor-pointer text-sm font-medium" style={{ color: 'var(--primary)' }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleImageChange(e.target.files?.[0] || null)
+                    }
+                    className="hidden"
+                  />
+                  <span className="px-4 py-2 rounded-xl border-2 transition hover:shadow-md" style={{ borderColor: 'var(--primary)' }}>
+                    Adicionar Imagem
+                  </span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => videoInputRef.current?.click()}
+                  className="px-4 py-2 rounded-xl border-2 text-sm font-medium transition hover:shadow-md"
+                  style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}
+                >
+                  Adicionar Frash (vídeo)
+                </button>
+                <input ref={videoInputRef} type="file" accept="video/*" onChange={(e) => handleVideoChange(e.target.files?.[0] || null)} className="hidden" />
+              </div>
               <p className="text-xs" style={{ color: 'var(--gray)' }}>
-                Adicione uma imagem opcional
+                Adicione uma imagem ou vídeo Frash (3-10s)
               </p>
-            </>
+            </div>
           )}
 
           {preview && (
@@ -161,6 +207,40 @@ if (!trimmedText && !image) {
                 style={{ color: 'var(--accent)' }}
               >
                 Remover imagem
+              </button>
+            </div>
+          )}
+
+          {videoPreview && (
+            <div className="space-y-2">
+              <div className="relative rounded-xl overflow-hidden bg-black">
+                <video
+                  src={videoPreview}
+                  controls
+                  muted
+                  className="w-full max-h-56"
+                />
+                <div
+                  className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  style={{
+                    backgroundColor: "var(--accent)",
+                    color: "var(--white)",
+                  }}
+                >
+                  Frash
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (videoPreview) URL.revokeObjectURL(videoPreview)
+                  setVideo(null)
+                  setVideoPreview(null)
+                }}
+                className="text-xs hover:underline transition"
+                style={{ color: 'var(--accent)' }}
+              >
+                Remover vídeo
               </button>
             </div>
           )}

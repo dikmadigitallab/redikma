@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CommentsBox } from "./comentarios";
 import { PostBar } from "./posts-bar";
 import { useSession } from "next-auth/react";
@@ -21,6 +21,7 @@ type Post = {
   createdAt: string;
   authorId: string;
   image: string;
+  video?: string;
   author: {
     id: string;
     nome: string;
@@ -31,6 +32,42 @@ type Post = {
   postador: string;
   comentarios: [];
 };
+
+function FrashPlayer({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = ref.current
+    if (!video) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {})
+        } else {
+          video.pause()
+        }
+      },
+      { threshold: 0.5 }
+    )
+
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      muted
+      playsInline
+      loop
+      controls
+      className="w-full max-h-520px"
+      style={{ maxHeight: "520px" }}
+    />
+  )
+}
 
 export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const { data: session } = useSession();
@@ -503,6 +540,28 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                   {renderTextWithLinks(post.label)}
                 </div>
               </div>
+
+              {/* Vídeo (Frash) */}
+              {post.video && (
+                <div className="relative rounded-2xl overflow-hidden border"
+                  style={{
+                    backgroundColor: "var(--background)",
+                    borderColor: "var(--border)",
+                  }}
+                >
+                  <FrashPlayer src={post.video} />
+
+                  <div
+                    className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                    style={{
+                      backgroundColor: "var(--accent)",
+                      color: "var(--white)",
+                    }}
+                  >
+                    Frash
+                  </div>
+                </div>
+              )}
 
               {/* Imagem */}
               {post.image && (

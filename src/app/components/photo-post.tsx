@@ -22,6 +22,7 @@ type PhotoPostProps = {
     createdAt: string
     authorId: string
     image: string
+    video?: string
     author: {
       id: string
       nome: string
@@ -99,6 +100,7 @@ export function PhotoPost({
               src={post.image}
               alt="Post de foto"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
               priority
               onLoad={handleImageLoad}

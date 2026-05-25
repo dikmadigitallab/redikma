@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import {
   RiImageEditFill,
   RiImageAddLine,
+  RiVideoAddLine,
   RiCloseLine,
 } from "react-icons/ri"
 import { useSession } from "next-auth/react"
@@ -25,7 +26,11 @@ export function PostBar({ onCreated, onRefresh }: Props) {
   const [showEditor, setShowEditor] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const { data: session } = useSession()
@@ -39,12 +44,10 @@ export function PostBar({ onCreated, onRefresh }: Props) {
 
   useEffect(() => {
     return () => {
-      if (preview) {
-        URL.revokeObjectURL(preview)
-
-      }
+      if (preview) URL.revokeObjectURL(preview)
+      if (videoPreview) URL.revokeObjectURL(videoPreview)
     }
-  }, [preview])
+  }, [preview, videoPreview])
 
   function handleImageSelection(file: File | null) {
     if (!file) return
@@ -74,6 +77,33 @@ export function PostBar({ onCreated, onRefresh }: Props) {
 
     // Abre o editor desktop
     setShowEditor(true)
+  }
+
+  function handleVideoSelection(file: File | null) {
+    if (!file) return
+
+    if (videoPreview) URL.revokeObjectURL(videoPreview)
+
+    const video = document.createElement("video")
+    video.preload = "metadata"
+
+    video.onloadedmetadata = () => {
+      const duration = video.duration
+      if (duration < 3 || duration > 10) {
+        toast.error("O vídeo deve ter entre 3 e 10 segundos")
+        URL.revokeObjectURL(video.src)
+        return
+      }
+      setVideo(file)
+      setVideoPreview(video.src)
+    }
+
+    video.onerror = () => {
+      toast.error("Não foi possível ler o vídeo")
+      URL.revokeObjectURL(video.src)
+    }
+
+    video.src = URL.createObjectURL(file)
   }
 
   function handleSaveEditedImage(blob: Blob) {
@@ -109,8 +139,8 @@ export function PostBar({ onCreated, onRefresh }: Props) {
 
     const trimmedText = text.trim()
 
-    if (!trimmedText && !finalBlob) {
-      return toast.warning("Adicione um texto ou uma imagem para postar")
+    if (!trimmedText && !finalBlob && !video) {
+      return toast.warning("Adicione um texto, imagem ou vídeo para postar")
     }
 
     setLoading(true)
@@ -129,6 +159,10 @@ export function PostBar({ onCreated, onRefresh }: Props) {
         })
 
         formData.append("image", file)
+      }
+
+      if (video) {
+        formData.append("video", video)
       }
 
       const res = await fetch("/api/posts", {
@@ -154,14 +188,15 @@ export function PostBar({ onCreated, onRefresh }: Props) {
   }
 
   function resetForm() {
-    if (preview) {
-      URL.revokeObjectURL(preview)
-    }
+    if (preview) URL.revokeObjectURL(preview)
+    if (videoPreview) URL.revokeObjectURL(videoPreview)
 
     setText("")
     setImage(null)
     setFinalBlob(null)
     setPreview(null)
+    setVideo(null)
+    setVideoPreview(null)
     setShowEditor(false)
     setOpen(false)
   }
@@ -340,12 +375,56 @@ export function PostBar({ onCreated, onRefresh }: Props) {
               </div>
             )}
 
+            {/* Preview do vídeo */}
+            {videoPreview && (
+              <div
+                className="relative rounded-2xl overflow-hidden border"
+                style={{
+                  backgroundColor: "var(--background)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <video
+                  src={videoPreview}
+                  controls
+                  className="w-full max-h-105"
+                  style={{ maxHeight: "420px" }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (videoPreview) URL.revokeObjectURL(videoPreview)
+                    setVideo(null)
+                    setVideoPreview(null)
+                  }}
+                  className="absolute top-3 right-3 w-10 h-10 rounded-xl flex items-center justify-center transition-opacity hover:opacity-80"
+                  style={{
+                    backgroundColor: "rgba(26, 26, 26, 0.65)",
+                    color: "var(--white)",
+                  }}
+                >
+                  <RiCloseLine className="w-5 h-5" />
+                </button>
+
+                <div
+                  className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                  style={{
+                    backgroundColor: "var(--accent)",
+                    color: "var(--white)",
+                  }}
+                >
+                  Frash
+                </div>
+              </div>
+            )}
+
             {/* Rodapé */}
             <div
               className="flex items-center justify-between pt-4 border-t"
               style={{ borderColor: "var(--border)" }}
             >
-              {/* Botão de adicionar foto */}
+              {/* Botões de mídia */}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -374,6 +453,34 @@ export function PostBar({ onCreated, onRefresh }: Props) {
                   }
                   className="hidden"
                 />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    videoInputRef.current?.click()
+                  }
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition hover:shadow-md hover:border-accent"
+                  style={{
+                    backgroundColor: "var(--background)",
+                    borderColor: "var(--primary)",
+                    color: "var(--primary)",
+                  }}
+                >
+                  <RiVideoAddLine className="w-5 h-5" />
+                  <span>Adicionar Frash</span>
+                </button>
+
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) =>
+                    handleVideoSelection(
+                      e.target.files?.[0] || null
+                    )
+                  }
+                  className="hidden"
+                />
               </div>
 
               {/* Botões de ação */}
@@ -395,7 +502,7 @@ export function PostBar({ onCreated, onRefresh }: Props) {
                   onClick={handleSubmit}
                   disabled={
                     loading ||
-                    (!text.trim() && !finalBlob)
+                    (!text.trim() && !finalBlob && !video)
                   }
                   className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
                   style={{

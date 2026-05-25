@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { uploadImage } from "@/lib/uploads"
+import { uploadImage, uploadVideo } from "@/lib/uploads"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
 
@@ -14,9 +14,8 @@ export async function POST(req: Request) {
     const postador = formData.get("postador") as string
     const duration = formData.get("duration") as string
     const imageFile = formData.get("image")
+    const videoFile = formData.get("video")
 
-    // Agora authorId é obrigatório, mas label pode ser vazio
-    // desde que exista uma imagem.
     if (!authorId) {
       return NextResponse.json(
         { error: "Usuário não informado" },
@@ -24,19 +23,14 @@ export async function POST(req: Request) {
       )
     }
 
-    // Verifica se foi enviada uma imagem válida
     const hasImage =
       imageFile instanceof File && imageFile.size > 0
+    const hasVideo =
+      videoFile instanceof File && videoFile.size > 0
 
-    // Permite:
-    // - somente texto
-    // - somente imagem
-    // - texto + imagem
-    // Impede:
-    // - texto vazio e sem imagem
-    if (!label && !hasImage) {
+    if (!label && !hasImage && !hasVideo) {
       return NextResponse.json(
-        { error: "Adicione um texto ou uma imagem para postar" },
+        { error: "Adicione um texto, imagem ou vídeo para postar" },
         { status: 400 }
       )
     }
@@ -64,9 +58,14 @@ export async function POST(req: Request) {
     }
 
     let imageUrl: string | null = null
+    let videoUrl: string | null = null
 
     if (hasImage) {
       imageUrl = await uploadImage(imageFile, "Postagens")
+    }
+
+    if (hasVideo) {
+      videoUrl = await uploadVideo(videoFile, "post-videos")
     }
 
     const postagem = await prisma.postagem.create({
@@ -75,7 +74,7 @@ export async function POST(req: Request) {
         authorId,
         duration: duration ?? "",
         image: imageUrl,
-        video: null,
+        video: videoUrl,
         postador,
         publicado: true,
       },
