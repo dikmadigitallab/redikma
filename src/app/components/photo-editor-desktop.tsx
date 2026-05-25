@@ -1,22 +1,23 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { toast } from "sonner"
+import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
+import { toast } from "sonner";
 
 interface EditorDesktopProps {
-  imageFile: File | null
-  onSave: (blob: Blob) => void
-  onCancel: () => void
-  aspectRatio?: string
+  imageFile: File | null;
+  onSave: (blob: Blob) => void;
+  onCancel: () => void;
+  aspectRatio?: string;
 }
 
 type Settings = {
-  brightness: number
-  contrast: number
-  saturation: number
-  temperature: number
-  sharpness: number
-}
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  temperature: number;
+  sharpness: number;
+};
 
 export function EditorDesktop({
   imageFile,
@@ -24,11 +25,11 @@ export function EditorDesktop({
   onCancel,
   aspectRatio = "1/1",
 }: EditorDesktopProps) {
-  const [preview, setPreview] = useState<string | null>(null)
-  const [zoom, setZoom] = useState(1)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [dragging, setDragging] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [preview, setPreview] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [settings, setSettings] = useState<Settings>({
     brightness: 100,
@@ -36,136 +37,140 @@ export function EditorDesktop({
     saturation: 100,
     temperature: 0,
     sharpness: 0,
-  })
+  });
 
-  const dragStart = useRef({ x: 0, y: 0 })
-  const containerRef = useRef<HTMLDivElement>(null)
+  const dragStart = useRef({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Gerencia a URL de preview e reseta estados quando a imagem muda
   useEffect(() => {
     if (!imageFile) {
-      setPreview(null)
-      return
+      setPreview(null);
+      return;
     }
 
-    const url = URL.createObjectURL(imageFile)
-    setPreview(url)
-    
+    const url = URL.createObjectURL(imageFile);
+    setPreview(url);
+
     // Reseta os controles para os valores padrão sempre que uma nova imagem é carregada
-    setZoom(1)
-    setPosition({ x: 0, y: 0 })
+    setZoom(1);
+    setPosition({ x: 0, y: 0 });
     setSettings({
       brightness: 100,
       contrast: 100,
       saturation: 100,
       temperature: 0,
       sharpness: 0,
-    })
+    });
 
     return () => {
-      URL.revokeObjectURL(url)
-    }
-  }, [imageFile])
+      URL.revokeObjectURL(url);
+    };
+  }, [imageFile]);
 
   useEffect(() => {
     function handleMove(e: MouseEvent) {
-      if (!dragging) return
+      if (!dragging) return;
       setPosition({
         x: e.clientX - dragStart.current.x,
         y: e.clientY - dragStart.current.y,
-      })
+      });
     }
 
     function handleUp() {
-      setDragging(false)
+      setDragging(false);
     }
 
     if (dragging) {
-      window.addEventListener("mousemove", handleMove)
-      window.addEventListener("mouseup", handleUp)
+      window.addEventListener("mousemove", handleMove);
+      window.addEventListener("mouseup", handleUp);
     }
 
     return () => {
-      window.removeEventListener("mousemove", handleMove)
-      window.removeEventListener("mouseup", handleUp)
-    }
-  }, [dragging])
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+  }, [dragging]);
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const container = containerRef.current;
+    if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
-      e.preventDefault()
-      setZoom((prev) => Math.min(Math.max(prev + e.deltaY * -0.001, 1), 3))
-    }
+      e.preventDefault();
+      setZoom((prev) => Math.min(Math.max(prev + e.deltaY * -0.001, 1), 3));
+    };
 
-    container.addEventListener("wheel", handleWheel, { passive: false })
-    return () => container.removeEventListener("wheel", handleWheel)
-  }, [])
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    return () => container.removeEventListener("wheel", handleWheel);
+  }, []);
 
   function getFilterString() {
-    return `brightness(${settings.brightness}%) contrast(${settings.contrast}%) saturate(${settings.saturation}%)`
+    return `brightness(${settings.brightness}%) contrast(${settings.contrast}%) saturate(${settings.saturation}%)`;
   }
 
   async function generateResult() {
-    if (!preview) return
-    setLoading(true)
+    if (!preview) return;
+    setLoading(true);
 
     try {
-      const img = new Image()
+      const img = new Image();
       await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve()
-        img.onerror = () => reject()
-        img.src = preview
-      })
+        img.onload = () => resolve();
+        img.onerror = () => reject();
+        img.src = preview;
+      });
 
-      const canvas = document.createElement("canvas")
-      const ctx = canvas.getContext("2d")
-      if (!ctx) throw new Error()
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error();
 
-      const size = 1080
-      canvas.width = size
-      canvas.height = size
+      const size = 1080;
+      canvas.width = size;
+      canvas.height = size;
 
-      const imgRatio = img.width / img.height
-      let drawWidth = size
-      let drawHeight = size
-      let offsetX = 0
-      let offsetY = 0
+      const imgRatio = img.width / img.height;
+      let drawWidth = size;
+      let drawHeight = size;
+      let offsetX = 0;
+      let offsetY = 0;
 
       if (imgRatio > 1) {
-        drawWidth = size * imgRatio
-        offsetX = (size - drawWidth) / 2
+        drawWidth = size * imgRatio;
+        offsetX = (size - drawWidth) / 2;
       } else {
-        drawHeight = size / imgRatio
-        offsetY = (size - drawHeight) / 2
+        drawHeight = size / imgRatio;
+        offsetY = (size - drawHeight) / 2;
       }
 
-      const containerWidth = containerRef.current?.clientWidth || size
-      const scaleFactor = size / containerWidth
+      const containerWidth = containerRef.current?.clientWidth || size;
+      const scaleFactor = size / containerWidth;
 
-      ctx.save()
-      ctx.translate(size / 2, size / 2)
-      ctx.translate(position.x * scaleFactor, position.y * scaleFactor)
-      ctx.scale(zoom, zoom)
-      ctx.translate(-size / 2, -size / 2)
+      ctx.save();
+      ctx.translate(size / 2, size / 2);
+      ctx.translate(position.x * scaleFactor, position.y * scaleFactor);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-size / 2, -size / 2);
 
-      ctx.filter = getFilterString()
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight)
-      ctx.restore()
+      ctx.filter = getFilterString();
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      ctx.restore();
 
-      canvas.toBlob((blob) => {
-        setLoading(false)
-        if (blob) onSave(blob)
-      }, "image/jpeg", 0.9)
+      canvas.toBlob(
+        (blob) => {
+          setLoading(false);
+          if (blob) onSave(blob);
+        },
+        "image/jpeg",
+        0.9,
+      );
     } catch (error) {
-      toast.error("Erro ao processar imagem")
-      setLoading(false)
+      toast.error("Erro ao processar imagem");
+      setLoading(false);
     }
   }
 
-  if (!imageFile || !preview) return null
+  if (!imageFile || !preview) return null;
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-md mx-auto bg-white p-4 rounded-3xl shadow-xl">
@@ -174,16 +179,19 @@ export function EditorDesktop({
         className="relative rounded-2xl overflow-hidden bg-black border select-none touch-none"
         style={{ aspectRatio }}
         onMouseDown={(e) => {
-          setDragging(true)
+          setDragging(true);
           dragStart.current = {
             x: e.clientX - position.x,
             y: e.clientY - position.y,
-          }
+          };
         }}
       >
-        <img
+        <Image
           src={preview}
           alt="Preview"
+          fill
+          unoptimized
+          sizes="100vw"
           className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none"
           style={{
             transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
@@ -232,5 +240,5 @@ export function EditorDesktop({
         </button>
       </div>
     </div>
-  )
+  );
 }

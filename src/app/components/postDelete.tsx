@@ -29,14 +29,14 @@ export function PostOptions({ postId, onDelete, onEdit }: PostOptionsProps) {
       {/* Botão de 3 pontinhos */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="text-[var(--primary)] hover:bg-[var(--primary-10)] p-1 rounded-full transition-colors flex items-center justify-center select-none"
+        className="text-primary hover:bg-primary-10 p-1 rounded-full transition-colors flex items-center justify-center select-none"
       >
         <MoreHorizontal size={24} />
       </button>
 
       {/* Menu Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-10 w-48 bg-white border border-[var(--primary)] rounded-xl shadow-xl z-[60] py-2 animate-in fade-in zoom-in duration-200">
+        <div className="absolute right-0 mt-10 w-48 bg-white border border-primary rounded-xl shadow-xl z-60 py-2 animate-in fade-in zoom-in duration-200">
           
           {/* Opção: Editar */}
           <button
@@ -51,7 +51,7 @@ export function PostOptions({ postId, onDelete, onEdit }: PostOptionsProps) {
           </button>
           
           {/* Linha Divisória */}
-          <div className="h-[1px] bg-neutral-100 my-1" />
+          <div className="h-1px bg-neutral-100 my-1" />
 
           {/* Opção: Apagar */}
           <button

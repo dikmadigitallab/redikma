@@ -1,63 +1,63 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { UserPlus, Upload, FileText, X, CheckCircle } from "lucide-react"
-import { useSession } from "next-auth/react"
-import { toast } from "sonner"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { UserPlus, Upload, FileText, X, CheckCircle } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
-type Tab = "individual" | "lote"
+type Tab = "individual" | "lote";
 
 interface ResultItem {
-  nome: string
-  cpf: string
-  senha: string
-  username: string
+  nome: string;
+  cpf: string;
+  senha: string;
+  username: string;
 }
 
 interface ImportResult {
   summary: {
-    total: number
-    success: number
-    errors: number
-    skipped: number
-  }
+    total: number;
+    success: number;
+    errors: number;
+    skipped: number;
+  };
   results: {
-    success: ResultItem[]
-    errors: { linha: number; erro: string; debug?: string }[]
-    skipped: { linha: number; cpf: string; motivo: string }[]
-  }
+    success: ResultItem[];
+    errors: { linha: number; erro: string; debug?: string }[];
+    skipped: { linha: number; cpf: string; motivo: string }[];
+  };
 }
 
 export default function CadastroPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-  const [tab, setTab] = useState<Tab>("individual")
-  const [loading, setLoading] = useState(false)
+  const [tab, setTab] = useState<Tab>("individual");
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     nome: "",
     admissao: "",
     cargo: "",
     nascimento: "",
     cpf: "",
-  })
-  const [file, setFile] = useState<File | null>(null)
-  const [result, setResult] = useState<ImportResult | null>(null)
+  });
+  const [file, setFile] = useState<File | null>(null);
+  const [result, setResult] = useState<ImportResult | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [status, router])
+  }, [status, router]);
 
   if (status === "loading") {
-    return null
+    return null;
   }
 
   if (!session) {
-    return null
+    return null;
   }
 
   function formatCPF(value: string) {
@@ -66,16 +66,16 @@ export default function CadastroPage() {
       .slice(0, 11)
       .replace(/(\d{3})(\d)/, "$1.$2")
       .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
   }
 
   function handleChangeCpf(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm({ ...form, cpf: formatCPF(e.target.value) })
+    setForm({ ...form, cpf: formatCPF(e.target.value) });
   }
 
   async function handleSubmitIndividual(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await fetch("/api/usuarios/criar", {
@@ -85,74 +85,76 @@ export default function CadastroPage() {
           ...form,
           cpf: form.cpf.replace(/\D/g, ""),
         }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error)
-        return
+        toast.error(data.error);
+        return;
       }
 
-      toast.success(`${data.user.nome} cadastrado!\nUsername: ${data.user.username}\nSenha: ${data.senhaPadrao}`)
-      setForm({ nome: "", admissao: "", cargo: "", nascimento: "", cpf: "" })
+      toast.success(
+        `${data.user.nome} cadastrado!\nUsername: ${data.user.username}\nSenha: ${data.senhaPadrao}`,
+      );
+      setForm({ nome: "", admissao: "", cargo: "", nascimento: "", cpf: "" });
     } catch {
-      toast.error("Erro de conexão")
+      toast.error("Erro de conexão");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function handleSubmitLote() {
-    if (!file) return
+    if (!file) return;
 
-    setLoading(true)
+    setLoading(true);
 
     try {
-      const formData = new FormData()
-      formData.append("file", file)
+      const formData = new FormData();
+      formData.append("file", file);
 
       const res = await fetch("/api/usuarios/criar/lote", {
         method: "POST",
         body: formData,
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error)
-        return
+        toast.error(data.error);
+        return;
       }
 
-      setResult(data)
+      setResult(data);
 
       if (data.summary.success > 0) {
-        toast.success(`${data.summary.success} usuário(s) importado(s) com sucesso!`)
+        toast.success(
+          `${data.summary.success} usuário(s) importado(s) com sucesso!`,
+        );
       }
 
       if (data.summary.errors > 0) {
-        toast.warning(`${data.summary.errors} erro(s) ao importar`)
+        toast.warning(`${data.summary.errors} erro(s) ao importar`);
       }
 
       if (data.summary.skipped > 0) {
-        toast.info(`${data.summary.skipped} usuário(s) ignorado(s) (já cadastrados)`)
+        toast.info(
+          `${data.summary.skipped} usuário(s) ignorado(s) (já cadastrados)`,
+        );
       }
     } catch {
-      toast.error("Erro ao processar arquivo")
+      toast.error("Erro ao processar arquivo");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <main
-      className="min-h-screen bg-[var(--background)] px-4 py-6 md:px-8 md:py-10"
-    >
+    <main className="min-h-screen bg-background px-4 py-6 md:px-8 md:py-10">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Cabeçalho */}
-        <div
-          className="bg-[var(--white)] border border-[var(--border)] rounded-3xl shadow-sm p-6 md:p-8"
-        >
+        <div className="bg-white border border-border rounded-3xl shadow-sm p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div
@@ -173,8 +175,8 @@ export default function CadastroPage() {
                   className="text-sm md:text-base mt-1"
                   style={{ color: "var(--gray)" }}
                 >
-                  Adicione usuários individualmente ou importe vários registros por
-                  planilha.
+                  Adicione usuários individualmente ou importe vários registros
+                  por planilha.
                 </p>
               </div>
             </div>
@@ -192,13 +194,8 @@ export default function CadastroPage() {
                 className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full md:w-auto"
                 style={{
                   backgroundColor:
-                    tab === "individual"
-                      ? "var(--primary)"
-                      : "transparent",
-                  color:
-                    tab === "individual"
-                      ? "white"
-                      : "var(--black)",
+                    tab === "individual" ? "var(--primary)" : "transparent",
+                  color: tab === "individual" ? "white" : "var(--black)",
                   boxShadow:
                     tab === "individual"
                       ? "0 4px 12px rgba(0,0,0,0.08)"
@@ -213,17 +210,10 @@ export default function CadastroPage() {
                 className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full md:w-auto"
                 style={{
                   backgroundColor:
-                    tab === "lote"
-                      ? "var(--primary)"
-                      : "transparent",
-                  color:
-                    tab === "lote"
-                      ? "white"
-                      : "var(--black)",
+                    tab === "lote" ? "var(--primary)" : "transparent",
+                  color: tab === "lote" ? "white" : "var(--black)",
                   boxShadow:
-                    tab === "lote"
-                      ? "0 4px 12px rgba(0,0,0,0.08)"
-                      : "none",
+                    tab === "lote" ? "0 4px 12px rgba(0,0,0,0.08)" : "none",
                 }}
               >
                 Importar Planilha
@@ -238,7 +228,7 @@ export default function CadastroPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-[var(--white)] border border-[var(--border)] rounded-3xl shadow-sm p-6 md:p-8"
+            className="bg-white border border-border rounded-3xl shadow-sm p-6 md:p-8"
           >
             <form
               onSubmit={handleSubmitIndividual}
@@ -254,9 +244,7 @@ export default function CadastroPage() {
                 <input
                   type="text"
                   value={form.nome}
-                  onChange={(e) =>
-                    setForm({ ...form, nome: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
                   required
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none transition focus:ring-2"
                   style={{
@@ -299,9 +287,7 @@ export default function CadastroPage() {
                 <input
                   type="text"
                   value={form.cargo}
-                  onChange={(e) =>
-                    setForm({ ...form, cargo: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, cargo: e.target.value })}
                   placeholder="Título reduzido do cargo"
                   required
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none transition focus:ring-2"
@@ -378,7 +364,7 @@ export default function CadastroPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-[var(--white)] border border-[var(--border)] rounded-3xl shadow-sm p-6 md:p-8 space-y-6"
+            className="bg-white border border-border rounded-3xl shadow-sm p-6 md:p-8 space-y-6"
           >
             {/* Informações */}
             <div
@@ -389,10 +375,7 @@ export default function CadastroPage() {
               }}
             >
               <div className="flex items-center gap-2 mb-3">
-                <FileText
-                  size={18}
-                  style={{ color: "var(--secondary)" }}
-                />
+                <FileText size={18} style={{ color: "var(--secondary)" }} />
                 <span
                   className="text-sm font-semibold"
                   style={{ color: "var(--black)" }}
@@ -405,14 +388,11 @@ export default function CadastroPage() {
                 className="text-sm leading-relaxed"
                 style={{ color: "var(--gray)" }}
               >
-                A planilha deve conter as colunas Nome, Admissão, Título Reduzido
-                (Cargo), Nascimento e CPF.
+                A planilha deve conter as colunas Nome, Admissão, Título
+                Reduzido (Cargo), Nascimento e CPF.
               </p>
 
-              <p
-                className="text-sm mt-2"
-                style={{ color: "var(--gray)" }}
-              >
+              <p className="text-sm mt-2" style={{ color: "var(--gray)" }}>
                 Formato {/* aceito */}: .xlsx{/* , .xls, .txt e .tsv. */}
               </p>
 
@@ -451,9 +431,7 @@ export default function CadastroPage() {
               <input
                 type="file"
                 accept=".xlsx,.xls,.txt,.tsv"
-                onChange={(e) =>
-                  setFile(e.target.files?.[0] || null)
-                }
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="hidden"
                 id="file-upload"
               />
@@ -495,9 +473,7 @@ export default function CadastroPage() {
               disabled={loading || !file}
               className="w-full py-3 rounded-xl text-white font-semibold text-sm transition hover:opacity-90 disabled:opacity-50 shadow-md"
               style={{
-                backgroundColor: !file
-                  ? "var(--gray)"
-                  : "var(--primary)",
+                backgroundColor: !file ? "var(--gray)" : "var(--primary)",
               }}
             >
               {loading ? "Processando..." : "Importar Usuários"}
@@ -506,5 +482,5 @@ export default function CadastroPage() {
         )}
       </div>
     </main>
-  )
+  );
 }

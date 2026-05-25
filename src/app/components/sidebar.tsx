@@ -126,7 +126,7 @@ const sidebarContent = (
               className={`group flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all duration-200 text-left font-semibold ${
                 item.disabled
                   ? "opacity-40 cursor-not-allowed"
-                  : "cursor-pointer hover:bg-[var(--accent)]"
+                  : "cursor-pointer hover:bg-accent"
               }`}
               style={{
                 backgroundColor: "transparent",
@@ -137,7 +137,7 @@ const sidebarContent = (
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${
                   item.disabled
                     ? ""
-                    : "group-hover:bg-white group-hover:text-[var(--accent)]"
+                    : "group-hover:bg-white group-hover:text-accent"
                 }`}
                 style={{
                   backgroundColor: "var(--primary-10)",
@@ -152,8 +152,8 @@ const sidebarContent = (
                 <span
                   className={`text-sm md:text-[80%] font-bold truncate transition-colors duration-200 ${
                     item.disabled
-                      ? "text-[var(--primary)]"
-                      : "text-[var(--primary)] group-hover:text-black"
+                      ? "text-primary"
+                      : "text-primary group-hover:text-black"
                   }`}
                 >
                   {item.label}
@@ -209,7 +209,7 @@ const sidebarContent = (
 
   return (
     <aside
-      className="hidden md:flex z-[9999] flex-col w-[18vw] h-screen fixed left-0 top-0 overflow-y-auto shadow-xl"
+      className="hidden md:flex z-9999 flex-col w-[18vw] h-screen fixed left-0 top-0 overflow-y-auto shadow-xl"
       style={{
         backgroundColor: "var(--white)",
         borderRight: "1px solid var(--border)",
