@@ -160,6 +160,8 @@ export async function PUT(req: Request) {
 }
 
 //
+
+/* 
 export async function DELETE(req: Request) {
   const session = await getServerSession(authOptions)
 
@@ -206,5 +208,196 @@ export async function DELETE(req: Request) {
   } catch (error) {
     console.error("Erro ao deletar usuário:", error)
     return NextResponse.json({ error: "Erro ao deletar usuário" }, { status: 500 })
+  }
+}
+
+ */
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (
+    !(
+      session?.user.role === "ADMIN" ||
+      session?.user.role === "SYSTEM_ADM"
+    )
+  ) {
+    return NextResponse.json(
+      { error: "Não autorizado" },
+      { status: 401 }
+    )
+  }
+
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id")
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID do usuário é obrigatório" },
+        { status: 400 }
+      )
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Usuário não encontrado" },
+        { status: 404 }
+      )
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const posts = await tx.postagem.findMany({
+        where: {
+          authorId: id,
+        },
+        select: {
+          id: true,
+        },
+      })
+
+      const postIds = posts.map((post) => post.id)
+
+      const comentarios = await tx.comentario.findMany({
+        where: {
+          OR: [
+            {
+              authorId: id,
+            },
+            {
+              postId: {
+                in: postIds,
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+      })
+
+      const comentarioIds = comentarios.map((c) => c.id)
+
+      // likes dos comentários
+      if (comentarioIds.length > 0) {
+        await tx.like.deleteMany({
+          where: {
+            comentarioId: {
+              in: comentarioIds,
+            },
+          },
+        })
+      }
+
+      // likes das postagens
+      if (postIds.length > 0) {
+        await tx.like.deleteMany({
+          where: {
+            postId: {
+              in: postIds,
+            },
+          },
+        })
+      }
+
+      // likes do usuário
+      await tx.like.deleteMany({
+        where: {
+          userId: id,
+        },
+      })
+
+      // comentários filhos
+      if (comentarioIds.length > 0) {
+        await tx.comentario.deleteMany({
+          where: {
+            parentId: {
+              in: comentarioIds,
+            },
+          },
+        })
+      }
+
+      // comentários principais
+      await tx.comentario.deleteMany({
+        where: {
+          OR: [
+            {
+              authorId: id,
+            },
+            {
+              postId: {
+                in: postIds,
+              },
+            },
+          ],
+        },
+      })
+
+      // notificações recebidas
+      await tx.notification.deleteMany({
+        where: {
+          userId: id,
+        },
+      })
+
+      // notificações enviadas
+      await tx.notification.deleteMany({
+        where: {
+          actorId: id,
+        },
+      })
+
+      // aceitações
+      await tx.aceite_cookies.deleteMany({
+        where: {
+          userId: id,
+        },
+      })
+
+      await tx.aceite_lgpd.deleteMany({
+        where: {
+          userId: id,
+        },
+      })
+
+      await tx.aceite_termos.deleteMany({
+        where: {
+          userId: id,
+        },
+      })
+
+      // postagens
+      await tx.postagem.deleteMany({
+        where: {
+          authorId: id,
+        },
+      })
+
+      // usuário
+      await tx.user.delete({
+        where: {
+          id,
+        },
+      })
+    })
+
+    return NextResponse.json({
+      message: "Usuário deletado com sucesso",
+      user: {
+        id,
+        nome: user.nome,
+      },
+    })
+  } catch (error) {
+    console.error("Erro ao deletar usuário:", error)
+
+    return NextResponse.json(
+      { error: "Erro ao deletar usuário" },
+      { status: 500 }
+    )
   }
 }
