@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 interface EditorDesktopProps {
@@ -25,7 +25,10 @@ export function EditorDesktop({
   onCancel,
   aspectRatio = "1/1",
 }: EditorDesktopProps) {
-  const [preview, setPreview] = useState<string | null>(null);
+  const preview = useMemo(() => {
+    if (!imageFile) return null;
+    return URL.createObjectURL(imageFile);
+  }, [imageFile]);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -42,31 +45,32 @@ export function EditorDesktop({
   const dragStart = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Gerencia a URL de preview e reseta estados quando a imagem muda
+  // Reseta os controles para os valores padrão sempre que a imagem muda
   useEffect(() => {
-    if (!imageFile) {
-      setPreview(null);
-      return;
-    }
+    if (!imageFile) return;
 
-    const url = URL.createObjectURL(imageFile);
-    setPreview(url);
+    const timeoutId = window.setTimeout(() => {
+      setZoom(1);
+      setPosition({ x: 0, y: 0 });
+      setSettings({
+        brightness: 100,
+        contrast: 100,
+        saturation: 100,
+        temperature: 0,
+        sharpness: 0,
+      });
+    }, 0);
 
-    // Reseta os controles para os valores padrão sempre que uma nova imagem é carregada
-    setZoom(1);
-    setPosition({ x: 0, y: 0 });
-    setSettings({
-      brightness: 100,
-      contrast: 100,
-      saturation: 100,
-      temperature: 0,
-      sharpness: 0,
-    });
-
-    return () => {
-      URL.revokeObjectURL(url);
-    };
+    return () => window.clearTimeout(timeoutId);
   }, [imageFile]);
+
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
 
   useEffect(() => {
     function handleMove(e: MouseEvent) {
@@ -114,7 +118,7 @@ export function EditorDesktop({
     setLoading(true);
 
     try {
-      const img = new Image();
+      const img = new window.Image();
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = () => reject();
