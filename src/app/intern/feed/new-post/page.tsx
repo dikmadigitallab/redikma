@@ -30,7 +30,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const [loading, setLoading] = useState(false)
 
   // NOVO: Estado para controlar qual câmera usar
-  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user")
 
   const { data: session } = useSession()
   const router = useRouter()
