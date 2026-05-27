@@ -60,12 +60,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
 
   useEffect(() => {
+    if (isRecording) return
     if (showCamera && !finalBlob && !showEditor) {
       startCamera()
     } else if (!showCamera) {
       stopCamera()
     }
-  }, [showCamera, finalBlob, showEditor, facingMode]) //resolver depois
+  }, [showCamera, finalBlob, showEditor, facingMode, isRecording])
 
 
 
@@ -124,8 +125,16 @@ export default function CreatePostPage({ onRefresh }: Props) {
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data)
       }
+      recorder.onerror = () => {
+        toast.error("Erro durante a gravação")
+        stopCamera()
+      }
       recorder.onstop = () => {
         const recordedSeconds = (Date.now() - startTime) / 1000
+        if (chunksRef.current.length === 0) {
+          toast.error("Nenhum dado de vídeo foi capturado")
+          return
+        }
         const blob = new Blob(chunksRef.current, { type: recordedMime })
         const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
         const tempUrl = URL.createObjectURL(file)
@@ -157,7 +166,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
         }
         tempVideo.src = tempUrl
       }
-      recorder.start(100)
+      recorder.start()
       setIsRecording(true)
       setRecordingTime(0)
       let elapsed = 0
