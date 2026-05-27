@@ -61,12 +61,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   useEffect(() => {
     if (isRecording) return
-    if (showCamera && !finalBlob && !showEditor) {
+    if (showCamera && !finalBlob && !showEditor && !video) {
+      if (recorderRef.current && recorderRef.current.state !== "inactive") return
       startCamera()
     } else if (!showCamera) {
       stopCamera()
     }
-  }, [showCamera, finalBlob, showEditor, facingMode, isRecording])
+  }, [showCamera, finalBlob, showEditor, facingMode, isRecording, video])
 
 
 
