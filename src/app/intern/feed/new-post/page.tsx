@@ -136,6 +136,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
         const validChunks = chunksRef.current.filter(b => b.size > 0)
         if (validChunks.length === 0) {
           toast.error("Gravação falhou - tente novamente")
+          stopCamera()
           return
         }
         const blob = new Blob(validChunks, { type: recordedMime })
@@ -191,11 +192,24 @@ export default function CreatePostPage({ onRefresh }: Props) {
       }
       r.stop()
     }
-    setIsRecording(false)
+    recorderRef.current = null
   }
 
   function toggleCamera() {
     setFacingMode(prev => prev === "environment" ? "user" : "environment")
+  }
+
+  function handlePointerDown(e: React.PointerEvent) {
+    e.preventDefault()
+    if (isRecording) return
+    startRecording()
+    const onEnd = () => {
+      window.removeEventListener('pointerup', onEnd)
+      window.removeEventListener('pointercancel', onEnd)
+      stopRecording()
+    }
+    window.addEventListener('pointerup', onEnd)
+    window.addEventListener('pointercancel', onEnd)
   }
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -412,44 +426,53 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       </button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      {!isRecording ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={takePhoto}
-                            className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
-                          >
-                            Tirar foto
-                          </button>
-                          <button
-                            type="button"
-                            onClick={startRecording}
-                            className="py-3 rounded-2xl border-2 border-red-500 text-red-500 bg-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
-                          >
+                      <button
+                        type="button"
+                        onClick={takePhoto}
+                        disabled={isRecording}
+                        className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition disabled:opacity-30"
+                      >
+                        Tirar foto
+                      </button>
+                      <button
+                        type="button"
+                        onPointerDown={handlePointerDown}
+                        onContextMenu={(e) => e.preventDefault()}
+                        className={`py-3 rounded-2xl text-sm font-bold select-none touch-none flex items-center justify-center gap-2 ${
+                          isRecording
+                            ? "bg-red-600 text-white cursor-default"
+                            : "border-2 border-red-500 text-red-500 bg-white active:scale-[0.98] transition"
+                        }`}
+                      >
+                        {isRecording ? (
+                          <>
+                            <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
+                            {recordingTime}s
+                          </>
+                        ) : (
+                          <>
                             <span className="w-2 h-2 rounded-full bg-red-500" />
-                            Gravar Frash
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={stopRecording}
-                            className="py-3 rounded-2xl bg-red-600 text-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
-                          >
-                            <span className="w-3 h-3 rounded-sm bg-white" />
-                            Parar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setShowCamera(false)}
-                            className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
-                          >
-                            Voltar
-                          </button>
-                        </>
-                      )}
+                            Segurar para gravar
+                          </>
+                        )}
+                      </button>
                     </div>
+
+                    {isRecording && (
+                      <p className="text-center text-xs text-neutral-500">
+                        Solte para parar a gravação
+                      </p>
+                    )}
+
+                    {!isRecording && (
+                      <button
+                        type="button"
+                        onClick={() => setShowCamera(false)}
+                        className="w-full py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
+                      >
+                        Voltar
+                      </button>
+                    )}
                   </>
                 ) : (
                   <div className="flex flex-col items-center gap-4 py-8">
