@@ -23,13 +23,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   const [video, setVideo] = useState<File | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
+  const [videoDuration, setVideoDuration] = useState(0)
 
   const [isFixed,] = useState(false)
   const [duration,] = useState<DurationType>("24h")
   const [loading, setLoading] = useState(false)
 
   // NOVO: Estado para controlar qual câmera usar
-  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user")
 
   const { data: session } = useSession()
   const router = useRouter()
@@ -44,50 +45,159 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   const [showCamera, setShowCamera] = useState(false)
 
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordingTime, setRecordingTime] = useState(0)
+  const recorderRef = useRef<MediaRecorder | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const recordingRef = useRef(false)
+  const canvasRecRef = useRef<{ animFrameId: number } | null>(null)
 
-  useEffect(() => {
-    return () => stopCamera()
-  }, [stopCamera])
+  const MAX_RECORDING_SECONDS = 10
 
-
-
-  useEffect(() => {
-    if (showCamera && !finalBlob && !showEditor) {
-      startCamera()
-    } else if (!showCamera) {
-      stopCamera()
+  const stopCamera = useCallback(() => {
+    if (canvasRecRef.current) {
+      cancelAnimationFrame(canvasRecRef.current.animFrameId)
+      canvasRecRef.current = null
     }
-  }, [showCamera, finalBlob, showEditor, facingMode]) //resolver depois
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop()
+    }
+    recorderRef.current = null
+    setIsRecording(false)
+    
+    setStream(currentStream => {
+      if (currentStream) {
+        currentStream.getTracks().forEach(t => t.stop())
+      }
+      return null
+    })
+  }, [])
 
-
-
-
-
-
-
-  async function startCamera() {
+  const startCamera = useCallback(async () => {
     stopCamera()
     try {
       const s = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facingMode } },
-        audio: false
+        video: {
+          facingMode: { ideal: facingMode },
+          width: { ideal: 480, max: 640 },
+          height: { ideal: 640, max: 480 }
+        },
+        audio: true
       })
       setStream(s)
       if (videoRef.current) videoRef.current.srcObject = s
     } catch {
       toast.error("Erro ao acessar câmera")
     }
+  }, [facingMode, stopCamera])
+
+  useEffect(() => {
+    return () => stopCamera()
+  }, [stopCamera])
+
+  useEffect(() => {
+    if (isRecording) return
+    if (showCamera && !finalBlob && !showEditor && !video) {
+      if (recorderRef.current && recorderRef.current.state !== "inactive") return
+      startCamera()
+    } else if (!showCamera) {
+      stopCamera()
+    }
+  }, [showCamera, finalBlob, showEditor, facingMode, isRecording, video, startCamera, stopCamera])
+
+  function startRecording() {
+    if (!stream || recordingRef.current) return
+
+    const chunks: Blob[] = []
+    const startTime = Date.now()
+
+    try {
+      const recorder = new MediaRecorder(stream)
+      recorderRef.current = recorder
+      
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data)
+      }
+      
+      recorder.onerror = () => {
+        toast.error("Erro durante a gravação")
+        recordingRef.current = false
+        stopCamera()
+      }
+      
+      recorder.onstop = () => {
+        if (chunks.length === 0) {
+          toast.error("Gravação falhou - tente novamente")
+          recordingRef.current = false
+          stopCamera()
+          return
+        }
+
+        const recordedMime = recorder.mimeType || "video/webm"
+        const ext = recordedMime.includes("mp4") ? "mp4" : "webm"
+        
+        const blob = new Blob(chunks, { type: recordedMime })
+        const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
+        const tempUrl = URL.createObjectURL(file)
+        
+        const recordedSeconds = (Date.now() - startTime) / 1000
+        
+        setVideoDuration(recordedSeconds)
+        setVideo(file)
+        setVideoPreview(tempUrl)
+        recordingRef.current = false
+        stopCamera()
+      }
+      
+      recorder.start(200)
+      setIsRecording(true)
+      setRecordingTime(0)
+      let elapsed = 0
+      
+      timerRef.current = setInterval(() => {
+        elapsed++
+        setRecordingTime(elapsed)
+        if (elapsed >= MAX_RECORDING_SECONDS) {
+          stopRecording()
+        }
+      }, 1000)
+    } catch (e) {
+      toast.error("Erro ao iniciar gravação")
+    }
   }
 
-  function stopCamera() {
-    if (stream) {
-      stream.getTracks().forEach(t => t.stop())
-      setStream(null)
+  function stopRecording() {
+    if (canvasRecRef.current) {
+      cancelAnimationFrame(canvasRecRef.current.animFrameId)
+      canvasRecRef.current = null
     }
-  } //acertar depois
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+    const r = recorderRef.current
+    if (r && r.state !== "inactive") {
+      r.stop()
+    }
+    recorderRef.current = null
+    recordingRef.current = false
+    setIsRecording(false)
+  }
 
   function toggleCamera() {
     setFacingMode(prev => prev === "environment" ? "user" : "environment")
+  }
+
+  function handleStartRecording() {
+    if (recordingRef.current) return
+    startRecording()
+    if (recorderRef.current) {
+      recordingRef.current = true
+    }
   }
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -107,14 +217,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
     tempVideo.preload = "metadata"
 
     tempVideo.onloadedmetadata = () => {
-      const duration = tempVideo.duration
-      if (duration < 3 || duration > 10) {
-        toast.error("O vídeo deve ter entre 3 e 10 segundos")
+      const dur = tempVideo.duration
+      if (dur > 10) {
+        toast.error("O vídeo deve ter no máximo 10 segundos")
         URL.revokeObjectURL(tempUrl)
         return
       }
       setVideo(file)
       setVideoPreview(tempUrl)
+      setVideoDuration(dur)
       stopCamera()
     }
 
@@ -159,11 +270,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
     if (videoPreview) URL.revokeObjectURL(videoPreview)
     setVideo(null)
     setVideoPreview(null)
+    setVideoDuration(0)
   }
 
   async function handleSubmit() {
     if (!user?.id) return toast.error("Usuário não identificado")
     if (!text && !finalBlob && !video) return toast.warning("Adicione conteúdo")
+    if (video && videoDuration > 0 && videoDuration < 3) {
+      return toast.error("O vídeo precisa ter no mínimo 3 segundos")
+    }
 
     setLoading(true)
     try {
@@ -201,25 +316,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   return (
     <main className="h-dvh bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
-
-
-
-      {/* 
-      <header className="shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-[var(--primary)] px-4 py-3 safe-top flex items-center justify-between">
-        <button
-          onClick={() => window.history.back()}
-          className="text-sm text-[var(--primary)] hover:text-black transition min-w-14 text-left"
-        >
-          Voltar
-        </button>
-        <h1 className="text-sm sm:text-base font-semibold tracking-wide text-center flex-1">
-          Nova postagem
-        </h1>
-        <div className="min-w-14" />
-      </header>
-
- */}
-
       {/* ÁREA ROLÁVEL COM ESPAÇAMENTO MÁXIMO (pb-24) */}
       <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-24">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
@@ -282,6 +378,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         className="w-full aspect-3/4 max-h-[40vh] sm:max-h-[60vh] object-cover"
                         style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
                       />
+                      {isRecording && (
+                        <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md">
+                          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                          <span className="text-white text-xs font-bold tabular-nums">
+                            {recordingTime}s / {MAX_RECORDING_SECONDS}s
+                          </span>
+                        </div>
+                      )}
                       <button
                         onClick={toggleCamera}
                         className="absolute bottom-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white active:scale-90 transition"
@@ -291,20 +395,43 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       </button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={takePhoto}
-                        className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
-                      >
-                        Tirar foto
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowCamera(false)}
-                        className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
-                      >
-                        Voltar
-                      </button>
+                      {!isRecording ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={takePhoto}
+                            className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
+                          >
+                            Tirar foto
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleStartRecording}
+                            className="py-3 rounded-2xl border-2 border-red-500 text-red-500 bg-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                          >
+                            <span className="w-2 h-2 rounded-full bg-red-500" />
+                            Gravar Frash
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={stopRecording}
+                            className="py-3 rounded-2xl bg-red-600 text-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                          >
+                            <span className="w-3 h-3 rounded-sm bg-white" />
+                            Parar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowCamera(false)}
+                            className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
+                          >
+                            Voltar
+                          </button>
+                        </>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -332,6 +459,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         <Camera size={18} />
                         Usar câmera
                       </button>
+                      <p className="text-xs text-center" style={{ color: "var(--gray)" }}>
+                        Vídeos Frash limitados a {MAX_RECORDING_SECONDS}s
+                      </p>
                       <button
                         type="button"
                         onClick={() => videoInputRef.current?.click()}
