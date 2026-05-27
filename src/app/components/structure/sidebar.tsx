@@ -7,6 +7,7 @@ import {
   UserPlus,
   Users,
   Rss,
+  LayoutDashboard,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { UserCard } from "./cardUser"
@@ -22,6 +23,8 @@ export function Sidebar() {
   const isAdmin =
     session?.user?.role === "ADMIN" ||
     session?.user?.role === "SYSTEM_ADM"
+
+  const isSystemAdmin = session?.user?.role === "SYSTEM_ADM"
 
   async function handleLogout() {
     await signOut({ callbackUrl: "/login" })
@@ -41,6 +44,19 @@ export function Sidebar() {
       },
       disabled: false,
     },
+
+    ...(isSystemAdmin
+      ? [
+          {
+            icon: LayoutDashboard,
+            label: "Dashboard",
+            onClick: () => {
+              router.push("/admin/dashboard")
+            },
+            disabled: false,
+          },
+        ]
+      : []),
 
     ...(isAdmin
       ? [
