@@ -48,8 +48,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const recorderRef = useRef<MediaRecorder | null>(null)
-  const chunksRef = useRef<Blob[]>([])
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const recordingRef = useRef(false)
+  const canvasRecRef = useRef<{ animFrameId: number } | null>(null)
 
   const MAX_RECORDING_SECONDS = 10
 
@@ -90,6 +91,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   function stopCamera() {
+    if (canvasRecRef.current) {
+      cancelAnimationFrame(canvasRecRef.current.animFrameId)
+      canvasRecRef.current = null
+    }
     if (timerRef.current) {
       clearInterval(timerRef.current)
       timerRef.current = null
@@ -106,36 +111,37 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   function startRecording() {
-    if (!stream) return
-    chunksRef.current = []
-    const mimeType =
-      MediaRecorder.isTypeSupported("video/mp4;codecs=avc1")
-        ? "video/mp4;codecs=avc1"
-        : MediaRecorder.isTypeSupported("video/mp4")
-        ? "video/mp4"
-        : MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
-        ? "video/webm;codecs=vp9,opus"
-        : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
-        ? "video/webm;codecs=vp8,opus"
-        : "video/webm"
+    if (!stream || recordingRef.current) return
+
+    const chunks: Blob[] = []
+    const mimeType = "video/webm"
+
+    const videoTrack = stream.getVideoTracks()[0]
+    if (!videoTrack) {
+      toast.error("Câmera não disponível")
+      return
+    }
+    const videoOnlyStream = new MediaStream([videoTrack])
+
     const startTime = Date.now()
     try {
-      const recorder = new MediaRecorder(stream, { mimeType })
+      const recorder = new MediaRecorder(videoOnlyStream, { mimeType })
       recorderRef.current = recorder
-      const recordedMime = recorder.mimeType || "video/mp4"
-      const isMp4 = recordedMime.startsWith("video/mp4")
-      const ext = isMp4 ? "mp4" : "webm"
+      const recordedMime = recorder.mimeType || "video/webm"
+      const ext = "webm"
       recorder.ondataavailable = (e) => {
-        chunksRef.current.push(e.data)
+        chunks.push(e.data)
       }
       recorder.onerror = () => {
         toast.error("Erro durante a gravação")
+        recordingRef.current = false
         stopCamera()
       }
       recorder.onstop = () => {
-        const validChunks = chunksRef.current.filter(b => b.size > 0)
+        const validChunks = chunks.filter(b => b.size > 0)
         if (validChunks.length === 0) {
           toast.error("Gravação falhou - tente novamente")
+          recordingRef.current = false
           stopCamera()
           return
         }
@@ -153,6 +159,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
           setVideoDuration(tempVideo.duration)
           setVideo(file)
           setVideoPreview(tempUrl)
+          recordingRef.current = false
           stopCamera()
         }
         tempVideo.onerror = () => {
@@ -160,11 +167,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
           validated = true
           setVideo(file)
           setVideoPreview(tempUrl)
+          recordingRef.current = false
           stopCamera()
         }
         tempVideo.src = tempUrl
       }
-      recorder.start()
+      recorder.start(200)
       setIsRecording(true)
       setRecordingTime(0)
       let elapsed = 0
@@ -181,35 +189,33 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   function stopRecording() {
+    if (canvasRecRef.current) {
+      cancelAnimationFrame(canvasRecRef.current.animFrameId)
+      canvasRecRef.current = null
+    }
     if (timerRef.current) {
       clearInterval(timerRef.current)
       timerRef.current = null
     }
     const r = recorderRef.current
     if (r && r.state !== "inactive") {
-      if (typeof r.requestData === "function") {
-        try { r.requestData() } catch {}
-      }
       r.stop()
     }
     recorderRef.current = null
+    recordingRef.current = false
+    setIsRecording(false)
   }
 
   function toggleCamera() {
     setFacingMode(prev => prev === "environment" ? "user" : "environment")
   }
 
-  function handlePointerDown(e: React.PointerEvent) {
-    e.preventDefault()
-    if (isRecording) return
+  function handleStartRecording() {
+    if (recordingRef.current) return
     startRecording()
-    const onEnd = () => {
-      window.removeEventListener('pointerup', onEnd)
-      window.removeEventListener('pointercancel', onEnd)
-      stopRecording()
+    if (recorderRef.current) {
+      recordingRef.current = true
     }
-    window.addEventListener('pointerup', onEnd)
-    window.addEventListener('pointercancel', onEnd)
   }
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -426,53 +432,44 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       </button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={takePhoto}
-                        disabled={isRecording}
-                        className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition disabled:opacity-30"
-                      >
-                        Tirar foto
-                      </button>
-                      <button
-                        type="button"
-                        onPointerDown={handlePointerDown}
-                        onContextMenu={(e) => e.preventDefault()}
-                        className={`py-3 rounded-2xl text-sm font-bold select-none touch-none flex items-center justify-center gap-2 ${
-                          isRecording
-                            ? "bg-red-600 text-white cursor-default"
-                            : "border-2 border-red-500 text-red-500 bg-white active:scale-[0.98] transition"
-                        }`}
-                      >
-                        {isRecording ? (
-                          <>
-                            <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
-                            {recordingTime}s
-                          </>
-                        ) : (
-                          <>
+                      {!isRecording ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={takePhoto}
+                            className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
+                          >
+                            Tirar foto
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleStartRecording}
+                            className="py-3 rounded-2xl border-2 border-red-500 text-red-500 bg-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                          >
                             <span className="w-2 h-2 rounded-full bg-red-500" />
-                            Segurar para gravar
-                          </>
-                        )}
-                      </button>
+                            Gravar Frash
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={stopRecording}
+                            className="py-3 rounded-2xl bg-red-600 text-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                          >
+                            <span className="w-3 h-3 rounded-sm bg-white" />
+                            Parar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowCamera(false)}
+                            className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
+                          >
+                            Voltar
+                          </button>
+                        </>
+                      )}
                     </div>
-
-                    {isRecording && (
-                      <p className="text-center text-xs text-neutral-500">
-                        Solte para parar a gravação
-                      </p>
-                    )}
-
-                    {!isRecording && (
-                      <button
-                        type="button"
-                        onClick={() => setShowCamera(false)}
-                        className="w-full py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
-                      >
-                        Voltar
-                      </button>
-                    )}
                   </>
                 ) : (
                   <div className="flex flex-col items-center gap-4 py-8">
