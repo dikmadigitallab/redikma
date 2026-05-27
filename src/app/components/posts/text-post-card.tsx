@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { Heart, MessageCircle, MoreHorizontal, Send } from "lucide-react"
 import { toast } from "sonner"
 import { CommentsBox } from "./comentarios"
@@ -9,6 +10,7 @@ import { PostOptions } from "./postDelete"
 import { LikeView } from "./likes-view"
 import { FrashPlayer } from "./frash-player"
 import { useSession } from "next-auth/react"
+import { TRUNCATE_LENGTH } from "@/lib/constantes"
 
 
 type Post = {
@@ -72,6 +74,11 @@ export function TextPostCard({
   const isAuthor = currentUserId === post.author.id
   const session = useSession()
   const user = session?.data?.user
+  const [textExpanded, setTextExpanded] = useState(false)
+  const shouldTruncate = post.label.length > TRUNCATE_LENGTH
+  const displayLabel = shouldTruncate && !textExpanded
+    ? post.label.slice(0, TRUNCATE_LENGTH)
+    : post.label
 
   return (
     <div
@@ -140,8 +147,16 @@ export function TextPostCard({
         </div>
 
         <div className="px-1">
-          <div className="text-sm leading-7 whitespace-pre-wrap wrap-break-words" style={{ color: "var(--black)" }}>
-            {renderTextWithLinks(post.label)}
+          <div className="text-sm leading-7 whitespace-pre-wrap break-words" style={{ color: "var(--black)" }}>
+            {renderTextWithLinks(displayLabel)}
+            {shouldTruncate && (
+              <button
+                onClick={() => setTextExpanded(!textExpanded)}
+                className="text-blue-600 hover:underline ml-1 text-sm"
+              >
+                {textExpanded ? "... ver menos" : "... ver mais"}
+              </button>
+            )}
           </div>
         </div>
 

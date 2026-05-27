@@ -9,6 +9,7 @@ import { useState} from 'react'
 import { LikeView } from './likes-view'
 import { CommentsBox } from './comentarios'
 import { PostOptions } from './postDelete'
+import { TRUNCATE_LENGTH } from '@/lib/constantes'
 import {useSession} from 'next-auth/react'
 
 type Liker = {
@@ -75,6 +76,12 @@ export function PhotoPost({
       return false
     }
   })
+
+  const [textExpanded, setTextExpanded] = useState(false)
+  const shouldTruncate = post.label.length > TRUNCATE_LENGTH
+  const displayLabel = shouldTruncate && !textExpanded
+    ? post.label.slice(0, TRUNCATE_LENGTH)
+    : post.label
 
   const session = useSession()
   const user = session?.data?.user
@@ -202,7 +209,15 @@ export function PhotoPost({
           {post.label && (
             <div className="px-3 py-2">
               <p className="text-sm leading-6 whitespace-pre-wrap break-words" style={{ color: "var(--black)" }}>
-                {post.label}
+                {displayLabel}
+                {shouldTruncate && (
+                  <button
+                    onClick={() => setTextExpanded(!textExpanded)}
+                    className="text-blue-600 hover:underline ml-1 text-sm"
+                  >
+                    {textExpanded ? "... ver menos" : "... ver mais"}
+                  </button>
+                )}
               </p>
             </div>
           )}
@@ -288,7 +303,15 @@ export function PhotoPost({
           {post.label && (
             <div className="px-1">
               <p className="text-sm leading-7 whitespace-pre-wrap break-words" style={{ color: "var(--black)" }}>
-                {post.label}
+                {displayLabel}
+                {shouldTruncate && (
+                  <button
+                    onClick={() => setTextExpanded(!textExpanded)}
+                    className="text-blue-600 hover:underline ml-1 text-sm"
+                  >
+                    {textExpanded ? "... ver menos" : "... ver mais"}
+                  </button>
+                )}
               </p>
             </div>
           )}

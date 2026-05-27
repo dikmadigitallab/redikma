@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { MAX_POST_LENGTH } from "@/lib/constantes";
 
 type EditPostModalProps = {
   postId: string;
@@ -19,6 +20,7 @@ export function EditPostModal({
 }: EditPostModalProps) {
   const [text, setText] = useState(currentText);
   const [saving, setSaving] = useState(false);
+  const limitWarned = useRef(false);
 
   async function handleSave() {
     const trimmed = text.trim();
@@ -96,17 +98,33 @@ export function EditPostModal({
         </div>
 
         <div className="p-4">
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="w-full min-h-120px p-3 rounded-xl border outline-none resize-y text-sm leading-relaxed"
-            style={{
-              backgroundColor: "var(--background)",
-              borderColor: "var(--border)",
-              color: "var(--black)",
-            }}
-            placeholder="Digite o texto do post..."
-          />
+          <div className="relative">
+            <textarea
+              value={text}
+              onChange={(e) => {
+                const val = e.target.value
+                setText(val)
+                if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
+                  limitWarned.current = true
+                  toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
+                }
+                if (val.length < MAX_POST_LENGTH) {
+                  limitWarned.current = false
+                }
+              }}
+              maxLength={MAX_POST_LENGTH}
+              className="w-full min-h-120px p-3 rounded-xl border outline-none resize-y text-sm leading-relaxed"
+              style={{
+                backgroundColor: "var(--background)",
+                borderColor: "var(--border)",
+                color: "var(--black)",
+              }}
+              placeholder="Digite o texto do post..."
+            />
+            <div className="absolute bottom-3 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
+              {text.length}/{MAX_POST_LENGTH}
+            </div>
+          </div>
         </div>
 
         <div

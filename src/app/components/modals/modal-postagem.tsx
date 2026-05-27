@@ -4,6 +4,7 @@ import { useState, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import Image from "next/image"
+import { MAX_POST_LENGTH } from "@/lib/constantes"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -28,6 +29,7 @@ export function CreatNewPost({ open, onClose, onSuccess, onRefresh }: Props) {
   const user = session?.user
 
   const videoInputRef = useRef<HTMLInputElement>(null)
+  const limitWarned = useRef(false)
 
   function handleImageChange(file: File | null) {
     setImage(file)
@@ -145,13 +147,29 @@ if (!trimmedText && !image && !video) {
 
         <div className="p-6 space-y-5">
 
-        <textarea
-          placeholder="Escreva algo..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="w-full rounded-xl p-4 resize-none h-28 outline-none text-sm font-medium transition focus:shadow-lg"
-          style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)', fontFamily: "'Red Hat Text', sans-serif" }}
-        />
+        <div className="relative">
+          <textarea
+            placeholder="Escreva algo..."
+            value={text}
+            onChange={(e) => {
+              const val = e.target.value
+              setText(val)
+              if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
+                limitWarned.current = true
+                toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
+              }
+              if (val.length < MAX_POST_LENGTH) {
+                limitWarned.current = false
+              }
+            }}
+            maxLength={MAX_POST_LENGTH}
+            className="w-full rounded-xl p-4 resize-none h-28 outline-none text-sm font-medium transition focus:shadow-lg"
+            style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)', fontFamily: "'Red Hat Text', sans-serif" }}
+          />
+          <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
+            {text.length}/{MAX_POST_LENGTH}
+          </div>
+        </div>
 
         <div className="rounded-xl p-4 text-center space-y-3 transition hover:bg-primary-10" style={{ border: `3px dashed var(--primary)` }}>
 

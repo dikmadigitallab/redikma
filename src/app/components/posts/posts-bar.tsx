@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 import { EditorDesktop } from "./photo-editor-desktop"
 import Image from "next/image"
+import { MAX_POST_LENGTH } from "@/lib/constantes"
 
 type Props = {
   onCreated?: () => void
@@ -32,6 +33,7 @@ export function PostBar({ onCreated, onRefresh }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const limitWarned = useRef(false)
 
   const { data: session } = useSession()
   const user = session?.user
@@ -322,17 +324,33 @@ export function PostBar({ onCreated, onRefresh }: Props) {
                 />
               </div>
 
-              <textarea
-                ref={textareaRef}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Compartilhe uma novidade com sua equipe..."
-                className="w-full min-h-35 resize-none outline-none text-sm leading-7"
-                style={{
-                  backgroundColor: "transparent",
-                  color: "var(--black)",
-                }}
-              />
+              <div className="flex-1 flex flex-col">
+                <textarea
+                  ref={textareaRef}
+                  value={text}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    setText(val)
+                    if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
+                      limitWarned.current = true
+                      toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
+                    }
+                    if (val.length < MAX_POST_LENGTH) {
+                      limitWarned.current = false
+                    }
+                  }}
+                  placeholder="Compartilhe uma novidade com sua equipe..."
+                  maxLength={MAX_POST_LENGTH}
+                  className="w-full min-h-35 resize-none outline-none text-sm leading-7"
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "var(--black)",
+                  }}
+                />
+                <div className="text-right text-xs mt-1" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
+                  {text.length}/{MAX_POST_LENGTH}
+                </div>
+              </div>
             </div>
 
             {/* Preview da imagem */}
