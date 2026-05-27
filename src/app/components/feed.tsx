@@ -112,6 +112,16 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [selectedAuthorId, setSelectedAuthorId] = useState<string | null>(null);
   const [openModal, setOpenModal] = useState(false);
+    const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>(
+  {},
+);
+
+function toggleExpand(postId: string) {
+  setExpandedPosts((prev) => ({
+    ...prev,
+    [postId]: !prev[postId],
+  }));
+}
 
   type Liker = {
     id: string;
@@ -481,10 +491,10 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
 
             <div className="p-4 md:p-5 space-y-4 overflow-visible">
               {/* Cabeçalho */}
-              <div
-                className="flex items-start gap-3 pb-4 border-b"
-                style={{ borderColor: "var(--border)" }}
-              >
+               <div
+    className="flex items-start gap-3 pb-4 border-b"
+    style={{ borderColor: "var(--border)" }}
+  >
                 <div className="relative shrink-0">
                   <div
                     className="absolute -inset-1 rounded-full opacity-15"
@@ -545,15 +555,50 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
                 </div>
               </div>
 
-              {/* Texto */}
-              <div className="px-1">
-                <div
-                  className="text-sm leading-7 whitespace-pre-wrap wrap-break-words"
-                  style={{ color: "var(--black)" }}
-                >
-                  {renderTextWithLinks(post.label)}
-                </div>
-              </div>
+{/* Texto */}
+<div className="px-1">
+  <div
+    className="text-sm leading-7 whitespace-pre-wrap break-words"
+    style={{ color: "var(--black)" }}
+  >
+    {(() => {
+      const isExpanded = expandedPosts[post.id];
+
+      const fullText = post.label || "";
+
+      const LIMIT = 100;
+
+      const shouldTruncate = fullText.length > LIMIT;
+
+      const displayedText =
+        shouldTruncate && !isExpanded
+          ? `${fullText.slice(0, LIMIT)}...`
+          : fullText;
+
+      return (
+        <>
+          {renderTextWithLinks(displayedText)}
+
+          {shouldTruncate && (
+            <>
+              {" "}
+              <button
+                type="button"
+                onClick={() => toggleExpand(post.id)}
+                className="text-sm font-semibold hover:underline"
+                style={{
+                  color: "var(--accent)",
+                }}
+              >
+                {isExpanded ? "Ver menos" : "Ver mais"}
+              </button>
+            </>
+          )}
+        </>
+      );
+    })()}
+  </div>
+</div>
 
               {/* Vídeo (Frash) */}
               {post.video && (

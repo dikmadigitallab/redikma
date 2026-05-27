@@ -234,22 +234,18 @@ export function PostViewModal({ postId, onClose }: Props) {
                     className="absolute -inset-1 rounded-full opacity-15"
                     style={{ backgroundColor: "var(--secondary)" }}
                   />
-<Image
-  src={
-    post.author.foto ||
-    "/photoProfile/userDefault.png"
-  }
-  alt={post.author.nome}
-  width={40}
-  height={40}
-  loading="lazy"
-  
-  draggable={false}
-  className="relative w-10 h-10 rounded-full object-cover border-2"
-  style={{
-    borderColor: "var(--white)",
-  }}
-/>
+                  <Image
+                    src={post.author.foto || "/photoProfile/userDefault.png"}
+                    alt={post.author.nome}
+                    width={40}
+                    height={40}
+                    loading="lazy"
+                    draggable={false}
+                    className="relative w-10 h-10 rounded-full object-cover border-2"
+                    style={{
+                      borderColor: "var(--white)",
+                    }}
+                  />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -313,19 +309,16 @@ export function PostViewModal({ postId, onClose }: Props) {
                     borderColor: "var(--border)",
                   }}
                 >
-<Image
-  src={post.image}
-  alt=""
-  width={1200}
-  height={800}
-  loading="lazy"
-  
-  draggable={false}
-  onClick={() =>
-    setSelectedImage(post.image)
-  }
-  className="w-full max-h-300px object-cover cursor-pointer transition-opacity hover:opacity-95"
-/>
+                  <Image
+                    src={post.image}
+                    alt=""
+                    width={1200}
+                    height={800}
+                    loading="lazy"
+                    draggable={false}
+                    onClick={() => setSelectedImage(post.image)}
+                    className="w-full max-h-300px object-cover cursor-pointer transition-opacity hover:opacity-95"
+                  />
                 </div>
               )}
 
