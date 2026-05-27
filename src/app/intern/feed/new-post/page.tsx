@@ -81,11 +81,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
     stopCamera()
     try {
       const s = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 480 },
-          height: { ideal: 640 }
-        },
+        video: { facingMode: { ideal: facingMode } },
         audio: true
       })
       setStream(s)
