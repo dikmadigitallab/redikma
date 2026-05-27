@@ -54,43 +54,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   const MAX_RECORDING_SECONDS = 10
 
-  useEffect(() => {
-    return () => stopCamera()
-  }, [stopCamera])
-
-
-
-  useEffect(() => {
-    if (isRecording) return
-    if (showCamera && !finalBlob && !showEditor && !video) {
-      if (recorderRef.current && recorderRef.current.state !== "inactive") return
-      startCamera()
-    } else if (!showCamera) {
-      stopCamera()
-    }
-  }, [showCamera, finalBlob, showEditor, facingMode, isRecording, video])
-
-
-
-
-
-
-
-  async function startCamera() {
-    stopCamera()
-    try {
-      const s = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facingMode } },
-        audio: true
-      })
-      setStream(s)
-      if (videoRef.current) videoRef.current.srcObject = s
-    } catch {
-      toast.error("Erro ao acessar câmera")
-    }
-  }
-
-  function stopCamera() {
+  const stopCamera = useCallback(() => {
     if (canvasRecRef.current) {
       cancelAnimationFrame(canvasRecRef.current.animFrameId)
       canvasRecRef.current = null
@@ -104,78 +68,96 @@ export default function CreatePostPage({ onRefresh }: Props) {
     }
     recorderRef.current = null
     setIsRecording(false)
-    if (stream) {
-      stream.getTracks().forEach(t => t.stop())
-      setStream(null)
+    
+    setStream(currentStream => {
+      if (currentStream) {
+        currentStream.getTracks().forEach(t => t.stop())
+      }
+      return null
+    })
+  }, [])
+
+  const startCamera = useCallback(async () => {
+    stopCamera()
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: facingMode },
+          width: { ideal: 480, max: 640 },
+          height: { ideal: 640, max: 480 }
+        },
+        audio: true
+      })
+      setStream(s)
+      if (videoRef.current) videoRef.current.srcObject = s
+    } catch {
+      toast.error("Erro ao acessar câmera")
     }
-  }
+  }, [facingMode, stopCamera])
+
+  useEffect(() => {
+    return () => stopCamera()
+  }, [stopCamera])
+
+  useEffect(() => {
+    if (isRecording) return
+    if (showCamera && !finalBlob && !showEditor && !video) {
+      if (recorderRef.current && recorderRef.current.state !== "inactive") return
+      startCamera()
+    } else if (!showCamera) {
+      stopCamera()
+    }
+  }, [showCamera, finalBlob, showEditor, facingMode, isRecording, video, startCamera, stopCamera])
 
   function startRecording() {
     if (!stream || recordingRef.current) return
 
     const chunks: Blob[] = []
-    const mimeType = "video/webm"
-
-    const videoTrack = stream.getVideoTracks()[0]
-    if (!videoTrack) {
-      toast.error("Câmera não disponível")
-      return
-    }
-    const videoOnlyStream = new MediaStream([videoTrack])
-
     const startTime = Date.now()
+
     try {
-      const recorder = new MediaRecorder(videoOnlyStream, { mimeType })
+      const recorder = new MediaRecorder(stream)
       recorderRef.current = recorder
-      const recordedMime = recorder.mimeType || "video/webm"
-      const ext = "webm"
+      
       recorder.ondataavailable = (e) => {
-        chunks.push(e.data)
+        if (e.data && e.data.size > 0) chunks.push(e.data)
       }
+      
       recorder.onerror = () => {
         toast.error("Erro durante a gravação")
         recordingRef.current = false
         stopCamera()
       }
+      
       recorder.onstop = () => {
-        const validChunks = chunks.filter(b => b.size > 0)
-        if (validChunks.length === 0) {
+        if (chunks.length === 0) {
           toast.error("Gravação falhou - tente novamente")
           recordingRef.current = false
           stopCamera()
           return
         }
-        const blob = new Blob(validChunks, { type: recordedMime })
+
+        const recordedMime = recorder.mimeType || "video/webm"
+        const ext = recordedMime.includes("mp4") ? "mp4" : "webm"
+        
+        const blob = new Blob(chunks, { type: recordedMime })
         const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
         const tempUrl = URL.createObjectURL(file)
+        
         const recordedSeconds = (Date.now() - startTime) / 1000
+        
         setVideoDuration(recordedSeconds)
-        const tempVideo = document.createElement("video")
-        tempVideo.preload = "metadata"
-        let validated = false
-        tempVideo.onloadedmetadata = () => {
-          if (validated) return
-          validated = true
-          setVideoDuration(tempVideo.duration)
-          setVideo(file)
-          setVideoPreview(tempUrl)
-          recordingRef.current = false
-          stopCamera()
-        }
-        tempVideo.onerror = () => {
-          if (validated) return
-          validated = true
-          setVideo(file)
-          setVideoPreview(tempUrl)
-          recordingRef.current = false
-          stopCamera()
-        }
-        tempVideo.src = tempUrl
+        setVideo(file)
+        setVideoPreview(tempUrl)
+        recordingRef.current = false
+        stopCamera()
       }
+      
       recorder.start(200)
       setIsRecording(true)
       setRecordingTime(0)
       let elapsed = 0
+      
       timerRef.current = setInterval(() => {
         elapsed++
         setRecordingTime(elapsed)
@@ -334,25 +316,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   return (
     <main className="h-dvh bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
-
-
-
-      {/* 
-      <header className="shrink-0 sticky top-0 z-20 bg-white/95 backdrop-blur-xl border-b border-[var(--primary)] px-4 py-3 safe-top flex items-center justify-between">
-        <button
-          onClick={() => window.history.back()}
-          className="text-sm text-[var(--primary)] hover:text-black transition min-w-14 text-left"
-        >
-          Voltar
-        </button>
-        <h1 className="text-sm sm:text-base font-semibold tracking-wide text-center flex-1">
-          Nova postagem
-        </h1>
-        <div className="min-w-14" />
-      </header>
-
- */}
-
       {/* ÁREA ROLÁVEL COM ESPAÇAMENTO MÁXIMO (pb-24) */}
       <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-24">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
