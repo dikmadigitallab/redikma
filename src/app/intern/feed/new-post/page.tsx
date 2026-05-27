@@ -105,24 +105,40 @@ export default function CreatePostPage({ onRefresh }: Props) {
   function startRecording() {
     if (!stream) return
     chunksRef.current = []
-    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
-      ? "video/webm;codecs=vp9,opus"
-      : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
-      ? "video/webm;codecs=vp8,opus"
-      : "video/webm"
+    const mimeType =
+      MediaRecorder.isTypeSupported("video/mp4")
+        ? "video/mp4"
+        : MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+        ? "video/webm;codecs=vp9,opus"
+        : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+        ? "video/webm;codecs=vp8,opus"
+        : "video/webm"
+    const startTime = Date.now()
     try {
       const recorder = new MediaRecorder(stream, { mimeType })
       recorderRef.current = recorder
+      const recordedMime = recorder.mimeType || mimeType
+      const isMp4 = recordedMime.startsWith("video/mp4")
+      const ext = isMp4 ? "mp4" : "webm"
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data)
       }
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "video/mp4" })
-        const file = new File([blob], "frash_camera.mp4", { type: "video/mp4" })
+        const recordedSeconds = (Date.now() - startTime) / 1000
+        const blob = new Blob(chunksRef.current, { type: recordedMime })
+        const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
         const tempUrl = URL.createObjectURL(file)
+        if (recordedSeconds < 3) {
+          toast.error("Grave pelo menos 3 segundos")
+          URL.revokeObjectURL(tempUrl)
+          return
+        }
         const tempVideo = document.createElement("video")
         tempVideo.preload = "metadata"
+        let validated = false
         tempVideo.onloadedmetadata = () => {
+          if (validated) return
+          validated = true
           const dur = tempVideo.duration
           if (dur < 3 || dur > 10) {
             toast.error("O vídeo deve ter entre 3 e 10 segundos")
@@ -134,8 +150,11 @@ export default function CreatePostPage({ onRefresh }: Props) {
           stopCamera()
         }
         tempVideo.onerror = () => {
-          toast.error("Não foi possível ler o vídeo gravado")
-          URL.revokeObjectURL(tempUrl)
+          if (validated) return
+          validated = true
+          setVideo(file)
+          setVideoPreview(tempUrl)
+          stopCamera()
         }
         tempVideo.src = tempUrl
       }
