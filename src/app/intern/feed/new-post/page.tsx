@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
@@ -29,7 +30,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const [duration,] = useState<DurationType>("24h")
   const [loading, setLoading] = useState(false)
 
-  // NOVO: Estado para controlar qual câmera usar
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user")
 
   const { data: session } = useSession()
@@ -69,17 +69,21 @@ export default function CreatePostPage({ onRefresh }: Props) {
     recorderRef.current = null
     setIsRecording(false)
     
-    setStream(currentStream => {
-      if (currentStream) {
-        currentStream.getTracks().forEach(t => t.stop())
-      }
-      return null
-    })
+    // CORREÇÃO: Parar as tracks de forma síncrona diretamente da referência
+    if (videoRef.current && videoRef.current.srcObject) {
+      const currentStream = videoRef.current.srcObject as MediaStream
+      currentStream.getTracks().forEach(t => t.stop())
+      videoRef.current.srcObject = null
+    }
+    setStream(null)
   }, [])
 
   const startCamera = useCallback(async () => {
     stopCamera()
     try {
+      // CORREÇÃO: Pequeno delay para garantir que o hardware soltou a câmera anterior no mobile
+      await new Promise(resolve => setTimeout(resolve, 100))
+
       const s = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: facingMode } },
         audio: true
@@ -312,11 +316,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   return (
     <main className="h-dvh bg-[#F5F5F7] text-black flex flex-col overflow-hidden">
-      {/* ÁREA ROLÁVEL COM ESPAÇAMENTO MÁXIMO (pb-24) */}
       <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-24">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
 
-          {/* TEXTAREA */}
           <div className="rounded-2xl bg-white border border-primary p-4 shadow-sm">
             <div className="relative">
             <textarea
@@ -342,7 +344,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
           </div>
           </div>
 
-          {/* ÁREA DE MÍDIA (CÂMERA / PREVIEW / EDITOR) */}
           <div className="rounded-2xl bg-white border border-primary p-3 shadow-sm space-y-4">
 
             {showEditor && image && (
@@ -383,8 +384,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         </div>
                       )}
                       <button
+                        type="button" // Previne qualquer submit acidental caso tenha um form em volta
                         onClick={toggleCamera}
-                        className="absolute bottom-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white active:scale-90 transition"
+                        className="absolute bottom-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white active:scale-90 transition z-10"
                         title="Alternar Câmera"
                       >
                         <RefreshCw size={20} />
@@ -526,7 +528,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
             <canvas ref={canvasRef} className="hidden" />
           </div>
 
-          {/* BOTÕES DE AÇÃO - Adicionado mb-10 para desgrudar do fundo */}
           <div className="w-full flex gap-3 pt-4 mb-10">
             <button
               type="button"
