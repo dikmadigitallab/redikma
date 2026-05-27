@@ -83,8 +83,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
       const s = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: facingMode },
-          width: { ideal: 480, max: 640 },
-          height: { ideal: 640, max: 480 }
+          width: { ideal: 480 },
+          height: { ideal: 640 }
         },
         audio: true
       })
