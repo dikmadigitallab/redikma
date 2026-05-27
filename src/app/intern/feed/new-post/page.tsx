@@ -108,7 +108,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
     if (!stream) return
     chunksRef.current = []
     const mimeType =
-      MediaRecorder.isTypeSupported("video/mp4")
+      MediaRecorder.isTypeSupported("video/mp4;codecs=avc1")
+        ? "video/mp4;codecs=avc1"
+        : MediaRecorder.isTypeSupported("video/mp4")
         ? "video/mp4"
         : MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
         ? "video/webm;codecs=vp9,opus"
@@ -119,25 +121,26 @@ export default function CreatePostPage({ onRefresh }: Props) {
     try {
       const recorder = new MediaRecorder(stream, { mimeType })
       recorderRef.current = recorder
-      const recordedMime = recorder.mimeType || mimeType
+      const recordedMime = recorder.mimeType || "video/mp4"
       const isMp4 = recordedMime.startsWith("video/mp4")
       const ext = isMp4 ? "mp4" : "webm"
       recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data)
+        chunksRef.current.push(e.data)
       }
       recorder.onerror = () => {
         toast.error("Erro durante a gravação")
         stopCamera()
       }
       recorder.onstop = () => {
-        const recordedSeconds = (Date.now() - startTime) / 1000
-        if (chunksRef.current.length === 0) {
-          toast.error("Nenhum dado de vídeo foi capturado")
+        const validChunks = chunksRef.current.filter(b => b.size > 0)
+        if (validChunks.length === 0) {
+          toast.error("Gravação falhou - tente novamente")
           return
         }
-        const blob = new Blob(chunksRef.current, { type: recordedMime })
+        const blob = new Blob(validChunks, { type: recordedMime })
         const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
         const tempUrl = URL.createObjectURL(file)
+        const recordedSeconds = (Date.now() - startTime) / 1000
         setVideoDuration(recordedSeconds)
         const tempVideo = document.createElement("video")
         tempVideo.preload = "metadata"
@@ -145,13 +148,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
         tempVideo.onloadedmetadata = () => {
           if (validated) return
           validated = true
-          if (tempVideo.duration > 10) {
-            toast.error("O vídeo deve ter no máximo 10 segundos")
-            URL.revokeObjectURL(tempUrl)
-            setVideo(null)
-            setVideoDuration(0)
-            return
-          }
           setVideoDuration(tempVideo.duration)
           setVideo(file)
           setVideoPreview(tempUrl)
@@ -177,7 +173,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
           stopRecording()
         }
       }, 1000)
-    } catch {
+    } catch (e) {
       toast.error("Erro ao iniciar gravação")
     }
   }
@@ -187,8 +183,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
       clearInterval(timerRef.current)
       timerRef.current = null
     }
-    if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      recorderRef.current.stop()
+    const r = recorderRef.current
+    if (r && r.state !== "inactive") {
+      if (typeof r.requestData === "function") {
+        try { r.requestData() } catch {}
+      }
+      r.stop()
     }
     setIsRecording(false)
   }
