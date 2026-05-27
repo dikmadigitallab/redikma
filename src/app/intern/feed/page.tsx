@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { CreatNewPost } from "../../components/modal-postagem"
+import { CreatNewPost } from "../../components/modals/modal-postagem"
 
-import { RightSidebar } from "../../components/stories"
-import { FeedNoticias } from "../../components/feed"
-import { Footer } from '../../components/footer'
-/* import { Header } from "@/app/components/feedHeader" */
-import { FloatButtonMobile } from "@/app/components/floatButtonMobile"
+import { RightSidebar } from "../../components/structure/stories"
+import { FeedNoticias } from "../../components/posts/feed"
+import { Footer } from '../../components/structure/footer'
+/* import { Header } from "@/app/components/structure/feedHeader" */
+import { FloatButtonMobile } from "@/app/components/buttons/floatButtonMobile"
 
 export default function Feed() {
   const [openModal, setOpenModal] = useState(false)

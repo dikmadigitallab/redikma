@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
-import { usePostModal } from "../providers/PostModalContext";
+import { usePostModal } from "../../providers/PostModalContext";
 import Image from "next/image";
 
 function timeAgo(dateStr: string): string {

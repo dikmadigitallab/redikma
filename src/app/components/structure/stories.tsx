@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { StoriesModal } from "./modal-stories";
+import { StoriesModal } from "../modals/modal-stories";
 
 type Story = {
   id: string;
