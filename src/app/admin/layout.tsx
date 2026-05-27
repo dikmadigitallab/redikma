@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
-import { Sidebar } from "../components/sidebar"
+import { Sidebar } from "../components/structure/sidebar"
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authOptions } from "../api/auth/[...nextauth]/route"
-import { Header } from "../components/feedHeader"
+import { Header } from "../components/structure/feedHeader"
 
 export const metadata: Metadata = {
   title: "ReDikma - Comunicando Cultura",

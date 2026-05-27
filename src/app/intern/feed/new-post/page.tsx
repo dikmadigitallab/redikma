@@ -4,10 +4,10 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Editor } from "@/app/components/photo-editor-mobile"
-// Importe um ícone de troca se tiver (ex: lucide-react) ou use texto
+import { Editor } from "@/app/components/posts/photo-editor-mobile"
 import { ImagePlus, Camera, RefreshCw, Video } from "lucide-react"
 import Image from "next/image"
+import { MAX_POST_LENGTH } from "@/lib/constantes"
 
 type DurationType = "1h" | "6h" | "12h" | "24h" | "7d" | "30d"
 
@@ -39,6 +39,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
+  const limitWarned = useRef(false)
   const [stream, setStream] = useState<MediaStream | null>(null)
 
   const [showCamera, setShowCamera] = useState(false)
@@ -225,12 +226,28 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
           {/* TEXTAREA */}
           <div className="rounded-2xl bg-white border border-primary p-4 shadow-sm">
+            <div className="relative">
             <textarea
               placeholder="Compartilhe algo..."
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value
+                setText(val)
+                if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
+                  limitWarned.current = true
+                  toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
+                }
+                if (val.length < MAX_POST_LENGTH) {
+                  limitWarned.current = false
+                }
+              }}
+              maxLength={MAX_POST_LENGTH}
               className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-20 leading-relaxed"
             />
+            <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
+              {text.length}/{MAX_POST_LENGTH}
+            </div>
+          </div>
           </div>
 
           {/* ÁREA DE MÍDIA (CÂMERA / PREVIEW / EDITOR) */}

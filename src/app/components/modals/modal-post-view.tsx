@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Edit3, MessageCircle, Heart } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { TRUNCATE_LENGTH } from "@/lib/constantes";
 
 const scrollStyles = `
   .modal-scroll::-webkit-scrollbar { width: 0; background: transparent; }
@@ -14,9 +15,9 @@ const scrollStyles = `
   .modal-scroll { scrollbar-width: thin; scrollbar-color: transparent transparent; }
   .modal-scroll:hover { scrollbar-color: rgba(0,0,0,0.15) transparent; }
 `;
-import { CommentsBox } from "./comentarios";
+import { CommentsBox } from "../posts/comentarios";
 import { ImageModal } from "./modal-view-photo";
-import { LikeView } from "./likes-view";
+import { LikeView } from "../posts/likes-view";
 import { EditPostModal } from "./modal-edit-post";
 
 type Post = {
@@ -50,6 +51,7 @@ export function PostViewModal({ postId, onClose }: Props) {
 
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const [textExpanded, setTextExpanded] = useState(false);
 
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
@@ -293,16 +295,30 @@ export function PostViewModal({ postId, onClose }: Props) {
               </div>
 
               {/* Texto */}
-              {post.label && (
-                <div className="px-1">
-                  <p
-                    className="text-sm leading-7 whitespace-pre-wrap wrap-break-words"
-                    style={{ color: "white" }}
-                  >
-                    {renderTextWithLinks(post.label)}
-                  </p>
-                </div>
-              )}
+              {post.label && (() => {
+                const shouldTruncate = post.label.length > TRUNCATE_LENGTH
+                const displayLabel = shouldTruncate && !textExpanded
+                  ? post.label.slice(0, TRUNCATE_LENGTH)
+                  : post.label
+                return (
+                  <div className="px-1">
+                    <p
+                      className="text-sm leading-7 whitespace-pre-wrap break-words"
+                      style={{ color: "white" }}
+                    >
+                      {renderTextWithLinks(displayLabel)}
+                      {shouldTruncate && (
+                        <button
+                          onClick={() => setTextExpanded(!textExpanded)}
+                          className="text-blue-600 hover:underline ml-1 text-sm"
+                        >
+                          {textExpanded ? "... ver menos" : "... ver mais"}
+                        </button>
+                      )}
+                    </p>
+                  </div>
+                )
+              })()}
 
               {/* Imagem */}
               {post.image && (

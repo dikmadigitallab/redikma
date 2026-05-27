@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { uploadImage, uploadVideo, deleteStorageFile } from "@/lib/uploads"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { MAX_POST_LENGTH_SERVER } from "@/lib/constantes"
 
 
 export async function POST(req: Request) {
@@ -15,6 +16,13 @@ export async function POST(req: Request) {
     const duration = formData.get("duration") as string
     const imageFile = formData.get("image")
     const videoFile = formData.get("video")
+
+    if (label.length > MAX_POST_LENGTH_SERVER) {
+      return NextResponse.json(
+        { error: `O texto da postagem deve ter no máximo ${MAX_POST_LENGTH_SERVER} caracteres` },
+        { status: 400 }
+      )
+    }
 
     if (!authorId) {
       return NextResponse.json(
