@@ -44,6 +44,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   const [showCamera, setShowCamera] = useState(false)
 
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordingTime, setRecordingTime] = useState(0)
+  const recorderRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const MAX_RECORDING_SECONDS = 10
 
   useEffect(() => {
     return () => stopCamera()
@@ -70,7 +77,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
     try {
       const s = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: facingMode } },
-        audio: false
+        audio: true
       })
       setStream(s)
       if (videoRef.current) videoRef.current.srcObject = s
@@ -80,11 +87,84 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }
 
   function stopCamera() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop()
+    }
+    recorderRef.current = null
+    setIsRecording(false)
     if (stream) {
       stream.getTracks().forEach(t => t.stop())
       setStream(null)
     }
-  } //acertar depois
+  }
+
+  function startRecording() {
+    if (!stream) return
+    chunksRef.current = []
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+      ? "video/webm;codecs=vp9,opus"
+      : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+      ? "video/webm;codecs=vp8,opus"
+      : "video/webm"
+    try {
+      const recorder = new MediaRecorder(stream, { mimeType })
+      recorderRef.current = recorder
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: "video/mp4" })
+        const file = new File([blob], "frash_camera.mp4", { type: "video/mp4" })
+        const tempUrl = URL.createObjectURL(file)
+        const tempVideo = document.createElement("video")
+        tempVideo.preload = "metadata"
+        tempVideo.onloadedmetadata = () => {
+          const dur = tempVideo.duration
+          if (dur < 3 || dur > 10) {
+            toast.error("O vídeo deve ter entre 3 e 10 segundos")
+            URL.revokeObjectURL(tempUrl)
+            return
+          }
+          setVideo(file)
+          setVideoPreview(tempUrl)
+          stopCamera()
+        }
+        tempVideo.onerror = () => {
+          toast.error("Não foi possível ler o vídeo gravado")
+          URL.revokeObjectURL(tempUrl)
+        }
+        tempVideo.src = tempUrl
+      }
+      recorder.start(100)
+      setIsRecording(true)
+      setRecordingTime(0)
+      let elapsed = 0
+      timerRef.current = setInterval(() => {
+        elapsed++
+        setRecordingTime(elapsed)
+        if (elapsed >= MAX_RECORDING_SECONDS) {
+          stopRecording()
+        }
+      }, 1000)
+    } catch {
+      toast.error("Erro ao iniciar gravação")
+    }
+  }
+
+  function stopRecording() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop()
+    }
+    setIsRecording(false)
+  }
 
   function toggleCamera() {
     setFacingMode(prev => prev === "environment" ? "user" : "environment")
@@ -282,6 +362,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         className="w-full aspect-3/4 max-h-[40vh] sm:max-h-[60vh] object-cover"
                         style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
                       />
+                      {isRecording && (
+                        <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md">
+                          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                          <span className="text-white text-xs font-bold tabular-nums">
+                            {recordingTime}s / {MAX_RECORDING_SECONDS}s
+                          </span>
+                        </div>
+                      )}
                       <button
                         onClick={toggleCamera}
                         className="absolute bottom-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white active:scale-90 transition"
@@ -291,20 +379,43 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       </button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={takePhoto}
-                        className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
-                      >
-                        Tirar foto
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowCamera(false)}
-                        className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
-                      >
-                        Voltar
-                      </button>
+                      {!isRecording ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={takePhoto}
+                            className="py-3 rounded-2xl bg-black text-white text-sm font-medium active:scale-[0.98] transition"
+                          >
+                            Tirar foto
+                          </button>
+                          <button
+                            type="button"
+                            onClick={startRecording}
+                            className="py-3 rounded-2xl border-2 border-red-500 text-red-500 bg-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                          >
+                            <span className="w-2 h-2 rounded-full bg-red-500" />
+                            Gravar Frash
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={stopRecording}
+                            className="py-3 rounded-2xl bg-red-600 text-white text-sm font-bold active:scale-[0.98] transition flex items-center justify-center gap-2"
+                          >
+                            <span className="w-3 h-3 rounded-sm bg-white" />
+                            Parar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowCamera(false)}
+                            className="py-3 rounded-2xl border border-neutral-300 bg-white text-sm font-medium active:scale-[0.98] transition"
+                          >
+                            Voltar
+                          </button>
+                        </>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -332,6 +443,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         <Camera size={18} />
                         Usar câmera
                       </button>
+                      <p className="text-xs text-center" style={{ color: "var(--gray)" }}>
+                        Vídeos Frash limitados a {MAX_RECORDING_SECONDS}s
+                      </p>
                       <button
                         type="button"
                         onClick={() => videoInputRef.current?.click()}
