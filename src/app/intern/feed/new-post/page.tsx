@@ -23,6 +23,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
   const [video, setVideo] = useState<File | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
+  const [videoDuration, setVideoDuration] = useState(0)
 
   const [isFixed,] = useState(false)
   const [duration,] = useState<DurationType>("24h")
@@ -128,23 +129,21 @@ export default function CreatePostPage({ onRefresh }: Props) {
         const blob = new Blob(chunksRef.current, { type: recordedMime })
         const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
         const tempUrl = URL.createObjectURL(file)
-        if (recordedSeconds < 3) {
-          toast.error("Grave pelo menos 3 segundos")
-          URL.revokeObjectURL(tempUrl)
-          return
-        }
+        setVideoDuration(recordedSeconds)
         const tempVideo = document.createElement("video")
         tempVideo.preload = "metadata"
         let validated = false
         tempVideo.onloadedmetadata = () => {
           if (validated) return
           validated = true
-          const dur = tempVideo.duration
-          if (dur < 3 || dur > 10) {
-            toast.error("O vídeo deve ter entre 3 e 10 segundos")
+          if (tempVideo.duration > 10) {
+            toast.error("O vídeo deve ter no máximo 10 segundos")
             URL.revokeObjectURL(tempUrl)
+            setVideo(null)
+            setVideoDuration(0)
             return
           }
+          setVideoDuration(tempVideo.duration)
           setVideo(file)
           setVideoPreview(tempUrl)
           stopCamera()
@@ -206,14 +205,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
     tempVideo.preload = "metadata"
 
     tempVideo.onloadedmetadata = () => {
-      const duration = tempVideo.duration
-      if (duration < 3 || duration > 10) {
-        toast.error("O vídeo deve ter entre 3 e 10 segundos")
+      const dur = tempVideo.duration
+      if (dur > 10) {
+        toast.error("O vídeo deve ter no máximo 10 segundos")
         URL.revokeObjectURL(tempUrl)
         return
       }
       setVideo(file)
       setVideoPreview(tempUrl)
+      setVideoDuration(dur)
       stopCamera()
     }
 
@@ -258,11 +258,15 @@ export default function CreatePostPage({ onRefresh }: Props) {
     if (videoPreview) URL.revokeObjectURL(videoPreview)
     setVideo(null)
     setVideoPreview(null)
+    setVideoDuration(0)
   }
 
   async function handleSubmit() {
     if (!user?.id) return toast.error("Usuário não identificado")
     if (!text && !finalBlob && !video) return toast.warning("Adicione conteúdo")
+    if (video && videoDuration > 0 && videoDuration < 3) {
+      return toast.error("O vídeo precisa ter no mínimo 3 segundos")
+    }
 
     setLoading(true)
     try {
