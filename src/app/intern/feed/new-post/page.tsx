@@ -110,17 +110,31 @@ export default function CreatePostPage({ onRefresh }: Props) {
     let recordingStream = stream
 
     if (!stream.getAudioTracks().length) {
+      stream.getTracks().forEach(t => t.stop())
+      setStream(null)
+      if (videoRef.current) videoRef.current.srcObject = null
+
+      await new Promise(resolve => setTimeout(resolve, 300))
+
       try {
         const fullStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: facingMode } },
           audio: true
         })
-        stream.getTracks().forEach(t => t.stop())
         setStream(fullStream)
         if (videoRef.current) videoRef.current.srcObject = fullStream
         recordingStream = fullStream
       } catch {
-        // Audio unavailable - record without
+        try {
+          const videoStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: facingMode } }
+          })
+          setStream(videoStream)
+          if (videoRef.current) videoRef.current.srcObject = videoStream
+        } catch {
+          toast.error("Erro ao acessar câmera")
+          return
+        }
       }
     }
 
