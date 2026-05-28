@@ -188,10 +188,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
         }
 
         const recordedMime = recorder.mimeType || "video/webm"
-        const ext = recordedMime.includes("mp4") ? "mp4" : "webm"
+        // Garante uma extensão limpa, extraindo o tipo antes de parâmetros como codecs
+        const cleanMime = recordedMime.split(';')[0] 
+        const ext = cleanMime.includes("mp4") ? "mp4" : "webm"
         
-        const blob = new Blob(chunks, { type: recordedMime })
-        const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
+        const blob = new Blob(chunks, { type: cleanMime })
+        const file = new File([blob], `frash_camera.${ext}`, { type: cleanMime })
         const tempUrl = URL.createObjectURL(file)
         
         const recordedSeconds = (Date.now() - startTime) / 1000
@@ -324,8 +326,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
   async function handleSubmit() {
     if (!user?.id) return toast.error("Usuário não identificado")
     if (!text && !finalBlob && !video) return toast.warning("Adicione conteúdo")
-    if (video && videoDuration > 0 && videoDuration < 3) {
-      return toast.error("O vídeo precisa ter no mínimo 3 segundos")
+    
+    if (video) {
+      if (videoDuration > 0 && videoDuration < 3) {
+        return toast.error("O vídeo precisa ter no mínimo 3 segundos")
+      }
+      if (video.size === 0) {
+        return toast.error("O arquivo de vídeo está vazio (0 bytes). Tente gravar novamente.")
+      }
     }
 
     setLoading(true)
@@ -342,7 +350,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
       }
 
       if (video) {
-        formData.append("video", video)
+        // Envia de forma estruturada: (nome do campo, arquivo, nome do arquivo)
+        formData.append("video", video, video.name)
+        
+        // Log para ajudar a debugar problemas no servidor
+        const mbSize = (video.size / (1024 * 1024)).toFixed(2)
+        console.log(`[Frontend] Enviando vídeo de ${mbSize}MB, formato: ${video.type}`)
       }
 
       const res = await fetch("/api/posts", {
@@ -351,15 +364,28 @@ export default function CreatePostPage({ onRefresh }: Props) {
       })
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Erro ao publicar" }))
-        throw new Error(err.error)
+        // Captura agressiva de erros para não esconder falhas 413 ou 500 do Next.js
+        const textResponse = await res.text()
+        let errorMessage = `Erro HTTP ${res.status}: Falha ao publicar`
+        
+        try {
+          const jsonError = JSON.parse(textResponse)
+          errorMessage = jsonError.error || jsonError.message || errorMessage
+        } catch {
+          console.error("[Servidor - Raw Error]:", textResponse)
+          if (res.status === 413) {
+            errorMessage = "Erro 413: O vídeo é muito grande para o servidor processar."
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       toast.success("Post criado com sucesso")
       if (onRefresh) onRefresh()
       router.push("/intern/feed")
     } catch (e: any) {
-      toast.error(e.message || "Erro ao publicar")
+      console.error("Erro no handleSubmit:", e)
+      toast.error(e.message || "Erro desconhecido ao publicar")
     } finally {
       setLoading(false)
     }
@@ -559,7 +585,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
                   <video
                     src={videoPreview}
                     controls
-                    // O atributo `muted` foi removido daqui para que você possa escutar o áudio do vídeo gravado.
                     className="w-full max-h-[40vh]"
                   />
                   <div
