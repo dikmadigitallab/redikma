@@ -51,7 +51,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const recordingRef = useRef(false)
   const canvasRecRef = useRef<{ animFrameId: number } | null>(null)
-  const audioStreamRef = useRef<MediaStream | null>(null)
 
   const MAX_RECORDING_SECONDS = 10
 
@@ -70,10 +69,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
     recorderRef.current = null
     setIsRecording(false)
     
-    if (audioStreamRef.current) {
-      audioStreamRef.current.getTracks().forEach(t => t.stop())
-      audioStreamRef.current = null
-    }
     if (videoRef.current && videoRef.current.srcObject) {
       const currentStream = videoRef.current.srcObject as MediaStream
       currentStream.getTracks().forEach(t => t.stop())
@@ -116,12 +111,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
     if (!stream.getAudioTracks().length) {
       try {
-        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        audioStreamRef.current = audioStream
-        const videoTrack = stream.getVideoTracks()[0]
-        if (videoTrack) {
-          recordingStream = new MediaStream([videoTrack, ...audioStream.getAudioTracks()])
-        }
+        const fullStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facingMode } },
+          audio: true
+        })
+        stream.getTracks().forEach(t => t.stop())
+        setStream(fullStream)
+        if (videoRef.current) videoRef.current.srcObject = fullStream
+        recordingStream = fullStream
       } catch {
         // Audio unavailable - record without
       }
@@ -169,6 +166,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
       }
       
       recorder.start(200)
+      recordingRef.current = true
       setIsRecording(true)
       setRecordingTime(0)
       let elapsed = 0
@@ -207,12 +205,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
     setFacingMode(prev => prev === "environment" ? "user" : "environment")
   }
 
-  function handleStartRecording() {
+  async function handleStartRecording() {
     if (recordingRef.current) return
-    startRecording()
-    if (recorderRef.current) {
-      recordingRef.current = true
-    }
+    await startRecording()
   }
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
