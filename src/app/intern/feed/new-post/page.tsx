@@ -112,8 +112,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
     if (showCamera && !finalBlob && !showEditor && !video) {
       if (recorderRef.current && recorderRef.current.state !== "inactive") return
       startCamera()
-    } else if (!showCamera) {
-      stopCamera()
+      return () => stopCamera()
     }
   }, [showCamera, finalBlob, showEditor, facingMode, isRecording, video, startCamera, stopCamera])
 

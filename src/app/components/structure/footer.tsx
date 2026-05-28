@@ -1,6 +1,6 @@
 import { version } from '../../../../package.json';
 //vamos dar nomes de animais  em ingles para as versões, tipo "1.0.0 - Lion", "1.1.0 - Tiger", etc. para ficar mais divertido
-const VERSION = ` ${version} - CAT-${version.split('.').join('')}`;
+const VERSION = ` ${version} - Lion-🦁-${version.split('.').join('')}`;
 
 export function Footer() {
   return (
