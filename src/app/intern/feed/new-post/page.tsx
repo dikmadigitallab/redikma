@@ -81,7 +81,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const startCamera = useCallback(async () => {
     stopCamera()
     try {
-      // CORREÇÃO: Pequeno delay para garantir que o hardware soltou a câmera anterior no mobile
       await new Promise(resolve => setTimeout(resolve, 100))
 
       const s = await navigator.mediaDevices.getUserMedia({
@@ -91,7 +90,16 @@ export default function CreatePostPage({ onRefresh }: Props) {
       setStream(s)
       if (videoRef.current) videoRef.current.srcObject = s
     } catch {
-      toast.error("Erro ao acessar câmera")
+      try {
+        const s = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facingMode } }
+        })
+        setStream(s)
+        if (videoRef.current) videoRef.current.srcObject = s
+        toast.warning("Microfone não disponível - Frash será sem áudio")
+      } catch {
+        toast.error("Erro ao acessar câmera")
+      }
     }
   }, [facingMode, stopCamera])
 
