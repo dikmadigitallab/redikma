@@ -40,20 +40,16 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
   const limitWarned = useRef(false)
-  
-  // Variáveis de controle de câmera e gravação
   const [stream, setStream] = useState<MediaStream | null>(null)
+
   const [showCamera, setShowCamera] = useState(false)
+
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
-  
   const recorderRef = useRef<MediaRecorder | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const recordingRef = useRef(false)
   const canvasRecRef = useRef<{ animFrameId: number } | null>(null)
-  
-  // NOVO: Trava para evitar conflitos ao abrir a câmera rapidamente
-  const isStartingCamera = useRef(false)
 
   const MAX_RECORDING_SECONDS = 10
 
@@ -81,37 +77,19 @@ export default function CreatePostPage({ onRefresh }: Props) {
   }, [])
 
   const startCamera = useCallback(async () => {
-    // Impede múltiplas execuções simultâneas
-    if (isStartingCamera.current) return
-    isStartingCamera.current = true
-
     stopCamera()
-    
     try {
-      // Aumentado levemente para o hardware liberar a câmera antes de pedir de novo
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise(resolve => setTimeout(resolve, 100))
 
-      // Tenta pedir áudio e vídeo de uma só vez
+      // CORREÇÃO 1: Solicitar áudio logo na inicialização da câmera
       const s = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: facingMode } },
-        audio: true
+        audio: true 
       })
       setStream(s)
       if (videoRef.current) videoRef.current.srcObject = s
-    } catch (err) {
-      // Se falhar (ex: usuário recusou microfone), tenta apenas o vídeo
-      try {
-        const videoOnlyStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: facingMode } }
-        })
-        setStream(videoOnlyStream)
-        if (videoRef.current) videoRef.current.srcObject = videoOnlyStream
-      } catch (fallbackErr) {
-        toast.error("Erro ao acessar câmera. Verifique as permissões.")
-        setShowCamera(false)
-      }
-    } finally {
-      isStartingCamera.current = false
+    } catch {
+      toast.error("Erro ao acessar câmera ou microfone")
     }
   }, [facingMode, stopCamera])
 
@@ -132,7 +110,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
     let recordingStream = stream
 
-    // Se o áudio não estiver presente no stream atual, tenta reconectar
+    // Fallback de segurança caso a stream ainda não tenha áudio
     if (!stream.getAudioTracks().length) {
       stream.getTracks().forEach(t => t.stop())
       setStream(null)
@@ -156,7 +134,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
           setStream(videoStream)
           if (videoRef.current) videoRef.current.srcObject = videoStream
         } catch {
-          toast.error("Erro ao acessar câmera para gravação.")
+          toast.error("Erro ao acessar câmera")
           return
         }
       }
@@ -217,7 +195,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
         }
       }, 1000)
     } catch (e) {
-      toast.error("Erro ao iniciar gravação. Verifique as permissões de áudio.")
+      toast.error("Erro ao iniciar gravação")
     }
   }
 
@@ -422,7 +400,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         ref={videoRef}
                         autoPlay
                         playsInline
-                        muted // Na gravação AO VIVO deve ser mutado para não dar eco.
+                        muted // Este é o preview AO VIVO, deve continuar mutado para evitar microfonia
                         className="w-full aspect-3/4 max-h-[40vh] sm:max-h-[60vh] object-cover"
                         style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
                       />
@@ -492,7 +470,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       Adicione mídia ao seu post
                     </p>
                     <div className="flex flex-col w-full gap-2.5 max-w-65">
-
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
@@ -559,7 +536,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                   <video
                     src={videoPreview}
                     controls
-                    // O atributo `muted` foi removido daqui para que você possa escutar o áudio do vídeo gravado.
+                    // CORREÇÃO 2: Removida a tag "muted" do preview do vídeo gravado.
                     className="w-full max-h-[40vh]"
                   />
                   <div
