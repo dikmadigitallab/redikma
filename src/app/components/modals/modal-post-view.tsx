@@ -14,9 +14,9 @@ const scrollStyles = `
   .modal-scroll { scrollbar-width: thin; scrollbar-color: transparent transparent; }
   .modal-scroll:hover { scrollbar-color: rgba(0,0,0,0.15) transparent; }
 `;
-import { CommentsBox } from "./comentarios";
+import { CommentsBox } from "../posts/comentarios";
 import { ImageModal } from "./modal-view-photo";
-import { LikeView } from "./likes-view";
+import { LikeView } from "../posts/likes-view";
 import { EditPostModal } from "./modal-edit-post";
 
 type Post = {

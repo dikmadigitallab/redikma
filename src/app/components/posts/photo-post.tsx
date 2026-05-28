@@ -3,17 +3,25 @@
 /* não mexer nessa agora
  */
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Heart, MessageCircle, Send } from 'lucide-react'
+<<<<<<< HEAD:src/app/components/photo-post.tsx
 import { useState } from 'react'
+=======
+import { useState} from 'react'
+>>>>>>> a82e5ad77f890c28c28ba8cecdde5c4a4c23e5f4:src/app/components/posts/photo-post.tsx
 import { LikeView } from './likes-view'
 import { CommentsBox } from './comentarios'
 import { PostOptions } from './postDelete'
+import {useSession} from 'next-auth/react'
 
 type Liker = {
   id: string
   nome: string
   foto: string
 }
+
+
 
 type PhotoPostProps = {
   post: {
@@ -63,6 +71,7 @@ export function PhotoPost({
   onDelete,
   onEdit,
 }: PhotoPostProps) {
+  const router = useRouter()
   const isAuthor = currentUserId === post.author.id
 
   const [, setImageLoaded] = useState(false)
@@ -88,6 +97,7 @@ export function PhotoPost({
     }
   })
 
+<<<<<<< HEAD:src/app/components/photo-post.tsx
   const LIMIT = 100
 
   const shouldTruncate =
@@ -97,6 +107,10 @@ export function PhotoPost({
     shouldTruncate && !expanded
       ? post.label.slice(0, LIMIT)
       : post.label
+=======
+  const session = useSession()
+  const user = session?.data?.user
+>>>>>>> a82e5ad77f890c28c28ba8cecdde5c4a4c23e5f4:src/app/components/posts/photo-post.tsx
 
   const handleImageLoad = (e: any) => {
     setImageLoaded(true)
@@ -159,7 +173,7 @@ export function PhotoPost({
 
             <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-3 z-10">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/50 bg-white/10 flex items-center justify-center shrink-0">
                     {post.author.foto &&
                     (post.author.foto.startsWith(
@@ -401,6 +415,7 @@ export function PhotoPost({
         ) : null}
 
         <div className="p-4 md:p-5 space-y-4">
+<<<<<<< HEAD:src/app/components/photo-post.tsx
           <div
             className="flex items-start gap-3 pb-4 border-b"
             style={{
@@ -421,6 +436,13 @@ export function PhotoPost({
                   post.author.foto ||
                   '/photoProfile/userDefault.png'
                 }
+=======
+          <div className="flex items-start gap-3 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
+            <div className="relative shrink-0 cursor-pointer" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
+              <div className="absolute -inset-1 rounded-full opacity-15" style={{ backgroundColor: "var(--secondary)" }} />
+              <img
+                src={post.author.foto || "/photoProfile/userDefault.png"}
+>>>>>>> a82e5ad77f890c28c28ba8cecdde5c4a4c23e5f4:src/app/components/posts/photo-post.tsx
                 alt={post.author.nome}
                 width={44}
                 height={44}
@@ -433,7 +455,7 @@ export function PhotoPost({
 
             <div className="flex-1 min-w-0 pr-8">
               <div className="flex items-baseline gap-2 flex-wrap">
-                <h3 className="text-sm md:text-base font-bold text-[var(--primary)] truncate">
+                <h3 className="text-sm md:text-base font-bold text-[var(--primary)] truncate cursor-pointer hover:underline" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
                   {post.author.nome}
                 </h3>
 
@@ -525,12 +547,53 @@ export function PhotoPost({
             />
           </div>
 
+<<<<<<< HEAD:src/app/components/photo-post.tsx
           <div
             className="pt-4 border-t space-y-4"
             style={{
               borderColor: 'var(--border)',
             }}
           >
+=======
+          <div className="pt-4 border-t space-y-4" style={{ borderColor: "var(--border)" }}>
+            <div
+              className="flex items-center gap-3 rounded-full px-3 py-2 border-2 relative transition focus-within:border-[var(--accent)]"
+              style={{
+                backgroundColor: "var(--background)",
+                borderColor: "var(--primary)",
+              }}
+            >
+              <img
+                src={`${user?.foto} || /photoProfile/userDefault.png`}
+                className="w-7 h-7 rounded-full object-cover shrink-0"
+                alt="Comentador"
+              />
+              <input
+                id={`comment-input-desk-${post.id}`}
+                value={currentComment}
+                maxLength={50}
+                onChange={(e) => onCommentChange(post.id, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey && currentComment.trim() !== "") {
+                    onComment(post.id)
+                  }
+                }}
+                placeholder="Escreva um comentário..."
+                className="flex-1 bg-transparent outline-none text-sm pr-12"
+                style={{ color: "var(--black)" }}
+              />
+              {currentComment.trim() !== "" && (
+                <button
+                  type="button"
+                  onClick={() => onComment(post.id)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center bg-[var(--accent)] transition-all duration-200 hover:shadow-md hover:scale-110 active:scale-95 focus:outline-none"
+                >
+                  <Send size={16} color="white" className="translate-x-[1px] -translate-y-[0.5px]" />
+                </button>
+              )}
+            </div>
+
+>>>>>>> a82e5ad77f890c28c28ba8cecdde5c4a4c23e5f4:src/app/components/posts/photo-post.tsx
             <div className="flex items-center gap-6 relative overflow-visible">
               <div
                 className="relative"

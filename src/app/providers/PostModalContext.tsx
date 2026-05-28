@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { PostViewModal } from "../components/modal-post-view";
+import { PostViewModal } from "../components/modals/modal-post-view";
 
 type PostModalContextData = {
   openPost: (postId: string) => void;

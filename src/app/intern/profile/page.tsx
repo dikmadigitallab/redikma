@@ -5,7 +5,7 @@ import { Suspense, useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Sidebar } from "@/app/components/sidebar";
+import { Sidebar } from "@/app/components/structure/sidebar";
 import {
   Camera,
   ImagePlus,

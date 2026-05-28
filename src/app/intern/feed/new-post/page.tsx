@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Editor } from "@/app/components/photo-editor-mobile"
+import { Editor } from "@/app/components/posts/photo-editor-mobile"
 // Importe um ícone de troca se tiver (ex: lucide-react) ou use texto
 import { ImagePlus, Camera, RefreshCw, Video } from "lucide-react"
 import Image from "next/image"

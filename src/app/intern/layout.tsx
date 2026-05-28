@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { Sidebar } from "../components/sidebar";
-import { Header } from "../components/feedHeader";
+import { Sidebar } from "../components/structure/sidebar";
+import { Header } from "../components/structure/feedHeader";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 
 export const metadata: Metadata = {
