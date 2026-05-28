@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
@@ -81,15 +82,13 @@ export default function CreatePostPage({ onRefresh }: Props) {
     try {
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      // CORREÇÃO 1: Solicitar áudio logo na inicialização da câmera
       const s = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facingMode } },
-        audio: true 
+        video: { facingMode: { ideal: facingMode } }
       })
       setStream(s)
       if (videoRef.current) videoRef.current.srcObject = s
     } catch {
-      toast.error("Erro ao acessar câmera ou microfone")
+      toast.error("Erro ao acessar câmera")
     }
   }, [facingMode, stopCamera])
 
@@ -110,7 +109,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
 
     let recordingStream = stream
 
-    // Fallback de segurança caso a stream ainda não tenha áudio
     if (!stream.getAudioTracks().length) {
       stream.getTracks().forEach(t => t.stop())
       setStream(null)
@@ -400,7 +398,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         ref={videoRef}
                         autoPlay
                         playsInline
-                        muted // Este é o preview AO VIVO, deve continuar mutado para evitar microfonia
+                        muted
                         className="w-full aspect-3/4 max-h-[40vh] sm:max-h-[60vh] object-cover"
                         style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
                       />
@@ -413,7 +411,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         </div>
                       )}
                       <button
-                        type="button" 
+                        type="button" // Previne qualquer submit acidental caso tenha um form em volta
                         onClick={toggleCamera}
                         className="absolute bottom-4 right-4 p-3 bg-white/20 backdrop-blur-md rounded-full text-white active:scale-90 transition z-10"
                         title="Alternar Câmera"
@@ -470,6 +468,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       Adicione mídia ao seu post
                     </p>
                     <div className="flex flex-col w-full gap-2.5 max-w-65">
+{/* 
+
+
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
@@ -479,6 +480,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         Abrir galeria
                       </button>
 
+
+ */}
                       <button
                         type="button"
                         onClick={() => setShowCamera(true)}
@@ -487,6 +490,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         <Camera size={18} />
                         Usar câmera
                       </button>
+
+
 
                       <p className="text-xs text-center" style={{ color: "var(--gray)" }}>
                         Vídeos Frash limitados a {MAX_RECORDING_SECONDS}s
@@ -536,7 +541,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                   <video
                     src={videoPreview}
                     controls
-                    // CORREÇÃO 2: Removida a tag "muted" do preview do vídeo gravado.
+                    muted
                     className="w-full max-h-[40vh]"
                   />
                   <div
