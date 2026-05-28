@@ -468,7 +468,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       Adicione mídia ao seu post
                     </p>
                     <div className="flex flex-col w-full gap-2.5 max-w-65">
-{/* 
+
 
 
                       <button
@@ -481,7 +481,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       </button>
 
 
- */}
+ {/* 
                       <button
                         type="button"
                         onClick={() => setShowCamera(true)}
@@ -492,7 +492,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       </button>
 
 
-
+ */}
                       <p className="text-xs text-center" style={{ color: "var(--gray)" }}>
                         Vídeos Frash limitados a {MAX_RECORDING_SECONDS}s
                       </p>
