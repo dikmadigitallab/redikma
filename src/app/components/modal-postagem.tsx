@@ -124,7 +124,7 @@ if (!trimmedText && !image && !video) {
       onSuccess?.()
       onRefresh?.()
     } catch {
-      toast.error("Erro ao criar postagem")
+      toast.error("Esse recurso não esta disponivel para você") //
     } finally {
       setLoading(false)
     }

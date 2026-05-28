@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
 
 
+/* 
 export async function POST(req: Request) {
   try {
     const formData = await req.formData()
@@ -84,6 +85,98 @@ export async function POST(req: Request) {
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Erro ao criar postagem" },
+      { status: 500 }
+    )
+  }
+}
+ */
+
+export async function POST(req: Request) {
+  try {
+    const formData = await req.formData()
+
+    const label = ((formData.get("label") as string) || "").trim()
+    const authorId = formData.get("authorId") as string
+    const postador = formData.get("postador") as string
+    const duration = formData.get("duration") as string
+    const imageFile = formData.get("image")
+    const videoFile = formData.get("video")
+
+    if (!authorId) {
+      return NextResponse.json(
+        { error: "Usuário não informado" },
+        { status: 400 }
+      )
+    }
+
+    const hasImage = imageFile instanceof File && imageFile.size > 0
+    const hasVideo = videoFile instanceof File && videoFile.size > 0
+
+    if (!label && !hasImage && !hasVideo) {
+      return NextResponse.json(
+        { error: "Adicione um texto, imagem ou vídeo para postar" },
+        { status: 400 }
+      )
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: authorId },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Usuário não encontrado" },
+        { status: 404 }
+      )
+    }
+
+    // Verifica permissão geral para criar qualquer post
+    if (
+      user.role !== "POSTADOR" &&
+      user.role !== "ADMIN" &&
+      user.role !== "SYSTEM_ADM"
+    ) {
+      return NextResponse.json(
+        { error: "Sem permissão para postar" },
+        { status: 403 }
+      )
+    }
+
+    // NOVA REGRA: Bloqueia o upload de vídeo se não for SYSTEM_ADM
+    if (hasVideo && user.role !== "SYSTEM_ADM") {
+      return NextResponse.json(
+        { error: "Esse recurso ainda não esta disponivel para você" },
+        { status: 403 }
+      )
+    }
+
+    let imageUrl: string | null = null
+    let videoUrl: string | null = null
+
+    if (hasImage) {
+      imageUrl = await uploadImage(imageFile, "Postagens")
+    }
+
+    if (hasVideo) {
+      videoUrl = await uploadVideo(videoFile, "post-videos")
+    }
+
+    const postagem = await prisma.postagem.create({
+      data: {
+        label,
+        authorId,
+        duration: duration ?? "",
+        image: imageUrl,
+        video: videoUrl,
+        postador,
+        publicado: true,
+      },
+    })
+
+    return NextResponse.json(postagem, { status: 201 })
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Esse recurso ainda não esta disponivel para você" },
       { status: 500 }
     )
   }

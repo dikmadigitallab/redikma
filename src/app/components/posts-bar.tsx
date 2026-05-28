@@ -181,7 +181,8 @@ export function PostBar({ onCreated, onRefresh }: Props) {
       onCreated?.()
       onRefresh?.()
     } catch {
-      toast.error("Erro ao criar post")
+      toast.error("Esse recurso não está disponivel para você") //
+      // toast.error("Erro ao criar postagem")
     } finally {
       setLoading(false)
     }
