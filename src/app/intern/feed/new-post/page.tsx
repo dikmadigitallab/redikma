@@ -473,6 +473,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         <ImagePlus size={18} />
                         Abrir galeria
                       </button>
+
+
+{/* 
                       <button
                         type="button"
                         onClick={() => setShowCamera(true)}
@@ -481,6 +484,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         <Camera size={18} />
                         Usar câmera
                       </button>
+
+ */}
+
                       <p className="text-xs text-center" style={{ color: "var(--gray)" }}>
                         Vídeos Frash limitados a {MAX_RECORDING_SECONDS}s
                       </p>
