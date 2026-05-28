@@ -117,7 +117,7 @@ export async function uploadVideo(
     const { error } = await supabase.storage
       .from(bucket)
       .upload(filePath, inputBuffer, {
-        contentType: (file.type?.split(";")[0]?.trim()) || "video/mp4",
+        contentType: file.type || "video/mp4",
       })
 
     if (error) throw new Error(error.message)
