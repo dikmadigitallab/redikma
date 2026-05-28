@@ -187,7 +187,8 @@ export default function CreatePostPage({ onRefresh }: Props) {
           return
         }
 
-        const recordedMime = recorder.mimeType || "video/webm"
+        const rawMime = recorder.mimeType || "video/webm"
+        const recordedMime = rawMime.split(";")[0].trim()
         const ext = recordedMime.includes("mp4") ? "mp4" : "webm"
         
         const blob = new Blob(chunks, { type: recordedMime })
