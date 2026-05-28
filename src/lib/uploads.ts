@@ -1,8 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
 import sharp from "sharp"
-import fs from "fs/promises"
-import path from "path"
-import os from "os"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -86,91 +83,24 @@ export async function uploadVideo(
   bucket: string
 ): Promise<string> {
   const arrayBuffer = await file.arrayBuffer()
-  const inputBuffer = Buffer.from(arrayBuffer)
+  const buffer = Buffer.from(arrayBuffer)
 
   const ext = file.name.split(".").pop() || "mp4"
+  const fileName = generateFileName(ext)
+  const filePath = `posts-video/${fileName}`
+  const contentType = file.type || `video/${ext === "mp4" ? "mp4" : ext}`
 
-  // tenta comprimir com ffmpeg; se falhar, faz upload do original
-  try {
-    const compressedBuffer = await compressVideo(inputBuffer, ext)
-    const fileName = generateFileName("mp4")
-    const filePath = `posts-video/${fileName}`
+  const { error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, buffer, { contentType })
 
-    const { error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, compressedBuffer, {
-        contentType: "video/mp4",
-      })
+  if (error) throw new Error(error.message)
 
-    if (error) throw new Error(error.message)
+  const { data } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath)
 
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath)
-
-    return data.publicUrl
-  } catch {
-    // fallback: upload original sem compressão
-    const fileName = generateFileName(ext)
-    const filePath = `posts-video/${fileName}`
-
-    const { error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, inputBuffer, {
-        contentType: file.type || "video/mp4",
-      })
-
-    if (error) throw new Error(error.message)
-
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath)
-
-    return data.publicUrl
-  }
-}
-
-async function compressVideo(
-  buffer: Buffer,
-  ext: string
-): Promise<Buffer> {
-  const ffmpeg = require("fluent-ffmpeg") as any
-  const ffmpegPath = require("ffmpeg-static") as string | null
-
-  if (!ffmpegPath) {
-    throw new Error("ffmpeg binary not found")
-  }
-
-  ffmpeg.setFfmpegPath(ffmpegPath)
-
-  const tempDir = os.tmpdir()
-  const tempInput = path.join(tempDir, `frash_input_${Date.now()}.${ext}`)
-  const tempOutput = path.join(tempDir, `frash_output_${Date.now()}.mp4`)
-
-  try {
-    await fs.writeFile(tempInput, buffer)
-
-    await new Promise<void>((resolve, reject) => {
-      ffmpeg(tempInput)
-        .videoCodec("libx264")
-        .audioCodec("aac")
-        .size("?x720")
-        .outputOptions([
-          "-crf 28",
-          "-preset medium",
-          "-movflags +faststart",
-          "-b:a 64k",
-        ])
-        .on("end", () => resolve())
-        .on("error", (err: Error) => reject(err))
-        .save(tempOutput)
-    })
-
-    return await fs.readFile(tempOutput)
-  } finally {
-    await fs.unlink(tempInput).catch(() => {})
-    await fs.unlink(tempOutput).catch(() => {})
-  }
+  return data.publicUrl
 }
 
 export async function deleteStorageFile(publicUrl: string): Promise<void> {
