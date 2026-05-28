@@ -51,6 +51,7 @@ export default function CreatePostPage({ onRefresh }: Props) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const recordingRef = useRef(false)
   const canvasRecRef = useRef<{ animFrameId: number } | null>(null)
+  const audioStreamRef = useRef<MediaStream | null>(null)
 
   const MAX_RECORDING_SECONDS = 10
 
@@ -69,7 +70,10 @@ export default function CreatePostPage({ onRefresh }: Props) {
     recorderRef.current = null
     setIsRecording(false)
     
-    // CORREÇÃO: Parar as tracks de forma síncrona diretamente da referência
+    if (audioStreamRef.current) {
+      audioStreamRef.current.getTracks().forEach(t => t.stop())
+      audioStreamRef.current = null
+    }
     if (videoRef.current && videoRef.current.srcObject) {
       const currentStream = videoRef.current.srcObject as MediaStream
       currentStream.getTracks().forEach(t => t.stop())
@@ -84,22 +88,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
       await new Promise(resolve => setTimeout(resolve, 100))
 
       const s = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: facingMode } },
-        audio: true
+        video: { facingMode: { ideal: facingMode } }
       })
       setStream(s)
       if (videoRef.current) videoRef.current.srcObject = s
     } catch {
-      try {
-        const s = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: facingMode } }
-        })
-        setStream(s)
-        if (videoRef.current) videoRef.current.srcObject = s
-        toast.warning("Microfone não disponível - Frash será sem áudio")
-      } catch {
-        toast.error("Erro ao acessar câmera")
-      }
+      toast.error("Erro ao acessar câmera")
     }
   }, [facingMode, stopCamera])
 
@@ -112,18 +106,32 @@ export default function CreatePostPage({ onRefresh }: Props) {
     if (showCamera && !finalBlob && !showEditor && !video) {
       if (recorderRef.current && recorderRef.current.state !== "inactive") return
       startCamera()
-      return () => stopCamera()
     }
   }, [showCamera, finalBlob, showEditor, facingMode, isRecording, video, startCamera, stopCamera])
 
-  function startRecording() {
+  async function startRecording() {
     if (!stream || recordingRef.current) return
+
+    let recordingStream = stream
+
+    if (!stream.getAudioTracks().length) {
+      try {
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        audioStreamRef.current = audioStream
+        const videoTrack = stream.getVideoTracks()[0]
+        if (videoTrack) {
+          recordingStream = new MediaStream([videoTrack, ...audioStream.getAudioTracks()])
+        }
+      } catch {
+        // Audio unavailable - record without
+      }
+    }
 
     const chunks: Blob[] = []
     const startTime = Date.now()
 
     try {
-      const recorder = new MediaRecorder(stream)
+      const recorder = new MediaRecorder(recordingStream)
       recorderRef.current = recorder
       
       recorder.ondataavailable = (e) => {
