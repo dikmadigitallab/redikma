@@ -329,7 +329,7 @@ export function Header() {
                             className="relative aspect-square overflow-hidden bg-neutral-100 group"
                           >
                             <Image
-                              src={post.image || '/placeholder.png'}
+                              src={post.image|| '/placeholder.png'}
                               alt=""
                               fill
                               sizes="(max-width: 768px) 33vw, 170px"
