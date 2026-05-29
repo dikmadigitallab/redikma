@@ -27,13 +27,12 @@ src/
 └── types/           # next-auth.d.ts
 ```
 
-## Paleta de Cores (CSS Custom Properties)
-- Primary Dark: #0A4554
-- Secondary: #4FC3D9
-- Success: #6BC28D
-- Warning: #FBB04B
-- Accent: #FDE205
-- Neutros: #1A1A1A, #757575, #E0E0E0, #F5F5F5, #FFFFFF
+## Paleta de Cores (CSS Custom Properties) - Brand Dikma
+- Primary (Azul Royal): #272662
+- Secondary (Azul Claro): #86B0DD
+- Accent (Laranja): #F15A24
+- Neutral (Bege): #F7ECDA
+- Neutros: #111827, #1F2937, #6B7280, #D1D5DB, #E5E7EB, #FFFFFF, #F8FAFC
 
 ## Convenções
 - Mobile-first com breakpoints sm(640), md(768), lg(1024)

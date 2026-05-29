@@ -180,7 +180,7 @@ export function TextPostCard({
               loading="lazy" quality={100} draggable={false}
               onClick={() => onOpenImage(post.image, post.id, post.authorId)}
               onDoubleClick={onLike}
-              className="w-full max-h-300px md:max-h-520px object-cover cursor-pointer transition-opacity hover:opacity-95"
+              className="w-full max-h-300px md:max-h-520px object-contain cursor-pointer transition-opacity hover:opacity-95"
             />
           </div>
         )}

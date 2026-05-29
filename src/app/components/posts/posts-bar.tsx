@@ -368,7 +368,7 @@ export function PostBar({ onCreated, onRefresh }: Props) {
                   width={1200}
                   height={1200}
                   unoptimized
-                  className="w-full max-h-105 object-cover"
+                  className="w-full max-h-105 object-contain"
                 />
 
                 <button

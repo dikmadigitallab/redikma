@@ -215,7 +215,7 @@ if (!trimmedText && !image && !video) {
   height={600}
   loading="lazy"
   draggable={false}
-  className="w-full h-56 object-cover rounded-xl"
+  className="w-full h-56 object-contain rounded-xl"
 />
 
               <button

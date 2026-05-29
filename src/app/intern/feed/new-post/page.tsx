@@ -188,10 +188,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
         }
 
         const recordedMime = recorder.mimeType || "video/webm"
-        const ext = recordedMime.includes("mp4") ? "mp4" : "webm"
+        // Garante uma extensão limpa, extraindo o tipo antes de parâmetros como codecs
+        const cleanMime = recordedMime.split(';')[0] 
+        const ext = cleanMime.includes("mp4") ? "mp4" : "webm"
         
-        const blob = new Blob(chunks, { type: recordedMime })
-        const file = new File([blob], `frash_camera.${ext}`, { type: recordedMime })
+        const blob = new Blob(chunks, { type: cleanMime })
+        const file = new File([blob], `frash_camera.${ext}`, { type: cleanMime })
         const tempUrl = URL.createObjectURL(file)
         
         const recordedSeconds = (Date.now() - startTime) / 1000
@@ -324,8 +326,14 @@ export default function CreatePostPage({ onRefresh }: Props) {
   async function handleSubmit() {
     if (!user?.id) return toast.error("Usuário não identificado")
     if (!text && !finalBlob && !video) return toast.warning("Adicione conteúdo")
-    if (video && videoDuration > 0 && videoDuration < 3) {
-      return toast.error("O vídeo precisa ter no mínimo 3 segundos")
+    
+    if (video) {
+      if (videoDuration > 0 && videoDuration < 3) {
+        return toast.error("O vídeo precisa ter no mínimo 3 segundos")
+      }
+      if (video.size === 0) {
+        return toast.error("O arquivo de vídeo está vazio (0 bytes). Tente gravar novamente.")
+      }
     }
 
     setLoading(true)
@@ -342,7 +350,12 @@ export default function CreatePostPage({ onRefresh }: Props) {
       }
 
       if (video) {
-        formData.append("video", video)
+        // Envia de forma estruturada: (nome do campo, arquivo, nome do arquivo)
+        formData.append("video", video, video.name)
+        
+        // Log para ajudar a debugar problemas no servidor
+        const mbSize = (video.size / (1024 * 1024)).toFixed(2)
+        console.log(`[Frontend] Enviando vídeo de ${mbSize}MB, formato: ${video.type}`)
       }
 
       const res = await fetch("/api/posts", {
@@ -351,15 +364,28 @@ export default function CreatePostPage({ onRefresh }: Props) {
       })
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Erro ao publicar" }))
-        throw new Error(err.error)
+        // Captura agressiva de erros para não esconder falhas 413 ou 500 do Next.js
+        const textResponse = await res.text()
+        let errorMessage = `Erro HTTP ${res.status}: Falha ao publicar`
+        
+        try {
+          const jsonError = JSON.parse(textResponse)
+          errorMessage = jsonError.error || jsonError.message || errorMessage
+        } catch {
+          console.error("[Servidor - Raw Error]:", textResponse)
+          if (res.status === 413) {
+            errorMessage = "Erro 413: O vídeo é muito grande para o servidor processar."
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       toast.success("Post criado com sucesso")
       if (onRefresh) onRefresh()
       router.push("/intern/feed")
     } catch (e: any) {
-      toast.error(e.message || "Erro ao publicar")
+      console.error("Erro no handleSubmit:", e)
+      toast.error(e.message || "Erro desconhecido ao publicar")
     } finally {
       setLoading(false)
     }
@@ -370,30 +396,32 @@ export default function CreatePostPage({ onRefresh }: Props) {
       <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-24">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
 
-          <div className="rounded-2xl bg-white border border-primary p-4 shadow-sm">
-            <div className="relative">
-            <textarea
-              placeholder="Compartilhe algo..."
-              value={text}
-              onChange={(e) => {
-                const val = e.target.value
-                setText(val)
-                if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
-                  limitWarned.current = true
-                  toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
-                }
-                if (val.length < MAX_POST_LENGTH) {
-                  limitWarned.current = false
-                }
-              }}
-              maxLength={MAX_POST_LENGTH}
-              className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-20 leading-relaxed"
-            />
-            <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
-              {text.length}/{MAX_POST_LENGTH}
+          {!showEditor && (
+            <div className="rounded-2xl bg-white border border-primary p-4 shadow-sm">
+              <div className="relative">
+              <textarea
+                placeholder="Compartilhe algo..."
+                value={text}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setText(val)
+                  if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
+                    limitWarned.current = true
+                    toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
+                  }
+                  if (val.length < MAX_POST_LENGTH) {
+                    limitWarned.current = false
+                  }
+                }}
+                maxLength={MAX_POST_LENGTH}
+                className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-20 leading-relaxed"
+              />
+              <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
+                {text.length}/{MAX_POST_LENGTH}
+              </div>
             </div>
-          </div>
-          </div>
+            </div>
+          )}
 
           <div className="rounded-2xl bg-white border border-primary p-3 shadow-sm space-y-4">
 
@@ -559,7 +587,6 @@ export default function CreatePostPage({ onRefresh }: Props) {
                   <video
                     src={videoPreview}
                     controls
-                    // O atributo `muted` foi removido daqui para que você possa escutar o áudio do vídeo gravado.
                     className="w-full max-h-[40vh]"
                   />
                   <div
@@ -582,24 +609,26 @@ export default function CreatePostPage({ onRefresh }: Props) {
             <canvas ref={canvasRef} className="hidden" />
           </div>
 
-          <div className="w-full flex gap-3 pt-4 mb-10">
-            <button
-              type="button"
-              onClick={() => window.history.back()}
-              className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
-            >
-              Cancelar
-            </button>
+          {!showEditor && (
+            <div className="w-full flex gap-3 pt-4 mb-10">
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
+              >
+                Cancelar
+              </button>
 
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading || (!text && !finalBlob && !video)}
-              className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
-            >
-              {loading ? "Publicando..." : "Publicar"}
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || (!text && !finalBlob && !video)}
+                className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
+              >
+                {loading ? "Publicando..." : "Publicar"}
+              </button>
+            </div>
+          )}
 
         </div>
       </section>

@@ -111,12 +111,22 @@ export function PhotoPost({
               boxShadow: '0 8px 40px rgba(39, 38, 98, 0.2)',
             }}
           >
+            <div
+              className="absolute inset-0 -m-4 scale-110"
+              style={{
+                backgroundImage: `url(${post.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'blur(20px)',
+                opacity: 0.5,
+              }}
+            />
             <Image
               src={post.image}
               alt="Post de foto"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
+              className="object-contain relative z-[1]"
               priority
               onLoad={handleImageLoad}
               onClick={() => onOpenImage(post.image, post.id, post.authorId)}
@@ -324,7 +334,7 @@ export function PhotoPost({
               src={post.image}
               onClick={() => onOpenImage(post.image, post.id, post.authorId)}
               onDoubleClick={onLike}
-              className="w-full max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
+              className="w-full max-h-[520px] object-contain cursor-pointer transition-opacity hover:opacity-95"
               alt="Imagem da postagem"
             />
           </div>

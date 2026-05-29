@@ -134,7 +134,7 @@ export const StoriesModal = ({
                 loading="lazy"
               
                 draggable={false}
-                className="w-full rounded-2xl mt-6 object-cover max-h-420px"
+                className="w-full rounded-2xl mt-6 object-contain max-h-420px"
               />
             )}
           </div>

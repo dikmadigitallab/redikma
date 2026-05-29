@@ -340,7 +340,7 @@ export function PostViewModal({ postId, onClose }: Props) {
   onClick={() =>
     setSelectedImage(post.image)
   }
-  className="w-full max-h-300px object-cover cursor-pointer transition-opacity hover:opacity-95"
+  className="w-full max-h-300px object-contain cursor-pointer transition-opacity hover:opacity-95"
 />
                 </div>
               )}
