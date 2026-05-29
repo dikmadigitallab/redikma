@@ -47,15 +47,27 @@ export function Header() {
   const avatarRef = useRef<HTMLDivElement | null>(null)
   const searchRef = useRef<HTMLDivElement | null>(null)
 
+
+  // 1. Definição do estado (mantive o case-sensitive que você postou, embora camelCase seja padrão)
+  const [label, setLabel] = useState<string>('Local');
   const pathname = usePathname();
-  const branch =
-    pathname.includes("hml")
-      ? "Beta"
-      : pathname.includes("dev")
-        ? "Desenvolvimento"
-        : pathname.includes("opencode")
-          ? "OPENCODE"
-          : "local";
+
+
+  useEffect(() => {
+    if (!pathname) return;
+    if (pathname.includes("hml")) {
+      setLabel("Beta");
+    } else if (pathname.includes("dev")) {
+      setLabel("Desenvolvimento");
+    } else if (pathname.includes("opencode")) {
+      setLabel("OPENCODE");
+    } else {
+      setLabel("local");
+    }
+
+    // A dependência [pathname] garante que isso só rode quando a URL mudar
+  }, [pathname]);
+
 
   const lastSeenKey = userId
     ? `notifications-last-seen-${userId}`
@@ -230,7 +242,7 @@ export function Header() {
 
           <div className="leading-tight">
             <h1 className="text-sm font-bold text-white drop-shadow-md">
-              ReDikma - {branch}
+              ReDikma - {label}
             </h1>
 
             <p className="text-[10px] text-white opacity-95 uppercase font-semibold tracking-wide drop-shadow-sm">
