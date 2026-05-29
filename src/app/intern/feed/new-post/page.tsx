@@ -396,30 +396,32 @@ export default function CreatePostPage({ onRefresh }: Props) {
       <section className="flex-1 overflow-y-auto overscroll-contain bg-inherit pb-24">
         <div className="w-full max-w-lg mx-auto px-3 sm:px-5 py-4 space-y-4">
 
-          <div className="rounded-2xl bg-white border border-primary p-4 shadow-sm">
-            <div className="relative">
-            <textarea
-              placeholder="Compartilhe algo..."
-              value={text}
-              onChange={(e) => {
-                const val = e.target.value
-                setText(val)
-                if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
-                  limitWarned.current = true
-                  toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
-                }
-                if (val.length < MAX_POST_LENGTH) {
-                  limitWarned.current = false
-                }
-              }}
-              maxLength={MAX_POST_LENGTH}
-              className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-20 leading-relaxed"
-            />
-            <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
-              {text.length}/{MAX_POST_LENGTH}
+          {!showEditor && (
+            <div className="rounded-2xl bg-white border border-primary p-4 shadow-sm">
+              <div className="relative">
+              <textarea
+                placeholder="Compartilhe algo..."
+                value={text}
+                onChange={(e) => {
+                  const val = e.target.value
+                  setText(val)
+                  if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
+                    limitWarned.current = true
+                    toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
+                  }
+                  if (val.length < MAX_POST_LENGTH) {
+                    limitWarned.current = false
+                  }
+                }}
+                maxLength={MAX_POST_LENGTH}
+                className="w-full bg-transparent outline-none text-sm sm:text-base resize-none h-20 leading-relaxed"
+              />
+              <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
+                {text.length}/{MAX_POST_LENGTH}
+              </div>
             </div>
-          </div>
-          </div>
+            </div>
+          )}
 
           <div className="rounded-2xl bg-white border border-primary p-3 shadow-sm space-y-4">
 
@@ -607,24 +609,26 @@ export default function CreatePostPage({ onRefresh }: Props) {
             <canvas ref={canvasRef} className="hidden" />
           </div>
 
-          <div className="w-full flex gap-3 pt-4 mb-10">
-            <button
-              type="button"
-              onClick={() => window.history.back()}
-              className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
-            >
-              Cancelar
-            </button>
+          {!showEditor && (
+            <div className="w-full flex gap-3 pt-4 mb-10">
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="flex-1 py-3.5 border border-neutral-300 rounded-2xl text-sm font-medium bg-white active:scale-[0.98] transition"
+              >
+                Cancelar
+              </button>
 
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading || (!text && !finalBlob && !video)}
-              className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
-            >
-              {loading ? "Publicando..." : "Publicar"}
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || (!text && !finalBlob && !video)}
+                className="flex-1 py-3.5 bg-black text-white rounded-2xl text-sm font-medium active:scale-[0.98] disabled:opacity-30 transition"
+              >
+                {loading ? "Publicando..." : "Publicar"}
+              </button>
+            </div>
+          )}
 
         </div>
       </section>
