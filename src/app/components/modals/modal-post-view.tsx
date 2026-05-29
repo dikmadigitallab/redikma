@@ -304,7 +304,7 @@ export function PostViewModal({ postId, onClose }: Props) {
                   <div className="px-1">
                     <p
                       className="text-sm leading-7 whitespace-pre-wrap break-words"
-                      style={{ color: "white" }}
+                      style={{ color: "var(--black)" }}
                     >
                       {renderTextWithLinks(displayLabel)}
                       {shouldTruncate && (
@@ -329,19 +329,19 @@ export function PostViewModal({ postId, onClose }: Props) {
                     borderColor: "var(--border)",
                   }}
                 >
-<Image
-  src={post.image}
-  alt=""
-  width={1200}
-  height={800}
-  loading="lazy"
-  
-  draggable={false}
-  onClick={() =>
-    setSelectedImage(post.image)
-  }
-  className="w-full max-h-300px object-contain cursor-pointer transition-opacity hover:opacity-95"
-/>
+                  <Image
+                    src={post.image}
+                    alt=""
+                    width={1200}
+                    height={800}
+                    loading="lazy"
+                    
+                    draggable={false}
+                    onClick={() =>
+                      setSelectedImage(post.image)
+                    }
+                    className="w-full max-h-300px object-contain cursor-pointer transition-opacity hover:opacity-95"
+                  />
                 </div>
               )}
 

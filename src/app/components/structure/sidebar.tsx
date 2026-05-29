@@ -26,6 +26,7 @@ export function Sidebar() {
 
   const isSystemAdmin = session?.user?.role === "SYSTEM_ADM"
 
+
   async function handleLogout() {
     await signOut({ callbackUrl: "/login" })
   }
@@ -288,7 +289,7 @@ const sidebarContent = (
               className="text-[15%] font-semibold uppercase tracking-[0.18em] mt-0.5"
               style={{ color: "var(--gray)" }}
             >
-              Comunicação Interna
+              Comunicação Interna 
             </p>
           </div>
         </div>

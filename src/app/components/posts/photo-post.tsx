@@ -11,6 +11,7 @@ import { CommentsBox } from './comentarios'
 import { PostOptions } from './postDelete'
 import { TRUNCATE_LENGTH } from '@/lib/constantes'
 import {useSession} from 'next-auth/react'
+import { PostBackground } from './post-background'
 
 type Liker = {
   id: string
@@ -250,15 +251,15 @@ export function PhotoPost({
 
       {/* Desktop: card layout */}
       <div
-        className="hidden md:block relative rounded-2xl border-2 shadow-md overflow-visible transition-all duration-500 hover:shadow-lg hover:border-[var(--accent)]"
+        className="hidden md:block relative rounded-2xl shadow-md overflow-visible transition-all duration-500 hover:shadow-lg"
         style={{
-          backgroundColor: "var(--white)",
-          borderColor: "var(--primary)",
+          background: "linear-gradient(to bottom, #f7a06a2f 0%, #f15b244e 100%)",
           boxShadow: "0 4px 16px rgba(39, 38, 98, 0.08)",
         }}
       >
+        <PostBackground />
         <div
-          className="h-1 w-full"
+          className="h-1 w-full relative z-10"
           style={{
             background:
               "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
@@ -273,7 +274,7 @@ export function PhotoPost({
             />
           </div>
         ) : null}
-        <div className="p-4 md:p-5 space-y-4">
+        <div className="relative z-10 p-4 md:p-5 space-y-4">
           <div className="flex items-start gap-3 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
             <div className="relative shrink-0 cursor-pointer" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
               <div className="absolute -inset-1 rounded-full opacity-15" style={{ backgroundColor: "var(--secondary)" }} />
@@ -326,10 +327,7 @@ export function PhotoPost({
             </div>
           )}
 
-          <div
-            className="rounded-2xl overflow-hidden border"
-            style={{ backgroundColor: "var(--background)", borderColor: "var(--border)" }}
-          >
+          <div className="rounded-2xl overflow-hidden">
             <img
               src={post.image}
               onClick={() => onOpenImage(post.image, post.id, post.authorId)}

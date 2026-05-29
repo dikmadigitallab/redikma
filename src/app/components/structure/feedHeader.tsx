@@ -8,7 +8,7 @@ import {
   Search,
   Rss,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { NotificationsBox } from "./box-notify"
 import { FaUserDoctor } from "react-icons/fa6"
@@ -46,6 +46,16 @@ export function Header() {
   const notifyRef = useRef<HTMLDivElement | null>(null)
   const avatarRef = useRef<HTMLDivElement | null>(null)
   const searchRef = useRef<HTMLDivElement | null>(null)
+
+const pathname = usePathname();
+    const branch =
+  pathname.includes("hml")
+    ? "Beta"
+    : pathname.includes("dev")
+    ? "Desenvolvimento"
+    : pathname.includes("opencode")
+    ? "OPENCODE"
+    : "local";
 
   const lastSeenKey = userId
     ? `notifications-last-seen-${userId}`
@@ -220,7 +230,7 @@ export function Header() {
 
           <div className="leading-tight">
             <h1 className="text-sm font-bold text-white drop-shadow-md">
-              ReDikma
+              ReDikma - {branch}
             </h1>
 
             <p className="text-[10px] text-white opacity-95 uppercase font-semibold tracking-wide drop-shadow-sm">

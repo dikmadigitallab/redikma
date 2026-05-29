@@ -11,6 +11,7 @@ import { LikeView } from "./likes-view"
 import { FrashPlayer } from "./frash-player"
 import { useSession } from "next-auth/react"
 import { TRUNCATE_LENGTH } from "@/lib/constantes"
+import { PostBackground } from "./post-background"
 
 
 type Post = {
@@ -83,15 +84,15 @@ export function TextPostCard({
   return (
     <div
       id={`post-${post.id}`}
-      className="relative rounded-2xl border-2 shadow-md overflow-visible transition-all duration-500 hover:shadow-lg hover:border-accent"
+      className="relative rounded-2xl shadow-md overflow-visible transition-all duration-500 hover:shadow-lg hover:border-accent"
       style={{
-        backgroundColor: "var(--white)",
-        borderColor: "var(--primary)",
+        background: "linear-gradient(to bottom, #f7a06a2f 0%, #f15b244e 100%)",
         boxShadow: "0 4px 16px rgba(39, 38, 98, 0.08)",
       }}
     >
+      <PostBackground />
       <div
-        className="h-1 w-full"
+        className="h-1 w-full relative z-10"
         style={{ background: "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)" }}
       />
 
@@ -112,7 +113,7 @@ export function TextPostCard({
         </div>
       )}
 
-      <div className="p-4 md:p-5 space-y-4 overflow-visible">
+      <div className="relative z-10 p-4 md:p-5 space-y-4 overflow-visible">
         <div className="flex items-start gap-3 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
           <div className="relative shrink-0 cursor-pointer" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
             <div className="absolute -inset-1 rounded-full opacity-15" style={{ backgroundColor: "var(--secondary)" }} />
@@ -161,7 +162,7 @@ export function TextPostCard({
         </div>
 
         {post.video && (
-          <div className="relative rounded-2xl overflow-hidden border" style={{ backgroundColor: "var(--background)", borderColor: "var(--border)" }}>
+          <div className="relative rounded-2xl overflow-hidden">
             <FrashPlayer src={post.video} muted={videoMuted} onToggleMute={onToggleMute} />
             <div
               className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
@@ -173,7 +174,7 @@ export function TextPostCard({
         )}
 
         {post.image && (
-          <div className="rounded-2xl overflow-hidden border" style={{ backgroundColor: "var(--background)", borderColor: "var(--border)" }}>
+          <div className="rounded-2xl overflow-hidden">
             <Image
               src={post.image} alt="Imagem da postagem"
               width={1200} height={800}
