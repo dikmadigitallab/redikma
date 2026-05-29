@@ -137,6 +137,7 @@ export function Editor({
   );
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayTool, setOverlayTool] = useState<ActiveTool>("adjust");
+  const [naturalSize, setNaturalSize] = useState({ w: 1, h: 1 });
 
   const dragStart = useRef({ x: 0, y: 0 });
   const pinchStart = useRef(0);
@@ -361,6 +362,13 @@ export function Editor({
   );
 
   useEffect(() => {
+    if (!preview) return;
+    const img = new Image();
+    img.onload = () => setNaturalSize({ w: img.width, h: img.height });
+    img.src = preview;
+  }, [preview]);
+
+  useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
@@ -386,38 +394,64 @@ export function Editor({
         img.onload = resolve;
       });
 
-      const outSize = 1080;
+      const maxDim = 1920;
+      const imgRatio = img.width / img.height;
+
+      let outW: number, outH: number;
+      if (cropAspect === "free") {
+        outW = img.width;
+        outH = img.height;
+      } else {
+        const [aw, ah] = cropAspect.split("/").map(Number);
+        if (aw >= ah) {
+          outW = maxDim;
+          outH = Math.round(maxDim * (ah / aw));
+        } else {
+          outH = maxDim;
+          outW = Math.round(maxDim * (aw / ah));
+        }
+      }
+
+      if (outW > maxDim || outH > maxDim) {
+        if (outW >= outH) {
+          outH = Math.round(outH * (maxDim / outW));
+          outW = maxDim;
+        } else {
+          outW = Math.round(outW * (maxDim / outH));
+          outH = maxDim;
+        }
+      }
+
       const canvas = document.createElement("canvas");
+      canvas.width = outW;
+      canvas.height = outH;
       const ctx = canvas.getContext("2d")!;
-      canvas.width = outSize;
-      canvas.height = outSize;
 
       ctx.filter = getFilterString();
 
-      const imgRatio = img.width / img.height;
-      let baseWidth = outSize,
-        baseHeight = outSize;
-      if (imgRatio > 1) {
-        baseHeight = outSize;
-        baseWidth = baseHeight * imgRatio;
+      const outRatio = outW / outH;
+      let baseW: number, baseH: number;
+      if (imgRatio > outRatio) {
+        baseH = outH;
+        baseW = baseH * imgRatio;
       } else {
-        baseWidth = outSize;
-        baseHeight = baseWidth / imgRatio;
+        baseW = outW;
+        baseH = baseW / imgRatio;
       }
 
-      const scaledWidth = baseWidth * zoom;
-      const scaledHeight = baseHeight * zoom;
-      const scaleX = outSize / (containerRef.current?.offsetWidth || outSize);
-      const scaleY = outSize / (containerRef.current?.offsetHeight || outSize);
-      const centerX = (outSize - scaledWidth) / 2 + position.x * scaleX;
-      const centerY = (outSize - scaledHeight) / 2 + position.y * scaleY;
+      const scaledW = baseW * zoom;
+      const scaledH = baseH * zoom;
+      const scaleX = outW / (containerRef.current?.offsetWidth || outW);
+      const scaleY = outH / (containerRef.current?.offsetHeight || outH);
+      const centerX = (outW - scaledW) / 2 + position.x * scaleX;
+      const centerY = (outH - scaledH) / 2 + position.y * scaleY;
 
       ctx.save();
-      ctx.translate(outSize / 2, outSize / 2);
+      ctx.translate(outW / 2, outH / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-      ctx.translate(-outSize / 2, -outSize / 2);
-      ctx.drawImage(img, centerX, centerY, scaledWidth, scaledHeight);
+      ctx.translate(-outW / 2, -outH / 2);
+      ctx.drawImage(img, centerX, centerY, scaledW, scaledH);
       ctx.restore();
 
       if (currentSettings.temperature !== 0) {
@@ -428,40 +462,51 @@ export function Editor({
           currentSettings.temperature > 0
             ? `rgba(255, 150, 0, ${Math.abs(currentSettings.temperature) / 200})`
             : `rgba(0, 150, 255, ${Math.abs(currentSettings.temperature) / 200})`;
-        ctx.fillRect(0, 0, outSize, outSize);
+        ctx.fillRect(0, 0, outW, outH);
       }
 
-      const outputCanvas = document.createElement("canvas");
-      const outCtx = outputCanvas.getContext("2d")!;
-      const [aw, ah] =
-        cropAspect === "free"
-          ? [outSize, outSize]
-          : cropAspect.split("/").map(Number);
-      const cropSize = outSize;
-      const cropW = aw >= ah ? cropSize : cropSize * (aw / ah);
-      const cropH = aw >= ah ? cropSize * (ah / aw) : cropSize;
-      outputCanvas.width = cropW;
-      outputCanvas.height = cropH;
-      outCtx.drawImage(
-        canvas,
-        (outSize - cropW) / 2,
-        (outSize - cropH) / 2,
-        cropW,
-        cropH,
-        0,
-        0,
-        cropW,
-        cropH,
-      );
-
-      outputCanvas.toBlob(
-        (blob) => {
-          if (blob) onSave(blob);
-          setLoading(false);
-        },
-        "image/jpeg",
-        0.9,
-      );
+      if (cropAspect !== "free") {
+        const [aw, ah] = cropAspect.split("/").map(Number);
+        let cropW = outW;
+        let cropH = outH;
+        if (aw / ah > outW / outH) {
+          cropW = outH * (aw / ah);
+        } else {
+          cropH = outW * (ah / aw);
+        }
+        const outputCanvas = document.createElement("canvas");
+        outputCanvas.width = Math.round(cropW);
+        outputCanvas.height = Math.round(cropH);
+        const outCtx = outputCanvas.getContext("2d")!;
+        outCtx.drawImage(
+          canvas,
+          Math.round((outW - cropW) / 2),
+          Math.round((outH - cropH) / 2),
+          Math.round(cropW),
+          Math.round(cropH),
+          0,
+          0,
+          Math.round(cropW),
+          Math.round(cropH),
+        );
+        outputCanvas.toBlob(
+          (blob) => {
+            if (blob) onSave(blob);
+            setLoading(false);
+          },
+          "image/jpeg",
+          0.9,
+        );
+      } else {
+        canvas.toBlob(
+          (blob) => {
+            if (blob) onSave(blob);
+            setLoading(false);
+          },
+          "image/jpeg",
+          0.9,
+        );
+      }
     } catch {
       toast.error("Erro ao processar imagem");
       setLoading(false);
@@ -544,11 +589,16 @@ export function Editor({
       </div>
 
       <div className="px-3">
-        <div
-          ref={containerRef}
-          className="relative rounded-2xl overflow-hidden bg-black border select-none touch-none"
-          style={{ aspectRatio }}
-          onWheel={handleZoom}
+          <div
+            ref={containerRef}
+            className="relative rounded-2xl overflow-hidden bg-black border select-none touch-none"
+            style={{
+              aspectRatio:
+                cropAspect === "free"
+                  ? `${naturalSize.w} / ${naturalSize.h}`
+                  : cropAspect,
+            }}
+            onWheel={handleZoom}
           onMouseDown={(e) => {
             if (showOverlay) return;
             e.preventDefault();
