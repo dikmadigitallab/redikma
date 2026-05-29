@@ -47,15 +47,15 @@ export function Header() {
   const avatarRef = useRef<HTMLDivElement | null>(null)
   const searchRef = useRef<HTMLDivElement | null>(null)
 
-const pathname = usePathname();
-    const branch =
-  pathname.includes("hml")
-    ? "Beta"
-    : pathname.includes("dev")
-    ? "Desenvolvimento"
-    : pathname.includes("opencode")
-    ? "OPENCODE"
-    : "local";
+  const pathname = usePathname();
+  const branch =
+    pathname.includes("hml")
+      ? "Beta"
+      : pathname.includes("dev")
+        ? "Desenvolvimento"
+        : pathname.includes("opencode")
+          ? "OPENCODE"
+          : "local";
 
   const lastSeenKey = userId
     ? `notifications-last-seen-${userId}`
@@ -207,7 +207,7 @@ const pathname = usePathname();
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b-2 shadow-lg md:sticky md:top-0 md:left-auto md:right-auto md:w-full" style={{background: 'var(--gradient-brand)', borderColor: 'var(--accent)'}}>
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b-2 shadow-lg md:sticky md:top-0 md:left-auto md:right-auto md:w-full" style={{ background: 'var(--gradient-brand)', borderColor: 'var(--accent)' }}>
       <div className="h-14 px-4 flex items-center justify-between max-w-7xl mx-auto">
         <div
           onClick={() =>
@@ -216,16 +216,16 @@ const pathname = usePathname();
           className="flex items-center gap-3 cursor-pointer shrink-0"
         >
           <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shadow-lg bg-white border-2 border-white">
-<Image
-  src="/icons/redikma_logo.png"
-  alt="logotipo ReDikma"
-  width={300}
-  height={300}
-  priority
-  
-  draggable={false}
-  className="w-full h-full object-contain"
-/>
+            <Image
+              src="/icons/redikma_logo.png"
+              alt="logotipo ReDikma"
+              width={300}
+              height={300}
+              priority
+
+              draggable={false}
+              className="w-full h-full object-contain"
+            />
           </div>
 
           <div className="leading-tight">
@@ -240,115 +240,112 @@ const pathname = usePathname();
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <div
-            className="relative"
-            ref={searchRef}
-          >
+
+          <div className="relative h-full" ref={searchRef}>
             <button
-              onClick={() =>
-                setOpenSearch(!openSearch)
-              }
-              className="w-9 h-9 flex items-center justify-center rounded-full text-primary hover:bg-primary-10 transition"
+              onClick={() => setOpenSearch(!openSearch)}
+              className="w-9 h-9 flex items-center justify-center rounded-full text-primary hover:bg-primary/10 transition-colors"
             >
               <Search size={18} />
             </button>
 
             {openSearch && (
-              <div className="absolute right-0 mt-3 w-360p] max-w-[calc(100vw-2rem)] bg-white border border-primary rounded-2xl shadow-2xl overflow-hidden z-50">
-                <div className="p-3 border-b border-neutral-100">
-                  <input
-                    type="text"
-                    placeholder="Buscar pessoas ou publicações..."
-                    value={search}
-                    onChange={(e) =>
-                      setSearch(e.target.value)
-                    }
-                    className="w-full h-11 px-4 rounded-xl border-2 border-primary outline-none text-sm focus:border-primary font-medium"
-                    style={{fontFamily: "'Red Hat Text', sans-serif"}}
-                  />
-                </div>
+              <>
+                {/* Overlay invisível no mobile para garantir que a busca não quebre o layout de baixo */}
+                <div
+                  className="fixed inset-0 z-40 sm:hidden"
+                  onClick={() => setOpenSearch(false)}
+                />
 
-                <div className="max-h-420px overflow-y-auto">
-                  {loading && (
-                    <div className="p-4 text-sm text-[varprimary">
-                      Buscando...
+                <div
+                  className="fixed top-20 left-4 right-4 sm:absolute sm:top-[calc(100%+12px)] sm:left-auto sm:right-0 sm:w-[520px] 
+        bg-white border border-neutral-100 sm:border-neutral-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden z-50 origin-top-right transition-all"
+                >
+                  <div className="p-3 border-b border-neutral-100 bg-neutral-50/50">
+                    <div className="relative">
+                      {/* Ícone dentro do input para visual mais premium */}
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search size={16} className="text-neutral-400" />
+                      </div>
+
+                      <input
+                        type="text"
+                        placeholder="Buscar pessoas ou publicações..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        autoFocus
+                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-sm font-medium transition-all"
+                        style={{ fontFamily: "'Red Hat Text', sans-serif" }}
+                      />
                     </div>
-                  )}
+                  </div>
 
-                  {!loading &&
-                    results.length === 0 &&
-                    search && (
-                      <div className="p-4 text-sm text-primary">
-                        Nenhuma publicação
-                        encontrada
+                  <div className="max-h-[60vh] sm:max-h-[420px] overflow-y-auto bg-white">
+                    {loading && (
+                      <div className="flex items-center justify-center p-8 text-sm text-neutral-400 font-medium">
+                        <span className="animate-pulse">Buscando...</span>
                       </div>
                     )}
 
-                  {!loading &&
-                    results.length > 0 && (
-                      <div className="grid grid-cols-3 gap-1 p-1">
+                    {!loading && results.length === 0 && search && (
+                      <div className="flex items-center justify-center p-8 text-sm text-neutral-400 font-medium">
+                        Nenhuma publicação encontrada
+                      </div>
+                    )}
+
+                    {!loading && results.length > 0 && (
+                      <div className="grid grid-cols-3 gap-[2px] p-1">
                         {results.map((post) => (
                           <button
                             key={post.id}
                             onClick={() => {
-                              const postElement =
-                                document.getElementById(
-                                  `post-${post.id}`
-                                )
+                              const postElement = document.getElementById(`post-${post.id}`)
 
                               if (postElement) {
-                                postElement.scrollIntoView(
-                                  {
-                                    behavior:
-                                      "smooth",
-                                    block:
-                                      "center",
-                                  }
-                                )
+                                postElement.scrollIntoView({
+                                  behavior: "smooth",
+                                  block: "center",
+                                })
 
                                 postElement.classList.add(
                                   "ring-4",
                                   "ring-cyan-400",
-                                  "ring-offset-2"
+                                  "ring-offset-2",
+                                  "transition-all"
                                 )
 
-                                setTimeout(
-                                  () => {
-                                    postElement.classList.remove(
-                                      "ring-4",
-                                      "ring-cyan-400",
-                                      "ring-offset-2"
-                                    )
-                                  },
-                                  3000
-                                )
+                                setTimeout(() => {
+                                  postElement.classList.remove(
+                                    "ring-4",
+                                    "ring-cyan-400",
+                                    "ring-offset-2"
+                                  )
+                                }, 3000)
                               }
 
-                              setOpenSearch(
-                                false
-                              )
+                              setOpenSearch(false)
                               setSearch("")
                             }}
                             className="relative aspect-square overflow-hidden bg-neutral-100 group"
                           >
-<Image
-  src={post.image}
-  alt=""
-  width={600}
-  height={600}
-  loading="lazy"
-  
-  draggable={false}
-  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-/>
+                            <Image
+                              src={post.image || '/placeholder.png'}
+                              alt=""
+                              fill
+                              sizes="(max-width: 768px) 33vw, 170px"
+                              loading="lazy"
+                              draggable={false}
+                              className="w-full h-full object-cover group-hover:scale-105 group-active:scale-95 transition-transform duration-300"
+                            />
 
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition" />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                           </button>
                         ))}
                       </div>
                     )}
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
 
@@ -361,11 +358,10 @@ const pathname = usePathname();
                 onClick={
                   handleToggleNotifications
                 }
-                className={`w-9 h-9 flex items-center justify-center rounded-full relative transition font-bold ${
-                  unreadCount > 0
+                className={`w-9 h-9 flex items-center justify-center rounded-full relative transition font-bold ${unreadCount > 0
                     ? "text-white bg-accent shadow-lg hover:shadow-xl"
                     : "text-neutral-600 hover:bg-[varprimary-10 hover:text-primary"
-                }`}
+                  }`}
               >
                 <Bell
                   size={18}
@@ -405,19 +401,19 @@ const pathname = usePathname();
               }
               className="w-9 h-9 rounded-full overflow-hidden border border-primary"
             >
-<Image
-  src={
-    user?.foto ||
-    "/photoProfile/userDefault.png"
-  }
-  alt="Foto do usuário"
-  width={200}
-  height={200}
-  loading="lazy"
-  
-  draggable={false}
-  className="w-full h-full object-cover"
-/>
+              <Image
+                src={
+                  user?.foto ||
+                  "/photoProfile/userDefault.png"
+                }
+                alt="Foto do usuário"
+                width={200}
+                height={200}
+                loading="lazy"
+
+                draggable={false}
+                className="w-full h-full object-cover"
+              />
             </button>
 
             {open && (

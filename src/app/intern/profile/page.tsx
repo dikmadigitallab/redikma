@@ -374,7 +374,7 @@ function PerfilPageContent() {
                 <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
                   <button
                     type="button"
-                    onClick={() => window.location.reload()}
+                    onClick={() => router.push("/intern/feed")}
                     disabled={loading}
                     className="w-full sm:w-auto sm:min-w-140px h-12 px-6 rounded-2xl text-sm font-semibold text-primary hover:bg-primary-10 transition-all flex items-center justify-center disabled:opacity-60"
                   >
