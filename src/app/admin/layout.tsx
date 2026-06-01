@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
-import { Sidebar } from "../components/sidebar"
+import { Sidebar } from "../components/structure/sidebar"
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authOptions } from "../api/auth/[...nextauth]/route"
-import { Header } from "../components/feedHeader"
+import { Header } from "../components/structure/feedHeader"
 
 export const metadata: Metadata = {
   title: "ReDikma - Comunicando Cultura",
@@ -41,7 +41,7 @@ export default async function RootLayout({
     >
       <Sidebar />
 
-      <main className="md:ml-64 pt-16 md:pt-0">
+      <main className="md:ml-[18vw] pt-16 md:pt-0">
         <div className="w-full h-full">
           <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8">
             <Header/>

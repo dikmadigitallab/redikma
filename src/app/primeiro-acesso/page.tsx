@@ -76,7 +76,7 @@ export default function PrimeiroAcessoPage() {
     <div className="min-h-screen bg-[#f6f7fb] flex flex-col">
       <header className="bg-white border-b border--primary px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#0A4554] flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-sm overflow-hidden">
             <Image
               src="/icons/redikma_logo.png"
               alt="Logo Redikma"
@@ -111,7 +111,7 @@ export default function PrimeiroAcessoPage() {
                   type="checkbox"
                   checked={accepted.termos}
                   onChange={() => setAccepted(prev => ({ ...prev, termos: !prev.termos }))}
-                  className="mt-0.5 w-5 h-5 rounded border-neutral-300 text-[#0A4554] focus:ring-[#0A4554]"
+                  className="mt-0.5 w-5 h-5 rounded border-neutral-300 text-primary focus:ring-primary"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-neutral-900 text-sm">
@@ -119,7 +119,7 @@ export default function PrimeiroAcessoPage() {
                   </p>
                   <p className="text-sm text-primary mt-0.5">
                     Declaro que li e concordo com os{" "}
-                    <Link href="/legais/termos-de-uso" target="_blank" className="text-[#0A4554] underline hover:no-underline">
+                    <Link href="/legais/termos-de-uso" target="_blank" className="text-primary underline hover:no-underline">
                       Termos de Uso da plataforma ReDikma
                     </Link>.
                   </p>
@@ -132,7 +132,7 @@ export default function PrimeiroAcessoPage() {
                   type="checkbox"
                   checked={accepted.lgpd}
                   onChange={() => setAccepted(prev => ({ ...prev, lgpd: !prev.lgpd }))}
-                  className="mt-0.5 w-5 h-5 rounded border-neutral-300 text-[#0A4554] focus:ring-[#0A4554]"
+                  className="mt-0.5 w-5 h-5 rounded border-neutral-300 text-primary focus:ring-primary"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-neutral-900 text-sm">
@@ -140,7 +140,7 @@ export default function PrimeiroAcessoPage() {
                   </p>
                   <p className="text-sm text-primary mt-0.5">
                     Declaro que li e estou ciente da{" "}
-                    <Link href="/legais/lgpd" target="_blank" className="text-[#0A4554] underline hover:no-underline">
+                    <Link href="/legais/lgpd" target="_blank" className="text-primary underline hover:no-underline">
                       Política de Privacidade e Proteção de Dados
                     </Link>.
                   </p>
@@ -153,7 +153,7 @@ export default function PrimeiroAcessoPage() {
                   type="checkbox"
                   checked={accepted.cookies}
                   onChange={() => setAccepted(prev => ({ ...prev, cookies: !prev.cookies }))}
-                  className="mt-0.5 w-5 h-5 rounded border-neutral-300 text-[#0A4554] focus:ring-[#0A4554]"
+                  className="mt-0.5 w-5 h-5 rounded border-neutral-300 text-primary focus:ring-primary"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-neutral-900 text-sm">
@@ -172,7 +172,7 @@ export default function PrimeiroAcessoPage() {
             <button
               onClick={handleAccept}
               disabled={!allAccepted || loading}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-[#0A4554] text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-primary text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Aguarde..." : "Aceitar e Continuar"}
               {!loading && <ArrowRight size={18} />}

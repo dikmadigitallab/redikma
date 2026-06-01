@@ -3,17 +3,23 @@
 /* não mexer nessa agora
  */
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Heart, MessageCircle, Send } from 'lucide-react'
-import { useEffect, useState, type SyntheticEvent } from 'react'
+import { useState} from 'react'
 import { LikeView } from './likes-view'
 import { CommentsBox } from './comentarios'
 import { PostOptions } from './postDelete'
+import { TRUNCATE_LENGTH } from '@/lib/constantes'
+import {useSession} from 'next-auth/react'
+import { PostBackground } from './post-background'
 
 type Liker = {
   id: string
   nome: string
   foto: string
 }
+
+
 
 type PhotoPostProps = {
   post: {
@@ -59,6 +65,7 @@ export function PhotoPost({
   onDelete,
   onEdit,
 }: PhotoPostProps) {
+  const router = useRouter()
   const isAuthor = currentUserId === post.author.id
   const [, setImageLoaded] = useState(false)
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
@@ -70,6 +77,15 @@ export function PhotoPost({
       return false
     }
   })
+
+  const [textExpanded, setTextExpanded] = useState(false)
+  const shouldTruncate = post.label.length > TRUNCATE_LENGTH
+  const displayLabel = shouldTruncate && !textExpanded
+    ? post.label.slice(0, TRUNCATE_LENGTH)
+    : post.label
+
+  const session = useSession()
+  const user = session?.data?.user
 
   const handleImageLoad = (e: any) => {
     setImageLoaded(true)
@@ -96,12 +112,22 @@ export function PhotoPost({
               boxShadow: '0 8px 40px rgba(39, 38, 98, 0.2)',
             }}
           >
+            <div
+              className="absolute inset-0 -m-4 scale-110"
+              style={{
+                backgroundImage: `url(${post.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'blur(20px)',
+                opacity: 0.5,
+              }}
+            />
             <Image
               src={post.image}
               alt="Post de foto"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
+              className="object-contain relative z-[1]"
               priority
               onLoad={handleImageLoad}
               onClick={() => onOpenImage(post.image, post.id, post.authorId)}
@@ -110,7 +136,7 @@ export function PhotoPost({
 
             <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-3 z-10">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/50 bg-white/10 flex items-center justify-center shrink-0">
                     {post.author.foto && (post.author.foto.startsWith('http') || post.author.foto.startsWith('/')) ? (
                       <Image
@@ -194,7 +220,15 @@ export function PhotoPost({
           {post.label && (
             <div className="px-3 py-2">
               <p className="text-sm leading-6 whitespace-pre-wrap break-words" style={{ color: "var(--black)" }}>
-                {post.label}
+                {displayLabel}
+                {shouldTruncate && (
+                  <button
+                    onClick={() => setTextExpanded(!textExpanded)}
+                    className="text-blue-600 hover:underline ml-1 text-sm"
+                  >
+                    {textExpanded ? "... ver menos" : "... ver mais"}
+                  </button>
+                )}
               </p>
             </div>
           )}
@@ -217,15 +251,15 @@ export function PhotoPost({
 
       {/* Desktop: card layout */}
       <div
-        className="hidden md:block relative rounded-2xl border-2 shadow-md overflow-visible transition-all duration-500 hover:shadow-lg hover:border-[var(--accent)]"
+        className="hidden md:block relative rounded-2xl shadow-md overflow-visible transition-all duration-500 hover:shadow-lg"
         style={{
-          backgroundColor: "var(--white)",
-          borderColor: "var(--primary)",
+          background: "linear-gradient(to bottom, #f7a06a2f 0%, #f15b244e 100%)",
           boxShadow: "0 4px 16px rgba(39, 38, 98, 0.08)",
         }}
       >
+        <PostBackground />
         <div
-          className="h-1 w-full"
+          className="h-1 w-full relative z-10"
           style={{
             background:
               "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
@@ -240,9 +274,9 @@ export function PhotoPost({
             />
           </div>
         ) : null}
-        <div className="p-4 md:p-5 space-y-4">
+        <div className="relative z-10 p-4 md:p-5 space-y-4">
           <div className="flex items-start gap-3 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
-            <div className="relative shrink-0">
+            <div className="relative shrink-0 cursor-pointer" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
               <div className="absolute -inset-1 rounded-full opacity-15" style={{ backgroundColor: "var(--secondary)" }} />
               <img
                 src={post.author.foto || "/photoProfile/userDefault.png"}
@@ -253,7 +287,7 @@ export function PhotoPost({
             </div>
             <div className="flex-1 min-w-0 pr-8">
               <div className="flex items-baseline gap-2 flex-wrap">
-                <h3 className="text-sm md:text-base font-bold text-[var(--primary)] truncate">
+                <h3 className="text-sm md:text-base font-bold text-[var(--primary)] truncate cursor-pointer hover:underline" onClick={() => router.push(`/intern/other-profile/${post.author.id}`)}>
                   {post.author.nome}
                 </h3>
                 {post.author.cargo && (
@@ -280,20 +314,25 @@ export function PhotoPost({
           {post.label && (
             <div className="px-1">
               <p className="text-sm leading-7 whitespace-pre-wrap break-words" style={{ color: "var(--black)" }}>
-                {post.label}
+                {displayLabel}
+                {shouldTruncate && (
+                  <button
+                    onClick={() => setTextExpanded(!textExpanded)}
+                    className="text-blue-600 hover:underline ml-1 text-sm"
+                  >
+                    {textExpanded ? "... ver menos" : "... ver mais"}
+                  </button>
+                )}
               </p>
             </div>
           )}
 
-          <div
-            className="rounded-2xl overflow-hidden border"
-            style={{ backgroundColor: "var(--background)", borderColor: "var(--border)" }}
-          >
+          <div className="rounded-2xl overflow-hidden">
             <img
               src={post.image}
               onClick={() => onOpenImage(post.image, post.id, post.authorId)}
               onDoubleClick={onLike}
-              className="w-full max-h-[520px] object-cover cursor-pointer transition-opacity hover:opacity-95"
+              className="w-full max-h-[520px] object-contain cursor-pointer transition-opacity hover:opacity-95"
               alt="Imagem da postagem"
             />
           </div>
@@ -307,7 +346,7 @@ export function PhotoPost({
               }}
             >
               <img
-                src="/photoProfile/userDefault.png"
+                src={`${user?.foto} || /photoProfile/userDefault.png`}
                 className="w-7 h-7 rounded-full object-cover shrink-0"
                 alt="Comentador"
               />

@@ -39,7 +39,7 @@ type FilterPreset = {
   settings: Partial<Settings>;
 };
 
-type ActiveTool = "adjust" | "filters" | "crop";
+type ActiveTool = "adjust" | "filters" | "crop" | null;
 
 type AspectRatioOption = {
   label: string;
@@ -135,8 +135,8 @@ export function Editor({
   const [cameraFacing, setCameraFacing] = useState<"user" | "environment">(
     "environment",
   );
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [overlayTool, setOverlayTool] = useState<ActiveTool>("adjust");
+  const [overlayTool, setOverlayTool] = useState<ActiveTool>(null);
+  const [naturalSize, setNaturalSize] = useState({ w: 1, h: 1 });
 
   const dragStart = useRef({ x: 0, y: 0 });
   const pinchStart = useRef(0);
@@ -361,6 +361,13 @@ export function Editor({
   );
 
   useEffect(() => {
+    if (!preview) return;
+    const img = new Image();
+    img.onload = () => setNaturalSize({ w: img.width, h: img.height });
+    img.src = preview;
+  }, [preview]);
+
+  useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
@@ -386,38 +393,64 @@ export function Editor({
         img.onload = resolve;
       });
 
-      const outSize = 1080;
+      const maxDim = 1920;
+      const imgRatio = img.width / img.height;
+
+      let outW: number, outH: number;
+      if (cropAspect === "free") {
+        outW = img.width;
+        outH = img.height;
+      } else {
+        const [aw, ah] = cropAspect.split("/").map(Number);
+        if (aw >= ah) {
+          outW = maxDim;
+          outH = Math.round(maxDim * (ah / aw));
+        } else {
+          outH = maxDim;
+          outW = Math.round(maxDim * (aw / ah));
+        }
+      }
+
+      if (outW > maxDim || outH > maxDim) {
+        if (outW >= outH) {
+          outH = Math.round(outH * (maxDim / outW));
+          outW = maxDim;
+        } else {
+          outW = Math.round(outW * (maxDim / outH));
+          outH = maxDim;
+        }
+      }
+
       const canvas = document.createElement("canvas");
+      canvas.width = outW;
+      canvas.height = outH;
       const ctx = canvas.getContext("2d")!;
-      canvas.width = outSize;
-      canvas.height = outSize;
 
       ctx.filter = getFilterString();
 
-      const imgRatio = img.width / img.height;
-      let baseWidth = outSize,
-        baseHeight = outSize;
-      if (imgRatio > 1) {
-        baseHeight = outSize;
-        baseWidth = baseHeight * imgRatio;
+      const outRatio = outW / outH;
+      let baseW: number, baseH: number;
+      if (imgRatio > outRatio) {
+        baseH = outH;
+        baseW = baseH * imgRatio;
       } else {
-        baseWidth = outSize;
-        baseHeight = baseWidth / imgRatio;
+        baseW = outW;
+        baseH = baseW / imgRatio;
       }
 
-      const scaledWidth = baseWidth * zoom;
-      const scaledHeight = baseHeight * zoom;
-      const scaleX = outSize / (containerRef.current?.offsetWidth || outSize);
-      const scaleY = outSize / (containerRef.current?.offsetHeight || outSize);
-      const centerX = (outSize - scaledWidth) / 2 + position.x * scaleX;
-      const centerY = (outSize - scaledHeight) / 2 + position.y * scaleY;
+      const scaledW = baseW * zoom;
+      const scaledH = baseH * zoom;
+      const scaleX = outW / (containerRef.current?.offsetWidth || outW);
+      const scaleY = outH / (containerRef.current?.offsetHeight || outH);
+      const centerX = (outW - scaledW) / 2 + position.x * scaleX;
+      const centerY = (outH - scaledH) / 2 + position.y * scaleY;
 
       ctx.save();
-      ctx.translate(outSize / 2, outSize / 2);
+      ctx.translate(outW / 2, outH / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1);
-      ctx.translate(-outSize / 2, -outSize / 2);
-      ctx.drawImage(img, centerX, centerY, scaledWidth, scaledHeight);
+      ctx.translate(-outW / 2, -outH / 2);
+      ctx.drawImage(img, centerX, centerY, scaledW, scaledH);
       ctx.restore();
 
       if (currentSettings.temperature !== 0) {
@@ -428,40 +461,51 @@ export function Editor({
           currentSettings.temperature > 0
             ? `rgba(255, 150, 0, ${Math.abs(currentSettings.temperature) / 200})`
             : `rgba(0, 150, 255, ${Math.abs(currentSettings.temperature) / 200})`;
-        ctx.fillRect(0, 0, outSize, outSize);
+        ctx.fillRect(0, 0, outW, outH);
       }
 
-      const outputCanvas = document.createElement("canvas");
-      const outCtx = outputCanvas.getContext("2d")!;
-      const [aw, ah] =
-        cropAspect === "free"
-          ? [outSize, outSize]
-          : cropAspect.split("/").map(Number);
-      const cropSize = outSize;
-      const cropW = aw >= ah ? cropSize : cropSize * (aw / ah);
-      const cropH = aw >= ah ? cropSize * (ah / aw) : cropSize;
-      outputCanvas.width = cropW;
-      outputCanvas.height = cropH;
-      outCtx.drawImage(
-        canvas,
-        (outSize - cropW) / 2,
-        (outSize - cropH) / 2,
-        cropW,
-        cropH,
-        0,
-        0,
-        cropW,
-        cropH,
-      );
-
-      outputCanvas.toBlob(
-        (blob) => {
-          if (blob) onSave(blob);
-          setLoading(false);
-        },
-        "image/jpeg",
-        0.9,
-      );
+      if (cropAspect !== "free") {
+        const [aw, ah] = cropAspect.split("/").map(Number);
+        let cropW = outW;
+        let cropH = outH;
+        if (aw / ah > outW / outH) {
+          cropW = outH * (aw / ah);
+        } else {
+          cropH = outW * (ah / aw);
+        }
+        const outputCanvas = document.createElement("canvas");
+        outputCanvas.width = Math.round(cropW);
+        outputCanvas.height = Math.round(cropH);
+        const outCtx = outputCanvas.getContext("2d")!;
+        outCtx.drawImage(
+          canvas,
+          Math.round((outW - cropW) / 2),
+          Math.round((outH - cropH) / 2),
+          Math.round(cropW),
+          Math.round(cropH),
+          0,
+          0,
+          Math.round(cropW),
+          Math.round(cropH),
+        );
+        outputCanvas.toBlob(
+          (blob) => {
+            if (blob) onSave(blob);
+            setLoading(false);
+          },
+          "image/jpeg",
+          0.9,
+        );
+      } else {
+        canvas.toBlob(
+          (blob) => {
+            if (blob) onSave(blob);
+            setLoading(false);
+          },
+          "image/jpeg",
+          0.9,
+        );
+      }
     } catch {
       toast.error("Erro ao processar imagem");
       setLoading(false);
@@ -481,8 +525,7 @@ export function Editor({
   const previewFilter = showOriginal ? "none" : getFilterString();
 
   function openTool(tool: ActiveTool) {
-    setOverlayTool(tool);
-    setShowOverlay(true);
+    setOverlayTool((prev) => (prev === tool ? null : tool));
   }
 
   return (
@@ -544,13 +587,17 @@ export function Editor({
       </div>
 
       <div className="px-3">
-        <div
-          ref={containerRef}
-          className="relative rounded-2xl overflow-hidden bg-black border select-none touch-none"
-          style={{ aspectRatio }}
-          onWheel={handleZoom}
+          <div
+            ref={containerRef}
+            className="relative rounded-2xl overflow-hidden bg-black border select-none touch-none"
+            style={{
+              aspectRatio:
+                cropAspect === "free"
+                  ? `${naturalSize.w} / ${naturalSize.h}`
+                  : cropAspect,
+            }}
+            onWheel={handleZoom}
           onMouseDown={(e) => {
-            if (showOverlay) return;
             e.preventDefault();
             setDragging(true);
             setIsInteracting(true);
@@ -559,9 +606,7 @@ export function Editor({
               y: e.clientY - position.y,
             };
           }}
-          onTouchStart={(e) => {
-            if (!showOverlay) handleTouchStart(e);
-          }}
+          onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
@@ -596,191 +641,11 @@ export function Editor({
             />
           </div>
 
-          {showOverlay && (
-            <div
-              className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/85 to-transparent pt-6 pb-4 px-4 z-10 rounded-t-3xl animate-in slide-in-from-bottom-2"
-              style={{ backdropFilter: "blur(10px)" }}
-            >
-              {/* Drag Handle */}
-              <div className="flex justify-center mb-4">
-                <div className="w-10 h-1 rounded-full bg-white/40 hover:bg-white/60 transition cursor-grab active:cursor-grabbing" />
-              </div>
-
-              <div className="flex items-center justify-between mb-4">
-                <span
-                  className="text-white text-sm font-bold uppercase tracking-wider"
-                  style={{ fontFamily: "'Red Hat Display', sans-serif" }}
-                >
-                  {overlayTool === "adjust"
-                    ? "Ajustes"
-                    : overlayTool === "filters"
-                      ? "Filtros"
-                      : "Cortar"}
-                </span>
-                <button
-                  onClick={() => setShowOverlay(false)}
-                  className="p-1.5 rounded-full bg-white/20 text-white hover:bg-white/40 transition"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              {overlayTool === "adjust" && (
-                <div className="space-y-3 max-h-180px overflow-y-auto pr-2">
-                  {adjustmentControls.map((ctrl) => (
-                    <div key={ctrl.key} className="flex flex-col gap-1.5">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-bold uppercase text-white/80">
-                          {ctrl.label}
-                        </span>
-                        <span className="text-sm font-bold px-3 py-1 rounded-lg bg-accent text-white">
-                          {currentSettings[ctrl.key]}
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min={ctrl.min}
-                        max={ctrl.max}
-                        value={currentSettings[ctrl.key]}
-                        onChange={(e) =>
-                          updateSetting(ctrl.key, Number(e.target.value))
-                        }
-                        onMouseUp={commitSettings}
-                        onTouchEnd={commitSettings}
-                        className="w-full h-2 rounded-full appearance-none cursor-pointer accent-accent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-track]:bg-primary-20 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5"
-                        style={{
-                          background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(255,255,255,0.1) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(255,255,255,0.1) 100%)`,
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {overlayTool === "filters" && (
-                <div className="grid grid-cols-4 gap-2 max-h-200px overflow-y-auto">
-                  {FILTER_PRESETS.map((preset) => (
-                    <button
-                      key={preset.name}
-                      type="button"
-                      onClick={() => {
-                        applyFilter(preset);
-                        setShowOverlay(false);
-                      }}
-                      className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition transform hover:scale-105 ${
-                        selectedFilter === preset.name
-                          ? "ring-3 ring-accent shadow-lg shadow-accent)]/50"
-                          : "ring-1 ring-white/20"
-                      }`}
-                    >
-                      <div
-                        className="w-full aspect-square rounded-lg border-2 bg-cover bg-center overflow-hidden shadow-md"
-                        style={{
-                          backgroundImage: `url(${preview || ""})`,
-                          filter: `brightness(${preset.settings.brightness ?? 100}%) contrast(${preset.settings.contrast ?? 100}%) saturate(${preset.settings.saturation ?? 100}%)`,
-                          borderColor:
-                            selectedFilter === preset.name
-                              ? "var(--accent)"
-                              : "rgba(255,255,255,0.1)",
-                        }}
-                      />
-                      <span className="text-xs font-bold text-white/90 truncate w-full text-center">
-                        {preset.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {overlayTool === "crop" && (
-                <div className="space-y-4 max-h-200px overflow-y-auto pr-2">
-                  <div>
-                    <label className="text-sm font-bold uppercase text-white/80 mb-2.5 block">
-                      Proporção
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {ASPECT_RATIOS.map((ar) => (
-                        <button
-                          key={ar.value}
-                          type="button"
-                          onClick={() => setCropAspect(ar.value)}
-                          className={`px-4 py-2 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${
-                            cropAspect === ar.value
-                              ? "bg-accent text-white border-accent shadow-lg shadow-accent/50"
-                              : "bg-white/10 text-white/80 border-white/20 hover:bg-white/20"
-                          }`}
-                        >
-                          {ar.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setRotation((prev) => (prev + 90) % 360)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-3 text-sm font-bold rounded-lg border-2 border-white/20 bg-white/10 text-white/80 hover:bg-primary-20 hover:border-primary transition"
-                    >
-                      <RxRotateCounterClockwise size={16} />
-                      Rotacionar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFlipX((prev) => !prev)}
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${
-                        flipX
-                          ? "bg-accent text-white border-accent shadow-lg shadow-accent/50"
-                          : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
-                      }`}
-                    >
-                      <TbFlipHorizontal size={14} />
-                      Flip H
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFlipY((prev) => !prev)}
-                      className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-3 text-xs font-bold rounded-lg border-2 transition transform hover:scale-105 ${
-                        flipY
-                          ? "bg-accent text-white border-accent shadow-lg shadow-accent/50"
-                          : "border-white/20 bg-white/10 text-white/80 hover:bg-white/20"
-                      }`}
-                    >
-                      <TbFlipVertical size={14} />
-                      Flip V
-                    </button>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-bold uppercase text-white/80">
-                        Zoom
-                      </span>
-                      <span className="text-sm font-bold px-3 py-1 rounded-lg bg-accent text-white">
-                        {zoom.toFixed(1)}x
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={1}
-                      max={3}
-                      step={0.01}
-                      value={zoom}
-                      onChange={(e) => setZoom(Number(e.target.value))}
-                      className="w-full h-2 rounded-full appearance-none cursor-pointer accent-accent)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing"
-                      style={{
-                        background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${((zoom - 1) / 2) * 100}%, rgba(255,255,255,0.1) ${((zoom - 1) / 2) * 100}%, rgba(255,255,255,0.1) 100%)`,
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {showOverlay && overlayTool === "crop" && (
+          {overlayTool === "crop" && (
             <div className="absolute inset-[12%] border-2 border-white/70 rounded-lg pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
           )}
 
-          {isInteracting && !showOverlay && (
+          {isInteracting && (
             <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none">
               {Array.from({ length: 9 }).map((_, i) => (
                 <div key={i} className="border border-white/20" />
@@ -802,7 +667,7 @@ export function Editor({
           type="button"
           onClick={() => openTool("adjust")}
           className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            showOverlay && overlayTool === "adjust"
+            overlayTool === "adjust"
               ? "bg-primary text-white border-2 border-accent shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
           }`}
@@ -814,7 +679,7 @@ export function Editor({
           type="button"
           onClick={() => openTool("filters")}
           className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            showOverlay && overlayTool === "filters"
+            overlayTool === "filters"
               ? "bg-primary text-white border-2 border-accent shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
           }`}
@@ -826,7 +691,7 @@ export function Editor({
           type="button"
           onClick={() => openTool("crop")}
           className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            showOverlay && overlayTool === "crop"
+            overlayTool === "crop"
               ? "bg-primary text-white border-2 border-accent shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
           }`}
@@ -835,6 +700,177 @@ export function Editor({
           <span className="text-xs">Cortar</span>
         </button>
       </div>
+
+      {overlayTool && (
+        <div className="px-3">
+          <div className="bg-white rounded-2xl border border-primary/20 shadow-sm p-4 space-y-4 max-h-64 overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold uppercase tracking-wider text-primary">
+                {overlayTool === "adjust"
+                  ? "Ajustes"
+                  : overlayTool === "filters"
+                    ? "Filtros"
+                    : "Cortar"}
+              </span>
+              <button
+                onClick={() => setOverlayTool(null)}
+                className="p-1 rounded-full hover:bg-primary-10 transition"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {overlayTool === "adjust" && (
+              <div className="space-y-3">
+                {adjustmentControls.map((ctrl) => (
+                  <div key={ctrl.key} className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold uppercase text-gray">
+                        {ctrl.label}
+                      </span>
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-accent text-white">
+                        {currentSettings[ctrl.key]}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={ctrl.min}
+                      max={ctrl.max}
+                      value={currentSettings[ctrl.key]}
+                      onChange={(e) =>
+                        updateSetting(ctrl.key, Number(e.target.value))
+                      }
+                      onMouseUp={commitSettings}
+                      onTouchEnd={commitSettings}
+                      className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-accent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-track]:bg-primary-20 [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4"
+                      style={{
+                        background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(39,38,98,0.1) ${((currentSettings[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100}%, rgba(39,38,98,0.1) 100%)`,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {overlayTool === "filters" && (
+              <div className="grid grid-cols-4 gap-2">
+                {FILTER_PRESETS.map((preset) => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => {
+                      applyFilter(preset);
+                      setOverlayTool(null);
+                    }}
+                    className={`flex flex-col items-center gap-1.5 p-1.5 rounded-xl transition transform hover:scale-105 ${
+                      selectedFilter === preset.name
+                        ? "ring-2 ring-accent"
+                        : "ring-1 ring-primary/20"
+                    }`}
+                  >
+                    <div
+                      className="w-full aspect-square rounded-lg border bg-cover bg-center overflow-hidden shadow-sm"
+                      style={{
+                        backgroundImage: `url(${preview || ""})`,
+                        filter: `brightness(${preset.settings.brightness ?? 100}%) contrast(${preset.settings.contrast ?? 100}%) saturate(${preset.settings.saturation ?? 100}%)`,
+                        borderColor:
+                          selectedFilter === preset.name
+                            ? "var(--accent)"
+                            : "rgba(0,0,0,0.06)",
+                      }}
+                    />
+                    <span className="text-[10px] font-bold text-gray truncate w-full text-center">
+                      {preset.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {overlayTool === "crop" && (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-bold uppercase text-gray mb-2 block">
+                    Proporção
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {ASPECT_RATIOS.map((ar) => (
+                      <button
+                        key={ar.value}
+                        type="button"
+                        onClick={() => setCropAspect(ar.value)}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition transform hover:scale-105 ${
+                          cropAspect === ar.value
+                            ? "bg-accent text-white border-accent"
+                            : "bg-white text-gray border-primary/20 hover:border-primary/40"
+                        }`}
+                      >
+                        {ar.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setRotation((prev) => (prev + 90) % 360)}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border border-primary/20 bg-white text-gray hover:bg-primary-10 transition"
+                  >
+                    <RxRotateCounterClockwise size={14} />
+                    Girar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFlipX((prev) => !prev)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border transition ${
+                      flipX
+                        ? "bg-accent text-white border-accent"
+                        : "bg-white text-gray border-primary/20 hover:bg-primary-10"
+                    }`}
+                  >
+                    <TbFlipHorizontal size={12} />
+                    Flip H
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFlipY((prev) => !prev)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border transition ${
+                      flipY
+                        ? "bg-accent text-white border-accent"
+                        : "bg-white text-gray border-primary/20 hover:bg-primary-10"
+                    }`}
+                  >
+                    <TbFlipVertical size={12} />
+                    Flip V
+                  </button>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold uppercase text-gray">
+                      Zoom
+                    </span>
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-accent text-white">
+                      {zoom.toFixed(1)}x
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.01}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-accent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing"
+                    style={{
+                      background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${((zoom - 1) / 2) * 100}%, rgba(241,90,36,0.15) ${((zoom - 1) / 2) * 100}%, rgba(241,90,36,0.15) 100%)`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="px-3 pb-3 space-y-2">
         <div className="relative">

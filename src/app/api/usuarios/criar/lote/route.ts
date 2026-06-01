@@ -100,8 +100,13 @@ function parseDateField(value: unknown): Date | null {
 
 function normalizeCPF(cpf: unknown): string {
   if (!cpf) return ""
-  return String(cpf).replace(/\D/g, "")
+
+  const onlyNumbers = String(cpf).replace(/\D/g, "")
+
+  return onlyNumbers.padStart(11, "0")
 }
+
+
 
 export async function POST(req: Request) {
 

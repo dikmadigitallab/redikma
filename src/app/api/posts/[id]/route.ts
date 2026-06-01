@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import { MAX_POST_LENGTH_SERVER } from "@/lib/constantes"
 
 export async function PUT(
   req: Request,
@@ -22,6 +23,14 @@ export async function PUT(
       return NextResponse.json({ error: "O texto não pode ficar vazio" }, { status: 400 })
     }
 
+    const trimmed = label.trim()
+    if (trimmed.length > MAX_POST_LENGTH_SERVER) {
+      return NextResponse.json(
+        { error: `O texto da postagem deve ter no máximo ${MAX_POST_LENGTH_SERVER} caracteres` },
+        { status: 400 }
+      )
+    }
+
     const postagem = await prisma.postagem.findUnique({
       where: { id },
     })
@@ -39,7 +48,7 @@ export async function PUT(
 
     const updated = await prisma.postagem.update({
       where: { id },
-      data: { label: label.trim() },
+      data: { label: trimmed },
     })
 
     return NextResponse.json(updated, { status: 200 })

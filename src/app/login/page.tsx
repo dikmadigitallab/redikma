@@ -78,7 +78,7 @@ export default function LoginCPF() {
           className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
         />
         {/* Camada translúcida estilo glassmorphism puxando para o verde da marca */}
-        <div className="absolute inset-0 bg-linear-to-br from-black/80 to-[#047857]/90 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-linear-to-br from-black/80 to-[#272662]/90 mix-blend-multiply" />
 
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -87,7 +87,7 @@ export default function LoginCPF() {
           className="relative z-10 p-12 text-white max-w-xl text-center flex flex-col items-center"
         >
           <h2 className="text-4xl font-bold mb-4 leading-tight">
-            Bem-vindo à <span className="text-green-400">ReDikma</span>
+            Bem-vindo à <span className="text-accent">ReDikma</span>
           </h2>
 
           <p className="text-lg text-gray-200 mb-8">
@@ -98,7 +98,7 @@ export default function LoginCPF() {
           <div className="flex -space-x-4 justify-center">
             <div className="flex -space-x-4 justify-center">
               <Image
-                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                className="w-12 h-12 rounded-full border-2 border-primary object-cover"
                 src="https://i.pravatar.cc/100?img=68"
                 alt="Usuário 1"
                 width={48}
@@ -106,7 +106,7 @@ export default function LoginCPF() {
               />
 
               <Image
-                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                className="w-12 h-12 rounded-full border-2 border-primary object-cover"
                 src="https://i.pravatar.cc/100?img=47"
                 alt="Usuário 2"
                 width={48}
@@ -114,7 +114,7 @@ export default function LoginCPF() {
               />
 
               <Image
-                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                className="w-12 h-12 rounded-full border-2 border-primary object-cover"
                 src="https://i.pravatar.cc/100?img=33"
                 alt="Usuário 3"
                 width={48}
@@ -122,14 +122,14 @@ export default function LoginCPF() {
               />
 
               <Image
-                className="w-12 h-12 rounded-full border-2 border-green-900 object-cover"
+                className="w-12 h-12 rounded-full border-2 border-primary object-cover"
                 src="https://i.pravatar.cc/100?img=12"
                 alt="Usuário 4"
                 width={48}
                 height={48}
               />
 
-              <div className="w-12 h-12 rounded-full border-2 border-green-900 bg-gray-800 flex items-center justify-center text-xs font-medium text-white shadow-lg">
+              <div className="w-12 h-12 rounded-full border-2 border-primary bg-gray-800 flex items-center justify-center text-xs font-medium text-white shadow-lg">
                 +99
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function LoginCPF() {
       {/* LADO DIREITO: Formulário de Login (Responsivo) */}
       <div
         className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 relative overflow-hidden"
-        style={{ backgroundColor: '#0A4554' }} // Fundo CHAPADO com Azul Corporativo
+        style={{ backgroundColor: 'var(--primary)' }} // Fundo CHAPADO com Azul Royal
       >
 
         {/* --- DECORAÇÕES GEOMÉTRICAS E LINHAS INFORMES --- */}
@@ -151,7 +151,7 @@ export default function LoginCPF() {
         <div
           className="absolute border-[3px] pointer-events-none"
           style={{
-            borderColor: '#4FC3D9',
+            borderColor: 'var(--secondary)',
             opacity: 0.15,
             width: '600px',
             height: '600px',
@@ -166,7 +166,7 @@ export default function LoginCPF() {
         <div
           className="absolute border pointer-events-none"
           style={{
-            borderColor: '#4FC3D9',
+            borderColor: 'var(--secondary)',
             opacity: 0.3,
             width: '450px',
             height: '450px',
@@ -181,7 +181,7 @@ export default function LoginCPF() {
         <div
           className="absolute rounded-full border-4 pointer-events-none"
           style={{
-            borderColor: '#4FC3D9',
+            borderColor: 'var(--secondary)',
             opacity: 0.08,
             width: '400px',
             height: '400px',
@@ -194,7 +194,7 @@ export default function LoginCPF() {
         <div
           className="absolute border-2 pointer-events-none"
           style={{
-            borderColor: '#FDE205', // Toque sutil do Accent (Amarelo Forte)
+            borderColor: 'var(--accent)', // Toque sutil do Accent (Laranja)
             opacity: 0.1,
             width: '180px',
             height: '180px',
@@ -217,7 +217,7 @@ export default function LoginCPF() {
             <div className="flex items-center gap-3 mb-6 pb-6" style={{ borderBottom: '1px solid #E0E0E0' }}>
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm"
-                style={{ backgroundColor: '#0A4554' }} // Logo em Azul Corporativo
+                style={{ backgroundColor: 'var(--primary)' }} // Logo em Azul Royal
               >
                 D
               </div>
@@ -239,10 +239,10 @@ export default function LoginCPF() {
               <div
                 className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent"
                 style={{ backgroundColor: '#FFFFFF', border: '1px solid #E0E0E0' }} // Fundo de input levemente cinza
-                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
+                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(39, 38, 98, 0.4)'} // Focus em Azul Royal
                 onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
               >
-                <ShieldCheck size={20} style={{ color: '#4FC3D9' }} />
+                <ShieldCheck size={20} style={{ color: 'var(--secondary)' }} />
                 <input
                   type="text"
                   placeholder="000.000.000-00"
@@ -262,10 +262,10 @@ export default function LoginCPF() {
               <div
                 className="flex items-center px-4 py-3 rounded-xl transition-all focus-within:ring-2 focus-within:border-transparent"
                 style={{ backgroundColor: '#FFFFFF', border: '1px solid #E0E0E0' }}
-                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(79, 195, 217, 0.4)'} // Focus em Ciano
+                onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px rgba(39, 38, 98, 0.4)'} // Focus em Azul Royal
                 onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
               >
-                <Lock size={20} style={{ color: '#4FC3D9' }} />
+                <Lock size={20} style={{ color: 'var(--secondary)' }} />
                 <input
                   type={showSenha ? "text" : "password"}
                   placeholder="Digite sua senha"
@@ -294,7 +294,7 @@ export default function LoginCPF() {
               disabled={loading || cpf.replace(/\D/g, "").length !== 11 || !senha}
               className="w-full py-3.5 rounded-xl text-white font-semibold text-base transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none mt-4"
               // Botão acompanhando o Primary Dark para manter elegância, mudando no hover (usando style inline pra ficar fixo, mas vc pode por hover via tailwind se tiver configurado as cores lá)
-              style={{ backgroundColor: loading || cpf.replace(/\D/g, "").length !== 11 || !senha ? '#757575' : '#0A4554' }}
+              style={{ backgroundColor: loading || cpf.replace(/\D/g, "").length !== 11 || !senha ? '#757575' : 'var(--primary)' }}
             >
               {loading ? "Entrando..." : "Entrar na Plataforma"}
             </button>

@@ -6,6 +6,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+const supabaseAdmin = process.env.SUPABASE_SERVICE_ROLE_KEY
+  ? createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  : null
+
 function generateFileName(extension: string) {
   const now = new Date()
 
@@ -81,22 +88,39 @@ export async function uploadVideo(
   const ext = file.name.split(".").pop() || "mp4"
   const fileName = generateFileName(ext)
   const filePath = `posts-video/${fileName}`
+  const contentType = file.type || `video/${ext === "mp4" ? "mp4" : ext}`
 
   const { error } = await supabase.storage
     .from(bucket)
-    .upload(filePath, buffer, {
-      contentType: file.type || "video/mp4",
-    })
+    .upload(filePath, buffer, { contentType })
 
-  if (error) {
-    throw new Error(error.message)
-  }
+  if (error) throw new Error(error.message)
 
   const { data } = supabase.storage
     .from(bucket)
     .getPublicUrl(filePath)
 
   return data.publicUrl
+}
+
+export async function deleteStorageFile(publicUrl: string): Promise<void> {
+  const url = new URL(publicUrl)
+  const segments = url.pathname.split("/")
+  const publicIndex = segments.indexOf("public")
+  if (publicIndex === -1 || publicIndex + 1 >= segments.length) return
+
+  const bucket = segments[publicIndex + 1]
+  const filePath = segments.slice(publicIndex + 2).join("/")
+
+  if (!bucket || !filePath) return
+
+  const client = supabaseAdmin ?? supabase
+
+  const { error } = await client.storage.from(bucket).remove([filePath])
+
+  if (error) {
+    console.error(`[Storage] Erro ao deletar ${bucket}/${filePath}:`, error.message)
+  }
 }
 
 // função específica para upload de imagem de perfil, que remove a imagem anterior (se existir) para evitar acúmulo de arquivos
