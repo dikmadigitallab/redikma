@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   Bell,
   LogOut,
@@ -8,7 +8,7 @@ import {
   Search,
   Rss,
 } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
+import {  useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { NotificationsBox } from "./box-notify"
 import { FaUserDoctor } from "react-icons/fa6"
@@ -48,26 +48,33 @@ export function Header() {
   const searchRef = useRef<HTMLDivElement | null>(null)
 
 
-  // 1. Definição do estado (mantive o case-sensitive que você postou, embora camelCase seja padrão)
-  const [label, setLabel] = useState<string>('Local');
-  const pathname = usePathname();
+
+ 
 
 
-  useEffect(() => {
-    if (!pathname) return;
-    if (pathname.includes("hml")) {
-      setLabel("Beta");
-    } else if (pathname.includes("dev")) {
-      setLabel("Desenvolvimento");
-    } else if (pathname.includes("opencode")) {
-      setLabel("OPENCODE");
-    } else {
-      setLabel("local");
-    }
+const label = useMemo(() => {
+  if (typeof window === "undefined") return "";
 
-    // A dependência [pathname] garante que isso só rode quando a URL mudar
-  }, [pathname]);
+  const hostname = window.location.hostname;
 
+  if (hostname === "localhost") {
+    return "LOCAL";
+  }
+
+  if (hostname.includes("hml")) {
+    return "BETA";
+  }
+
+  if (hostname.includes("dev")) {
+    return "DESENVOLVIMENTO";
+  }
+
+  if (hostname.includes("opencode")) {
+    return "OPENCODE";
+  }
+
+  return "";
+}, []);
 
   const lastSeenKey = userId
     ? `notifications-last-seen-${userId}`
@@ -104,7 +111,7 @@ export function Header() {
           : list.notifications || []
 
         const pending = notifications.filter(
-          (n: any) =>
+          (n:any) =>
             new Date(n.createdAt) > lastSeenDate
         ).length
 

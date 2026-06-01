@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route"
 import { notify } from "@/lib/notifications/notify"
 
+
 async function notifyComment(postId: string, authorId: string, parentId?: string | null) {
   try {
     const session = await getServerSession(authOptions)
@@ -46,13 +47,23 @@ async function notifyComment(postId: string, authorId: string, parentId?: string
 }
 
 // CREATE
+
+/* 
 export async function POST(req: Request) {
+  const TRUNCATE_LENGTH =50
   try {
     const { texto, postId, authorId, parentId } = await req.json()
 
     if (!texto || !postId || !authorId) {
       return NextResponse.json(
         { error: "Dados obrigatórios não informados" },
+        { status: 400 }
+      )
+    }
+
+    if (texto.length > TRUNCATE_LENGTH) {
+      return NextResponse.json(
+        { error: `Texto do comentário excede o limite de ${TRUNCATE_LENGTH} caracteres` },
         { status: 400 }
       )
     }
@@ -102,6 +113,94 @@ export async function POST(req: Request) {
       { error: "Erro ao criar comentário" },
       { status: 500 }
     )
+  }
+}
+
+ */
+
+export async function POST(req: Request) {
+  const TRUNCATE_LENGTH = 50;
+
+  try {
+    const { texto, postId, authorId, parentId } = await req.json();
+
+    const textoLimpo = String(texto ?? "").trim();
+
+    if (!textoLimpo || !postId || !authorId) {
+      return NextResponse.json(
+        { error: "Dados obrigatórios não informados" },
+        { status: 400 }
+      );
+    }
+
+    if (textoLimpo.length > TRUNCATE_LENGTH) {
+      return NextResponse.json(
+        {
+          error: `Texto do comentário excede o limite de ${TRUNCATE_LENGTH} caracteres`,
+        },
+        { status: 403 }
+      );
+    }
+
+    const postExiste = await prisma.postagem.findUnique({
+      where: { id: postId },
+      select: { id: true },
+    });
+
+    if (!postExiste) {
+      return NextResponse.json(
+        { error: "Post não encontrado" },
+        { status: 404 }
+      );
+    }
+
+    const userExiste = await prisma.user.findUnique({
+      where: { id: authorId },
+      select: { id: true },
+    });
+
+    if (!userExiste) {
+      return NextResponse.json(
+        { error: "Usuário não encontrado" },
+        { status: 404 }
+      );
+    }
+
+    const comentario = await prisma.comentario.create({
+      data: {
+        texto: textoLimpo,
+        postId,
+        authorId,
+        parentId: parentId || null,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            nome: true,
+            username: true,
+            foto: true,
+          },
+        },
+        likes: true,
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+      },
+    });
+
+    notifyComment(postId, authorId, parentId).catch(() => {});
+
+    return NextResponse.json(comentario);
+  } catch (error) {
+    console.error("Erro ao criar comentário:", error);
+
+    return NextResponse.json(
+      { error: "Erro ao criar comentário" },
+      { status: 500 }
+    );
   }
 }
 

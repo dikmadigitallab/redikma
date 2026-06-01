@@ -67,17 +67,17 @@ export function CreatNewPost({ open, onClose, onSuccess, onRefresh }: Props) {
     tempVideo.src = tempUrl
   }
 
-    async function handleSubmit() {
+  async function handleSubmit() {
     if (!user?.id) {
       toast.error("Usuário não identificado")
       return
     }
-const trimmedText = text.trim()
+    const trimmedText = text.trim()
 
-if (!trimmedText && !image && !video) {
-  toast.warning("Adicione um texto, imagem ou vídeo para postar")
-  return
-}
+    if (!trimmedText && !image && !video) {
+      toast.warning("Adicione um texto, imagem ou vídeo para postar")
+      return
+    }
 
 
 
@@ -137,7 +137,7 @@ if (!trimmedText && !image && !video) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundColor: 'var(--white)' }}>
-        
+
         {/* Header com cor primária */}
         <div className="p-6 border-b-2" style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--accent)' }}>
           <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'Red Hat Display', sans-serif" }}>
@@ -147,49 +147,50 @@ if (!trimmedText && !image && !video) {
 
         <div className="p-6 space-y-5">
 
-        <div className="relative">
-          <textarea
-            placeholder="Escreva algo..."
-            value={text}
-            onChange={(e) => {
-              const val = e.target.value
-              setText(val)
-              if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
-                limitWarned.current = true
-                toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
-              }
-              if (val.length < MAX_POST_LENGTH) {
-                limitWarned.current = false
-              }
-            }}
-            maxLength={MAX_POST_LENGTH}
-            className="w-full rounded-xl p-4 resize-none h-28 outline-none text-sm font-medium transition focus:shadow-lg"
-            style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)', fontFamily: "'Red Hat Text', sans-serif" }}
-          />
-          <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
-            {text.length}/{MAX_POST_LENGTH}
+          <div className="relative">
+            <textarea
+              placeholder="Escreva algo..."
+              value={text}
+              onChange={(e) => {
+                const val = e.target.value
+                setText(val)
+                if (val.length >= MAX_POST_LENGTH && !limitWarned.current) {
+                  limitWarned.current = true
+                  toast.warning(`Limite de ${MAX_POST_LENGTH} caracteres atingido`)
+                }
+                if (val.length < MAX_POST_LENGTH) {
+                  limitWarned.current = false
+                }
+              }}
+              maxLength={MAX_POST_LENGTH}
+              className="w-full rounded-xl p-4 resize-none h-28 outline-none text-sm font-medium transition focus:shadow-lg"
+              style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)', fontFamily: "'Red Hat Text', sans-serif" }}
+            />
+            <div className="absolute bottom-2 right-3 text-xs" style={{ color: text.length >= MAX_POST_LENGTH ? "var(--accent)" : "var(--gray)" }}>
+              {text.length}/{MAX_POST_LENGTH}
+            </div>
           </div>
-        </div>
 
-        <div className="rounded-xl p-4 text-center space-y-3 transition hover:bg-primary-10" style={{ border: `3px dashed var(--primary)` }}>
+          <div className="rounded-xl p-4 text-center space-y-3 transition hover:bg-primary-10" style={{ border: `3px dashed var(--primary)` }}>
 
-          {!preview && !videoPreview && (
-            <div className="space-y-3">
-              <div className="flex flex-col gap-2">
-                <label className="flex items-center justify-center gap-2 cursor-pointer text-sm font-medium" style={{ color: 'var(--primary)' }}>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleImageChange(e.target.files?.[0] || null)
-                    }
-                    className="hidden"
-                  />
-                  <span className="px-4 py-2 rounded-xl border-2 transition hover:shadow-md" style={{ borderColor: 'var(--primary)' }}>
-                    Adicionar Imagem
-                  </span>
-                </label>
+            {!preview && !videoPreview && (
+              <div className="space-y-3">
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center justify-center gap-2 cursor-pointer text-sm font-medium" style={{ color: 'var(--primary)' }}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleImageChange(e.target.files?.[0] || null)
+                      }
+                      className="hidden"
+                    />
+                    <span className="px-4 py-2 rounded-xl border-2 transition hover:shadow-md" style={{ borderColor: 'var(--primary)' }}>
+                      Adicionar Imagem
+                    </span>
+                  </label>
 
+                  {/* 
                 <button
                   type="button"
                   onClick={() => videoInputRef.current?.click()}
@@ -198,135 +199,138 @@ if (!trimmedText && !image && !video) {
                 >
                   Adicionar Frash (vídeo)
                 </button>
-                <input ref={videoInputRef} type="file" accept="video/*" onChange={(e) => handleVideoChange(e.target.files?.[0] || null)} className="hidden" />
-              </div>
-              <p className="text-xs" style={{ color: 'var(--gray)' }}>
-                Adicione uma imagem ou vídeo Frash (3-10s)
-              </p>
-            </div>
-          )}
 
-          {preview && (
-            <div className="space-y-2">
-             <Image
-  src={preview}
-  alt="preview"
-  width={1200}
-  height={600}
-  loading="lazy"
-  draggable={false}
-  className="w-full h-56 object-contain rounded-xl"
-/>
 
-              <button
-                type="button"
-                onClick={() => handleImageChange(null)}
-                className="text-xs hover:underline transition"
-                style={{ color: 'var(--accent)' }}
-              >
-                Remover imagem
-              </button>
-            </div>
-          )}
-
-          {videoPreview && (
-            <div className="space-y-2">
-              <div className="relative rounded-xl overflow-hidden bg-black">
-                <video
-                  src={videoPreview}
-                  controls
-                  muted
-                  className="w-full max-h-56"
-                />
-                <div
-                  className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                  style={{
-                    backgroundColor: "var(--accent)",
-                    color: "var(--white)",
-                  }}
-                >
-                  Frash
+ */}
+                  <input ref={videoInputRef} type="file" accept="video/*" onChange={(e) => handleVideoChange(e.target.files?.[0] || null)} className="hidden" />
                 </div>
+                <p className="text-xs" style={{ color: 'var(--gray)' }}>
+                  Adicione uma imagem ou vídeo Frash (3-10s)
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (videoPreview) URL.revokeObjectURL(videoPreview)
-                  setVideo(null)
-                  setVideoPreview(null)
-                }}
-                className="text-xs hover:underline transition"
-                style={{ color: 'var(--accent)' }}
-              >
-                Remover vídeo
-              </button>
-            </div>
-          )}
-        </div>
+            )}
 
-        <div className="space-y-4 pt-4" style={{ borderTop: `1px solid var(--border)` }}>
+            {preview && (
+              <div className="space-y-2">
+                <Image
+                  src={preview}
+                  alt="preview"
+                  width={1200}
+                  height={600}
+                  loading="lazy"
+                  draggable={false}
+                  className="w-full h-56 object-contain rounded-xl"
+                />
 
-          <label className="flex justify-between items-center text-sm">
-            <span style={{ color: 'var(--black)' }}>Post recorrente</span>
-            <input
-              type="checkbox"
-              checked={isRecurring}
-              onChange={(e) => setIsRecurring(e.target.checked)}
-              style={{ accentColor: 'var(--primary)' }}
-            />
-          </label>
+                <button
+                  type="button"
+                  onClick={() => handleImageChange(null)}
+                  className="text-xs hover:underline transition"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  Remover imagem
+                </button>
+              </div>
+            )}
 
-          <label className="flex justify-between items-center text-sm">
-            <span style={{ color: 'var(--black)' }}>Post fixo</span>
-            <input
-              type="checkbox"
-              checked={isFixed}
-              onChange={(e) => setIsFixed(e.target.checked)}
-              style={{ accentColor: 'var(--primary)' }}
-            />
-          </label>
+            {videoPreview && (
+              <div className="space-y-2">
+                <div className="relative rounded-xl overflow-hidden bg-black">
+                  <video
+                    src={videoPreview}
+                    controls
+                    muted
+                    className="w-full max-h-56"
+                  />
+                  <div
+                    className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                    style={{
+                      backgroundColor: "var(--accent)",
+                      color: "var(--white)",
+                    }}
+                  >
+                    Frash
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (videoPreview) URL.revokeObjectURL(videoPreview)
+                    setVideo(null)
+                    setVideoPreview(null)
+                  }}
+                  className="text-xs hover:underline transition"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  Remover vídeo
+                </button>
+              </div>
+            )}
+          </div>
 
-          {!isFixed && (
-            <div>
-              <p className="text-sm mb-2" style={{ color: 'var(--black)' }}>Duração</p>
-              <select
-                value={duration}
-                onChange={(e) => setDuration(e.target.value as DurationType)}
-                className="w-full rounded-xl p-2 text-sm outline-none font-medium"
-                style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)' }}
-              >
-                <option value="1h">1 hora</option>
-                <option value="6h">6 horas</option>
-                <option value="12h">12 horas</option>
-                <option value="24h">24 horas</option>
-                <option value="7d">7 dias</option>
-                <option value="30d">30 dias</option>
-              </select>
-            </div>
-          )}
+          <div className="space-y-4 pt-4" style={{ borderTop: `1px solid var(--border)` }}>
 
-        </div>
+            <label className="flex justify-between items-center text-sm">
+              <span style={{ color: 'var(--black)' }}>Post recorrente</span>
+              <input
+                type="checkbox"
+                checked={isRecurring}
+                onChange={(e) => setIsRecurring(e.target.checked)}
+                style={{ accentColor: 'var(--primary)' }}
+              />
+            </label>
 
-        <div className="flex justify-end gap-2 p-6 pt-4 border-t-2" style={{ borderColor: 'var(--primary-10)' }}>
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-sm font-bold transition hover:shadow-md"
-            style={{ backgroundColor: 'var(--background)', color: 'var(--primary)', border: `2px solid var(--primary)` }}
-          >
-            Cancelar
-          </button>
+            <label className="flex justify-between items-center text-sm">
+              <span style={{ color: 'var(--black)' }}>Post fixo</span>
+              <input
+                type="checkbox"
+                checked={isFixed}
+                onChange={(e) => setIsFixed(e.target.checked)}
+                style={{ accentColor: 'var(--primary)' }}
+              />
+            </label>
 
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-5 py-2.5 rounded-xl text-white text-sm font-bold transition hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:scale-100"
-            style={{ backgroundColor: 'var(--accent)' }}
-          >
-            {loading ? "Postando..." : "Postar"}
-          </button>
-        </div>
+            {!isFixed && (
+              <div>
+                <p className="text-sm mb-2" style={{ color: 'var(--black)' }}>Duração</p>
+                <select
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value as DurationType)}
+                  className="w-full rounded-xl p-2 text-sm outline-none font-medium"
+                  style={{ backgroundColor: 'var(--background)', border: `2px solid var(--primary)`, color: 'var(--black)' }}
+                >
+                  <option value="1h">1 hora</option>
+                  <option value="6h">6 horas</option>
+                  <option value="12h">12 horas</option>
+                  <option value="24h">24 horas</option>
+                  <option value="7d">7 dias</option>
+                  <option value="30d">30 dias</option>
+                </select>
+              </div>
+            )}
+
+          </div>
+
+          <div className="flex justify-end gap-2 p-6 pt-4 border-t-2" style={{ borderColor: 'var(--primary-10)' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-xl text-sm font-bold transition hover:shadow-md"
+              style={{ backgroundColor: 'var(--background)', color: 'var(--primary)', border: `2px solid var(--primary)` }}
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-5 py-2.5 rounded-xl text-white text-sm font-bold transition hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:scale-100"
+              style={{ backgroundColor: 'var(--accent)' }}
+            >
+              {loading ? "Postando..." : "Postar"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

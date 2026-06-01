@@ -6,6 +6,7 @@ import { Heart, Reply, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { containsBadWords } from "@/lib/ofensivas";
 
 type Comment = {
   id: string;
@@ -58,6 +59,8 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     };
   }, [open]);
 
+
+
   async function loadComments() {
     if (isFetching.current) return;
     isFetching.current = true;
@@ -95,6 +98,8 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
+
+
   async function delComents(id: string) {
     try {
       const res = await fetch("/api/posts/posts-comments", {
@@ -117,6 +122,8 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
       toast.error("Erro de conexão");
     }
   }
+
+
 
   async function likeComment(commentId: string) {
     if (!user?.id) return;
@@ -152,6 +159,8 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
+
+
   async function unlikeComment(commentId: string) {
     if (!user?.id) return;
 
@@ -177,10 +186,18 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
     }
   }
 
+
+
   //enviar resposta
   async function submitReply(commentId: string) {
     if (!user?.id || !replyText.trim()) return;
-
+    
+     if (containsBadWords(replyText)) {
+    toast.error("Resposta ofensiva não pode ser enviada");
+    setReplyText("");
+    return;
+  }
+    
     try {
       await fetch("/api/posts/posts-comments", {
         method: "POST",
@@ -313,7 +330,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                       width={32}
                       height={32}
                       loading="lazy"
-                      
+
                       draggable={false}
                       className="w-8 h-8 rounded-full object-cover shrink-0"
                     />
@@ -402,6 +419,7 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                       <input
                         type="text"
                         value={replyText}
+                        maxLength={50}
                         onChange={(e) => setReplyText(e.target.value)}
                         onKeyDown={(e) =>
                           e.key === "Enter" && submitReply(comment.id)
@@ -484,6 +502,27 @@ export function CommentsBox({ postId, postAuthorId }: Props) {
                             }}
                           >
                             {reply.texto}
+
+                            <span className="flex items-center gap-4 mt-2">
+                              <button
+                                onClick={() =>
+                                  hasUserLiked(reply)
+                                    ? unlikeComment(reply.id)
+                                    : likeComment(reply.id)
+                                }
+                                className="flex items-center gap-1 text-[10px] font-medium transition-opacity hover:opacity-80"
+                                style={{ color: "var(--gray)" }}
+                              >
+                                <Heart
+                                  size={12}
+                                  fill={hasUserLiked(reply) ? "#E53935" : "none"}
+                                  color={hasUserLiked(reply) ? "#E53935" : "currentColor"}
+                                />
+                                <span>{getLikesCount(reply)}</span>
+                              </button>
+                            </span>
+
+
                           </p>
                         </div>
                       </div>

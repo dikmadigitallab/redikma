@@ -542,6 +542,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                       <p className="text-xs text-center" style={{ color: "var(--gray)" }}>
                         Vídeos Frash limitados a {MAX_RECORDING_SECONDS}s
                       </p>
+
+
+{/* 
                       <button
                         type="button"
                         onClick={() => videoInputRef.current?.click()}
@@ -550,6 +553,9 @@ export default function CreatePostPage({ onRefresh }: Props) {
                         <Video size={18} />
                         Adicionar Frash
                       </button>
+
+ */}
+
                     </div>
                   </div>
                 )}

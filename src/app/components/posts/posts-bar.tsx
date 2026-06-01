@@ -472,21 +472,6 @@ export function PostBar({ onCreated, onRefresh }: Props) {
                   className="hidden"
                 />
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    videoInputRef.current?.click()
-                  }
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 text-sm font-bold transition hover:shadow-md hover:border-accent"
-                  style={{
-                    backgroundColor: "var(--background)",
-                    borderColor: "var(--primary)",
-                    color: "var(--primary)",
-                  }}
-                >
-                  <RiVideoAddLine className="w-5 h-5" />
-                  <span>Adicionar Frash</span>
-                </button>
 
                 <input
                   ref={videoInputRef}

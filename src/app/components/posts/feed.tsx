@@ -43,7 +43,7 @@ export function FeedNoticias({ onRefresh }: { onRefresh?: () => void }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const pathname = usePathname();
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
-  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(
+  const [isTouchDevice, ] = useState<boolean>(
     () =>
       typeof window !== "undefined" &&
       ("ontouchstart" in window || navigator.maxTouchPoints > 0),
