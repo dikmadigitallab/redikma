@@ -66,11 +66,11 @@ const label = useMemo(() => {
   }
 
   if (hostname.includes("dev")) {
-    return "DESENVOLVIMENTO";
+    return "DEV";
   }
 
   if (hostname.includes("opencode")) {
-    return "OPENCODE";
+    return "OPCD";
   }
 
   return "";
