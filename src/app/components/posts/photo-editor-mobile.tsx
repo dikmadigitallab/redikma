@@ -48,11 +48,11 @@ type AspectRatioOption = {
 
 const ASPECT_RATIOS: AspectRatioOption[] = [
   { label: "Livre", value: "free" },
+  { label: "3:4", value: "3/4" },   // Trazido para cima
+  { label: "9:16", value: "9/16" }, // Trazido para cima
   { label: "1:1", value: "1/1" },
   { label: "4:3", value: "4/3" },
-  { label: "3:4", value: "3/4" },
   { label: "16:9", value: "16/9" },
-  { label: "9:16", value: "9/16" },
 ];
 
 const FILTER_PRESETS: FilterPreset[] = [
@@ -110,7 +110,7 @@ export function Editor({
   imageFile,
   onSave,
   onCancel,
-  aspectRatio = "4/3",
+  aspectRatio = "3/4",
 }: EditorProps) {
   const preview = useMemo(() => {
     if (!imageFile) return "";
@@ -376,9 +376,8 @@ export function Editor({
   const getFilterString = useCallback(
     (s?: Settings) => {
       const st = s || currentSettings;
-      return `brightness(${st.brightness}%) contrast(${st.contrast}%) saturate(${st.saturation}%) blur(${
-        st.sharpness < 0 ? Math.abs(st.sharpness) / 10 : 0
-      }px)`;
+      return `brightness(${st.brightness}%) contrast(${st.contrast}%) saturate(${st.saturation}%) blur(${st.sharpness < 0 ? Math.abs(st.sharpness) / 10 : 0
+        }px)`;
     },
     [currentSettings],
   );
@@ -587,16 +586,16 @@ export function Editor({
       </div>
 
       <div className="px-3">
-          <div
-            ref={containerRef}
-            className="relative rounded-2xl overflow-hidden bg-black border select-none touch-none"
-            style={{
-              aspectRatio:
-                cropAspect === "free"
-                  ? `${naturalSize.w} / ${naturalSize.h}`
-                  : cropAspect,
-            }}
-            onWheel={handleZoom}
+        <div
+          ref={containerRef}
+          className="relative rounded-2xl overflow-hidden bg-black border select-none touch-none mx-auto w-full max-h-[55vh]" // <-- Adicionado: mx-auto e max-h-[55vh]
+          style={{
+            aspectRatio:
+              cropAspect === "free"
+                ? `${naturalSize.w} / ${naturalSize.h}`
+                : cropAspect,
+          }}
+          onWheel={handleZoom}
           onMouseDown={(e) => {
             e.preventDefault();
             setDragging(true);
@@ -666,11 +665,10 @@ export function Editor({
         <button
           type="button"
           onClick={() => openTool("adjust")}
-          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            overlayTool === "adjust"
+          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${overlayTool === "adjust"
               ? "bg-primary text-white border-2 border-accent shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
-          }`}
+            }`}
         >
           <SlidersHorizontal size={20} />
           <span className="text-xs">Ajustes</span>
@@ -678,11 +676,10 @@ export function Editor({
         <button
           type="button"
           onClick={() => openTool("filters")}
-          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            overlayTool === "filters"
+          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${overlayTool === "filters"
               ? "bg-primary text-white border-2 border-accent shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
-          }`}
+            }`}
         >
           <ImageIcon size={20} />
           <span className="text-xs">Filtros</span>
@@ -690,11 +687,10 @@ export function Editor({
         <button
           type="button"
           onClick={() => openTool("crop")}
-          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${
-            overlayTool === "crop"
+          className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-lg font-bold transition transform hover:scale-105 ${overlayTool === "crop"
               ? "bg-primary text-white border-2 border-accent shadow-lg"
               : "bg-white/20 text-white border-2 border-white/30 hover:bg-white/30 hover:border-white/50"
-          }`}
+            }`}
         >
           <Crop size={20} />
           <span className="text-xs">Cortar</span>
@@ -762,11 +758,10 @@ export function Editor({
                       applyFilter(preset);
                       setOverlayTool(null);
                     }}
-                    className={`flex flex-col items-center gap-1.5 p-1.5 rounded-xl transition transform hover:scale-105 ${
-                      selectedFilter === preset.name
+                    className={`flex flex-col items-center gap-1.5 p-1.5 rounded-xl transition transform hover:scale-105 ${selectedFilter === preset.name
                         ? "ring-2 ring-accent"
                         : "ring-1 ring-primary/20"
-                    }`}
+                      }`}
                   >
                     <div
                       className="w-full aspect-square rounded-lg border bg-cover bg-center overflow-hidden shadow-sm"
@@ -799,11 +794,10 @@ export function Editor({
                         key={ar.value}
                         type="button"
                         onClick={() => setCropAspect(ar.value)}
-                        className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition transform hover:scale-105 ${
-                          cropAspect === ar.value
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition transform hover:scale-105 ${cropAspect === ar.value
                             ? "bg-accent text-white border-accent"
                             : "bg-white text-gray border-primary/20 hover:border-primary/40"
-                        }`}
+                          }`}
                       >
                         {ar.label}
                       </button>
@@ -822,11 +816,10 @@ export function Editor({
                   <button
                     type="button"
                     onClick={() => setFlipX((prev) => !prev)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border transition ${
-                      flipX
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border transition ${flipX
                         ? "bg-accent text-white border-accent"
                         : "bg-white text-gray border-primary/20 hover:bg-primary-10"
-                    }`}
+                      }`}
                   >
                     <TbFlipHorizontal size={12} />
                     Flip H
@@ -834,11 +827,10 @@ export function Editor({
                   <button
                     type="button"
                     onClick={() => setFlipY((prev) => !prev)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border transition ${
-                      flipY
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border transition ${flipY
                         ? "bg-accent text-white border-accent"
                         : "bg-white text-gray border-primary/20 hover:bg-primary-10"
-                    }`}
+                      }`}
                   >
                     <TbFlipVertical size={12} />
                     Flip V
@@ -941,7 +933,7 @@ export function Editor({
             disabled={loading}
             className="flex-1 py-3 text-sm font-bold bg-accent text-white rounded-xl disabled:opacity-50 transition transform hover:scale-105 hover:shadow-lg shadow-lg shadow-accent)]/50"
           >
-            
+
             {loading ? "Salvando..." : "Confirmar"}
           </button>
         </div>
