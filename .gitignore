@@ -51,3 +51,7 @@ proteção_main.json
 
 /scripts_sql/dev
 /scripts_sql/prod
+/.opencode
+opencode.json
+checkpoint.md
+memorias.md

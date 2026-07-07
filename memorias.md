@@ -34,8 +34,14 @@ src/
 - Neutral (Bege): #F7ECDA
 - Neutros: #111827, #1F2937, #6B7280, #D1D5DB, #E5E7EB, #FFFFFF, #F8FAFC
 
+## Estrutura de Páginas Legais
+- `/legais/termos-de-uso` — Termos de Uso
+- `/legais/politicas de privacidade` — Política de Privacidade
+- `/legais/lgpd` — LGPD
+
 ## Convenções
 - Mobile-first com breakpoints sm(640), md(768), lg(1024)
 - Mínimo 44px para elementos touch
 - "use client" em componentes interativos
 - API routes em src/app/api/
+- Páginas legais seguem padrão: "use client" + template string com markdown + `<pre>` estilizado

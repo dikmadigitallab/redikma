@@ -18,3 +18,9 @@
   - Reset completo com 1 clique
   - Suporte a pinch-to-zoom em touch
   - Grade de terços durante interação
+
+## [2026-07-07] Página de Política de Privacidade
+- Criada página `/legais/politicas de privacidade` com conteúdo completo de Política de Privacidade (LGPD)
+- Segue o mesmo padrão da página de Termos de Uso: "use client" + template string
+- Conteúdo cobre: coleta, finalidades, base legal, compartilhamento, segurança, direitos do titular, cookies, publicações automáticas, conduta, DPO
+- Build verificado com sucesso (rota estática compilada)
