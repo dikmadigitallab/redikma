@@ -5,7 +5,7 @@ const handler = NextAuth({
   callbacks: {
     async session({ session, token }) {
       if (token.user) {
-        session.user = token.user
+        session.user = token.user as never
       }
       return session
     },

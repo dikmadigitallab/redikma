@@ -1,9 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Users, Search, Edit2, Trash2, X, AlertTriangle, Eye, EyeOff } from "lucide-react"
+import { Users, Search, Edit2, Trash2, X, AlertTriangle } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { toast } from "sonner"
 
@@ -46,7 +47,6 @@ export default function UsuariosPage() {
     senhaAtual: "",
     novaSenha: "",
   })
-  const [showNovaSenha, setShowNovaSenha] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -96,11 +96,14 @@ export default function UsuariosPage() {
     setEditModal(true)
   }
 
+
   function abrirDeleteModal(usuario: Usuario) {
     setUsuarioSelecionado(usuario)
     setDeleteModal(true)
   }
 
+
+  //edita os dados do usuario
   async function handleSalvarEdicao() {
     if (!editForm.nome.trim()) {
       toast.error("Nome é obrigatório")
@@ -112,15 +115,10 @@ export default function UsuariosPage() {
       return
     }
 
-    if (editForm.novaSenha && !editForm.senhaAtual) {
-      toast.error("Digite a senha atual para alterar")
-      return
-    }
-
     setSaving(true)
 
     try {
-      const res = await fetch("/api/usuarios", {
+      const res = await fetch(`/api/usuarios/manager?id=${editForm.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editForm),
@@ -143,23 +141,30 @@ export default function UsuariosPage() {
     }
   }
 
+  //deletar o usuario
   async function handleDeletar() {
     if (!usuarioSelecionado) return
 
     setSaving(true)
+
     try {
-      const res = await fetch(`/api/usuarios?id=${usuarioSelecionado.id}`, {
+      const res = await fetch(`/api/usuarios/manager?id=${usuarioSelecionado.id}`, {
         method: "DELETE",
       })
 
-      if (res.ok) {
-        toast.success(`${usuarioSelecionado.nome} foi deletado`)
-        buscarUsuarios()
-        setDeleteModal(false)
-      } else {
-        const data = await res.json()
-        toast.error(data.error || "Erro ao deletar")
+      let data = null
+      try {
+        data = await res.json()
+      } catch { }
+
+      if (!res.ok) {
+        toast.error(data?.error || "Erro ao deletar")
+        return
       }
+
+      toast.success(`${usuarioSelecionado.nome} foi deletado`)
+      buscarUsuarios()
+      setDeleteModal(false)
     } catch {
       toast.error("Erro ao deletar usuário")
     } finally {
@@ -170,7 +175,7 @@ export default function UsuariosPage() {
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--background)" }}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: "var(--primary-dark)" }} />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: "var(--primary)" }} />
       </div>
     )
   }
@@ -182,7 +187,7 @@ export default function UsuariosPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: "var(--primary-dark)" }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: "var(--primary)" }}>
               <Users size={20} />
             </div>
             <div>
@@ -236,12 +241,22 @@ export default function UsuariosPage() {
                       <td className="p-3">
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium"
-                            style={{ backgroundColor: "var(--primary-dark)" }}
+                            className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-medium"
+                            style={{ backgroundColor: "var(--primary)" }}
                           >
-                            {usuario.nome.charAt(0).toUpperCase()}
+
+                            <img
+                              src={usuario.foto || "/photoProfile/userDefault.png"}
+                              alt={usuario.nome}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                          <span className="text-sm font-medium" style={{ color: "var(--black)" }}>{usuario.nome}</span>
+                          <span
+                            className="text-sm font-medium"
+                            style={{ color: "var(--black)" }}
+                          >
+                            {usuario.nome}
+                          </span>
                         </div>
                       </td>
                       <td className="p-3 text-sm hidden md:table-cell" style={{ color: "var(--gray)" }}>{usuario.username}</td>
@@ -253,8 +268,8 @@ export default function UsuariosPage() {
                           style={{
                             backgroundColor:
                               usuario.role === "SYSTEM_ADM" ? "#E53935" :
-                              usuario.role === "ADMIN" ? "#F57C00" :
-                              usuario.role === "POSTADOR" ? "#1976D2" : "#757575",
+                                usuario.role === "ADMIN" ? "#F57C00" :
+                                  usuario.role === "POSTADOR" ? "#1976D2" : "#757575",
                             color: "white",
                           }}
                         >
@@ -342,43 +357,60 @@ export default function UsuariosPage() {
               </div>
 
               <div className="pt-4 border-t" style={{ borderColor: "var(--border)" }}>
-                <h3 className="text-sm font-medium mb-3" style={{ color: "var(--black)" }}>Alterar Senha</h3>
+                <h3 className="text-sm font-medium mb-3" style={{ color: "var(--black)" }}>
+                  Alterar Senha
+                </h3>
 
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: "var(--gray)" }}>Senha Atual</label>
-                    <input
-                      type="password"
-                      value={editForm.senhaAtual}
-                      onChange={(e) => setEditForm({ ...editForm, senhaAtual: e.target.value })}
-                      placeholder="Digite a senha atual"
-                      className="w-full px-3 py-2 rounded-lg text-sm outline-none"
-                      style={{ backgroundColor: "var(--background)", border: "1px solid var(--border)", color: "var(--black)" }}
-                    />
+                <div
+                  className="flex items-center justify-between p-3 rounded-xl"
+                  style={{
+                    backgroundColor: "var(--background)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium" style={{ color: "var(--black)" }}>
+                      Resetar senha
+                    </span>
+                    <span className="text-xs" style={{ color: "var(--gray)" }}>
+                      Define automaticamente pelos 6 primeiros dígitos do CPF
+                    </span>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: "var(--gray)" }}>Nova Senha</label>
-                    <div className="relative">
-                      <input
-                        type={showNovaSenha ? "text" : "password"}
-                        value={editForm.novaSenha}
-                        onChange={(e) => setEditForm({ ...editForm, novaSenha: e.target.value })}
-                        placeholder="Digite a nova senha"
-                        className="w-full px-3 py-2 pr-10 rounded-lg text-sm outline-none"
-                        style={{ backgroundColor: "var(--background)", border: "1px solid var(--border)", color: "var(--black)" }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNovaSenha(!showNovaSenha)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2"
-                      >
-                        {showNovaSenha ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                    <p className="text-xs mt-1" style={{ color: "var(--gray)" }}>Nova senha = 6 primeiros dígitos do CPF</p>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!editForm) return
+
+                      const senha = usuarioSelecionado?.cpf.replace(/\D/g, "").slice(0, 6)
+
+                      setEditForm({
+                        ...editForm,
+                        novaSenha: String(senha),
+                      })
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium transition"
+                    style={{
+                      border: "1px solid var(--border)",
+                      color: "var(--black)",
+                      backgroundColor: "transparent",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--hover)"
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent"
+                    }}
+                  >
+                    Resetar
+                  </button>
                 </div>
+
+                {editForm.novaSenha && (
+                  <p className="text-xs mt-2" style={{ color: "var(--gray)" }}>
+                    Nova senha pronta para salvar
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-2 pt-4">
@@ -393,7 +425,7 @@ export default function UsuariosPage() {
                   onClick={handleSalvarEdicao}
                   disabled={saving}
                   className="flex-1 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50"
-                  style={{ backgroundColor: "var(--primary-dark)" }}
+                  style={{ backgroundColor: "var(--primary)" }}
                 >
                   {saving ? "Salvando..." : "Salvar"}
                 </button>

@@ -30,10 +30,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
     }
 
-    const user = session.user as { role?: string }
-    if (user.role !== "SYSTEM_ADM" && user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Sem permissão" }, { status: 403 })
-    }
+  if (!(session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM")) {
+    console.log("regra de usuario: ", session?.user.role)
+  return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
 
     const { nome, admissao, cargo, nascimento, cpf } = await req.json()
 

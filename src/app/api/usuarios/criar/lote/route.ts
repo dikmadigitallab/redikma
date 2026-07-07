@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
 import * as XLSX from "xlsx"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 function gerarSenhaPadrao(cpf: string) {
   return cpf.replace(/\D/g, "").slice(0, 6)
@@ -98,10 +100,23 @@ function parseDateField(value: unknown): Date | null {
 
 function normalizeCPF(cpf: unknown): string {
   if (!cpf) return ""
-  return String(cpf).replace(/\D/g, "")
+
+  const onlyNumbers = String(cpf).replace(/\D/g, "")
+
+  return onlyNumbers.padStart(11, "0")
 }
 
+
+
 export async function POST(req: Request) {
+
+  const session = await getServerSession(authOptions)
+
+  if (!(session?.user.role === "ADMIN" || session?.user.role === "SYSTEM_ADM")) {
+    console.log("regra de usuario: ", session?.user.role)
+  return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+  }
+
   try {
     const formData = await req.formData()
     const file = formData.get("file") as File

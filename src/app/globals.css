@@ -1,32 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700;800;900&family=Red+Hat+Text:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* Cores Primárias */
-  --primary-dark: #0A4554;
-  --secondary: #4FC3D9;
-  --success: #6BC28D;
-  --warning: #FBB04B;
-  --accent: #FDE205;
+  /* Cores Brand Dikma */
+  --primary: #272662;
+  --accent: #F15A24;
+  --secondary: #86B0DD;
+  --neutral: #F7ECDA;
   
   /* Escala de Cinza */
-  --black: #1A1A1A;
-  --gray: #757575;
-  --border: #E0E0E0;
-  --background: #F5F5F5;
+  --black: #111827;
+  --gray-dark: #1F2937;
+  --gray: #6B7280;
+  --gray-light: #D1D5DB;
+  --border: #E5E7EB;
+  --background: #FFFFFF;
+  --surface: #F8FAFC;
   --white: #FFFFFF;
   
   /* Fontes */
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Red Hat Display', 'Red Hat Text', sans-serif;
   --font-mono: var(--font-geist-mono);
+
+  /* Design Tokens */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  
+  /* Gradientes Primários */
+  --gradient-primary: linear-gradient(135deg, #272662 0%, #1a1540 50%, #272662 100%);
+  --gradient-primary-light: linear-gradient(135deg, #272662 0%, #86B0DD 100%);
+  --gradient-accent: linear-gradient(135deg, #F15A24 0%, #d63a0a 100%);
+  --gradient-brand: linear-gradient(90deg, #272662 0%, #86B0DD 50%, #F15A24 100%);
+  
+  /* Variações de Opacidade */
+  --primary-10: rgba(39, 38, 98, 0.1);
+  --primary-15: rgba(39, 38, 98, 0.15);
+  --primary-20: rgba(39, 38, 98, 0.2);
+  --primary-30: rgba(39, 38, 98, 0.3);
+  --accent-10: rgba(241, 90, 36, 0.1);
+  --accent-15: rgba(241, 90, 36, 0.15);
+  --accent-20: rgba(241, 90, 36, 0.2);
 }
 
 @theme inline {
-  --color-primary: var(--primary-dark);
-  --color-secondary: var(--secondary);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
+  --color-primary: var(--primary);
   --color-accent: var(--accent);
+  --color-secondary: var(--secondary);
+  --color-neutral: var(--neutral);
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-text-primary: var(--black);
   --color-text-secondary: var(--gray);
   --color-border: var(--border);
@@ -37,9 +62,7 @@
 body {
   background: var(--background);
   color: var(--black);
-  font-family: Arial, Helvetica, sans-serif;
-
-  /* esconder scroll global */
+  font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
   overflow: auto;
 }
 
@@ -56,9 +79,80 @@ body {
 
 /* Estilos globais */
 a {
-  color: var(--primary-dark);
+  color: var(--primary);
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent);
 }
 
 button {
   transition: all 0.2s ease;
+  font-family: 'Red Hat Display', 'Red Hat Text', sans-serif;
+}
+
+/* Buttons Primários - Azul Royal */
+button:not([disabled]):not(.icon-btn) {
+  font-weight: 600;
+}
+
+/* Inputs com foco em Azul Royal */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(39, 38, 98, 0.1) !important;
+  font-family: 'Red Hat Text', sans-serif;
+}
+
+input,
+textarea,
+select {
+  font-family: 'Red Hat Text', sans-serif;
+}
+
+/* Estilos do Sidebar */
+aside {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--background);
+}
+
+aside::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+aside::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+aside::-webkit-scrollbar-thumb:hover {
+  background: var(--gray);
+}
+
+/* Menu items com melhor responsividade */
+button[disabled] {
+  cursor: not-allowed;
+}
+
+/* Garantir que o conteúdo principal não seja coberto no mobile */
+@media (max-width: 768px) {
+  main {
+    width: 100%;
+  }
+}
+
+@keyframes heart-burst {
+  0% { transform: scale(0); opacity: 1; }
+  40% { transform: scale(1.3); opacity: 0.9; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+.animate-heart-burst {
+  animation: heart-burst 0.8s ease-out forwards;
 }

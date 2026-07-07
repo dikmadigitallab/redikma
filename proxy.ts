@@ -1,19 +1,34 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { getToken } from "next-auth/jwt"
 
-export function proxy(req: NextRequest) {
-  const session = req.cookies.get("session")
+export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl
 
-  const isLoginPage = req.nextUrl.pathname.startsWith("/login")
+  const isProtected = ["/intern", "/admin"].some((route) =>
+    pathname.startsWith(route)
+  )
 
-  // ❌ não logado → manda pro login
-  if (!session && !isLoginPage) {
-    return NextResponse.redirect(new URL("/login", req.url))
+  if (!isProtected) return NextResponse.next()
+
+  let token
+  try {
+    token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    })
+  } catch {
+    token = null
   }
 
-  // ✅ já logado → evita voltar pro login
-  if (session && isLoginPage) {
-    return NextResponse.redirect(new URL("/feed", req.url))
+  if (!token) {
+    const loginUrl = new URL("/login", req.url)
+    loginUrl.searchParams.set("callbackUrl", pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  if (token.first_acess) {
+    return NextResponse.redirect(new URL("/primeiro-acesso", req.url))
   }
 
   return NextResponse.next()
@@ -21,7 +36,7 @@ export function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/feed/:path*",
-    "/login",
+    "/intern/:path*",
+    "/admin/:path*",
   ],
-}
+};

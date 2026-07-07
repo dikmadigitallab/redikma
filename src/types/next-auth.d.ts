@@ -1,4 +1,5 @@
 import NextAuth from "next-auth"
+import { User } from "@prisma/client"
 
 declare module "next-auth" {
   interface Session {
@@ -8,10 +9,13 @@ declare module "next-auth" {
       username: string
       cpf: string
       cargo: string
+      telefone: string
+      email: string
       role: string
       foto: string | null
       aniversario: string
       admissao: string
+      first_acess: boolean
     }
   }
 
@@ -21,25 +25,29 @@ declare module "next-auth" {
     username: string
     cpf: string
     cargo: string
+    telefone: string
+    email: string
     role: string
     foto: string | null
     aniversario: string
     admissao: string
+    first_acess: boolean
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    user: {
-      id: string
-      nome: string
-      username: string
-      cpf: string
-      cargo: string
-      role: string
-      foto: string | null
-      aniversario: string
-      admissao: string
-    }
+    id: string
+    nome: string
+    username: string
+    cpf: string
+    cargo: string
+    telefone: string
+    email: string
+    role: string
+    foto: string | null
+    aniversario: string
+    admissao: string
+    first_acess: boolean
   }
 }
