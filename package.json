@@ -1,10 +1,6 @@
 {
   "name": "redikma",
-<<<<<<< HEAD
-  "version": "0.0.1", 
-=======
   "version": "2.0.0",
->>>>>>> 333726306d064db9a7567c40fc25548e3d65da0d
   "private": true,
   "scripts": {
     "dev": "next dev",
