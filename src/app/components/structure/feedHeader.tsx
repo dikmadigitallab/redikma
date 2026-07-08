@@ -8,7 +8,7 @@ import {
   Search,
   Rss,
 } from "lucide-react"
-import {  useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { NotificationsBox } from "./box-notify"
 import { FaUserDoctor } from "react-icons/fa6"
@@ -49,32 +49,32 @@ export function Header() {
 
 
 
- 
 
 
-const label = useMemo(() => {
-  if (typeof window === "undefined") return "";
 
-  const hostname = window.location.hostname;
+  const label = useMemo(() => {
+    if (typeof window === "undefined") return "";
 
-  if (hostname === "localhost") {
-    return "LOCAL";
-  }
+    const hostname = window.location.hostname;
 
-  if (hostname.includes("hml")) {
-    return "BETA";
-  }
+    if (hostname === "localhost") {
+      return "LOCAL";
+    }
 
-  if (hostname.includes("dev")) {
-    return "DEV";
-  }
+    if (hostname.includes("hml")) {
+      return "BETA";
+    }
 
-  if (hostname.includes("opencode")) {
-    return "OPCD";
-  }
+    if (hostname.includes("dev")) {
+      return "DEV";
+    }
 
-  return "";
-}, []);
+    if (hostname.includes("opencode")) {
+      return "OPCD";
+    }
+
+    return "";
+  }, []);
 
   const lastSeenKey = userId
     ? `notifications-last-seen-${userId}`
@@ -111,7 +111,7 @@ const label = useMemo(() => {
           : list.notifications || []
 
         const pending = notifications.filter(
-          (n:any) =>
+          (n: any) =>
             new Date(n.createdAt) > lastSeenDate
         ).length
 
@@ -223,6 +223,24 @@ const label = useMemo(() => {
 
       setUnreadCount(0)
     }
+  }
+
+  function redirectToTelemedicine() {
+    //colocar alert antes de enviar
+    alert("Para acessar a Telemedicina da Samp, você será redirecionado para o site oficial. Clique em OK para continuar.");
+    window.open(
+      "https://www.saobernardosamp.com.br/servicos/telemedicina/?v=1",
+      "_blank"
+    )
+  }
+
+  function redirectToOuvidoria() {
+    //colocar alert antes de enviar
+    alert("Para acessar a Ouvidoria, você será redirecionado para o site oficial. Clique em OK para continuar.");
+    window.open(
+      "https://dikma.com.br/contato/#ouvidoria",
+      "_blank"
+    )
   }
 
   return (
@@ -348,7 +366,7 @@ const label = useMemo(() => {
                             className="relative aspect-square overflow-hidden bg-neutral-100 group"
                           >
                             <Image
-                              src={post.image|| '/placeholder.png'}
+                              src={post.image || '/placeholder.png'}
                               alt=""
                               fill
                               sizes="(max-width: 768px) 33vw, 170px"
@@ -378,8 +396,8 @@ const label = useMemo(() => {
                   handleToggleNotifications
                 }
                 className={`w-9 h-9 flex items-center justify-center rounded-full relative transition font-bold ${unreadCount > 0
-                    ? "text-white bg-accent shadow-lg hover:shadow-xl"
-                    : "text-neutral-600 hover:bg-[varprimary-10 hover:text-primary"
+                  ? "text-white bg-accent shadow-lg hover:shadow-xl"
+                  : "text-neutral-600 hover:bg-[varprimary-10 hover:text-primary"
                   }`}
               >
                 <Bell
@@ -469,10 +487,8 @@ const label = useMemo(() => {
                   <button
                     onClick={() => {
                       setOpen(false)
-                      window.open(
-                        "https://www.saobernardosamp.com.br/servicos/telemedicina/?v=1",
-                        "_blank"
-                      )
+                      redirectToTelemedicine()
+
                     }}
                     className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-10 transition"
                   >
@@ -483,10 +499,7 @@ const label = useMemo(() => {
                   <button
                     onClick={() => {
                       setOpen(false)
-                      window.open(
-                        "https://dikma.com.br/contato/#ouvidoria",
-                        "_blank"
-                      )
+                      redirectToOuvidoria()
                     }}
                     className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-primary hover:bg-primary-10 transition"
                   >
