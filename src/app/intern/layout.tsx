@@ -6,7 +6,7 @@ import { Header } from "../components/structure/feedHeader";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 
 export const metadata: Metadata = {
-  title: "ReDikma - Comunicando Cultura",
+  title: "Intranet - Comunicando Cultura",
   description: "Plataforma de comunicação interna para engajamento e colaboração corporativa",
 };
 

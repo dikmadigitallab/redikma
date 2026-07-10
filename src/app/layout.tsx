@@ -27,7 +27,7 @@ const redHatText = Red_Hat_Text({
 });
 
 export const metadata: Metadata = {
-  title: "ReDikma - Comunicando Cultura",
+  title: "Intranet - Comunicando Cultura",
   description:
     "Plataforma de comunicação interna para engajamento e colaboração corporativa",
 };

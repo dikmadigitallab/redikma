@@ -254,8 +254,8 @@ export function Header() {
         >
           <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shadow-lg bg-white border-2 border-white">
             <Image
-              src="/icons/redikma_logo.png"
-              alt="logotipo ReDikma"
+              src="/icons/Intranet_logo.png"
+              alt="logotipo Intranet"
               width={300}
               height={300}
               priority
@@ -267,7 +267,7 @@ export function Header() {
 
           <div className="leading-tight">
             <h1 className="text-sm font-bold text-white drop-shadow-md">
-              ReDikma - {label}
+              Intranet - {label}
             </h1>
 
             <p className="text-[10px] text-white opacity-95 uppercase font-semibold tracking-wide drop-shadow-sm">

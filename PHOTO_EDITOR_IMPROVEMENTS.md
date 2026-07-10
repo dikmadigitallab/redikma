@@ -9,6 +9,7 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 ## 🎨 Principais Melhorias
 
 ### 1. **Header Visual Premium**
+
 - Background com gradiente Azul Royal (#272662) a preto
 - Tipografia Red Hat Display com tamanho maior (text-lg)
 - Ícones maiores (18px) com cores brancas
@@ -16,6 +17,7 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 - Layout mais espaçoso e elegante
 
 ### 2. **Bottom Sheet / Overlay**
+
 - **Drag Handle**: Barra visual no topo para indicar que é arrastável
 - **Animação suave**: `animate-in slide-in-from-bottom-2`
 - **Backdrop blur**: Efeito de vidro fosco ao fundo
@@ -23,6 +25,7 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 - **Botão de fechar**: Maior e com melhor feedback visual
 
 ### 3. **Sliders com Cores Agressivas**
+
 - **Thumb maior**: 5x5 pixels com sombra
 - **Indicador de valor**: Fundo laranja (#F15A24) com texto branco
 - **Track com gradiente**: Azul Royal até 100% do valor
@@ -31,6 +34,7 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 - **Fonte maior**: Labels em text-sm font-bold
 
 ### 4. **Grid de Filtros Estilo Instagram**
+
 - **Previews em grid 4 colunas**: Mostra como cada filtro afeta a imagem
 - **Cards com border-2**: Borders mais visíveis
 - **Efeito hover**: `transform hover:scale-105`
@@ -39,6 +43,7 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 - **Altura aumentada**: max-h-200px com overflow
 
 ### 5. **Seção de Crop/Corte**
+
 - **Proporções com cores**: Laranja para selecionado
 - **Botões maior e mais espaçados**: Flex-1 com py-3
 - **Efeito visual**: Hover em cor primária
@@ -46,6 +51,7 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 - **Zoom slider**: Mesmo estilo dos sliders de ajuste
 
 ### 6. **Toolbar de Ferramentas**
+
 - **Background translúcido**: rgba(0,0,0,0.3)
 - **Botões maiores**: Ícones 20px, gap-1
 - **Estados ativos**: Fundo azul royal com border laranja
@@ -54,12 +60,14 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 - **Tipografia bold**: Font bold em todos os botões
 
 ### 7. **Zoom Indicator**
+
 - **Visual premium**: Backdrop blur com border branco/20%
 - **Posicionamento melhor**: bottom-3 right-3
 - **Texto maior**: text-xs font-bold
 - **Exemplo**: "1.5x Zoom" em vez de "1.5x"
 
 ### 8. **Botões Cancelar / Confirmar**
+
 - **Cancelar**: Border primária com hover em azul light
 - **Confirmar**: Background laranja com sombra colorida
 - **Hover effect**: hover:scale-105 em ambos
@@ -83,12 +91,12 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 
 ## 🎨 Cores Utilizadas
 
-| Elemento | Cor | Uso |
-|----------|-----|-----|
-| Primária | #272662 (Azul Royal) | Headers, backgrounds, borders |
-| Destaque | #F15A24 (Laranja) | Botões CTA, valores, seleções |
+| Elemento   | Cor                  | Uso                                |
+| ---------- | -------------------- | ---------------------------------- |
+| Primária   | #272662 (Azul Royal) | Headers, backgrounds, borders      |
+| Destaque   | #F15A24 (Laranja)    | Botões CTA, valores, seleções      |
 | Secundária | #86B0DD (Azul Claro) | Gradientes, elementos alternativos |
-| Neutra | #F7ECDA (Creme) | Backgrounds alternativos |
+| Neutra     | #F7ECDA (Creme)      | Backgrounds alternativos           |
 
 ---
 
@@ -122,6 +130,7 @@ O editor de fotos mobile foi completamente redesenhado para se assemelhar ao edi
 ## ✨ Resultado Final
 
 O editor agora oferece uma experiência semelhante à do Instagram com:
+
 - Visual profissional e moderno
 - Identidade visual Dikma forte
 - Feedback visual claro para cada ação
@@ -129,4 +138,4 @@ O editor agora oferece uma experiência semelhante à do Instagram com:
 - Componentes maiores e mais tocáveis
 - Layout otimizado para mobile
 
-A combinação de cores agressivas (azul royal + laranja) com tipografia Red Hat cria uma interface premium que se destaca no ecossistema do Redikma.
+A combinação de cores agressivas (azul royal + laranja) com tipografia Red Hat cria uma interface premium que se destaca no ecossistema do Intranet.

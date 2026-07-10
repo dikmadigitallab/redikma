@@ -87,7 +87,7 @@ export default function LoginCPF() {
           className="relative z-10 p-12 text-white max-w-xl text-center flex flex-col items-center"
         >
           <h2 className="text-4xl font-bold mb-4 leading-tight">
-            Bem-vindo à <span className="text-accent">ReDikma</span>
+            Bem-vindo à <span className="text-accent">Intranet</span>
           </h2>
 
           <p className="text-lg text-gray-200 mb-8">

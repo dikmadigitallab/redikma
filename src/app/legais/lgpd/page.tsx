@@ -1,12 +1,12 @@
 "use client";
 
-const politicaPrivacidade = `# Política de Privacidade e Proteção de Dados da Plataforma ReDikma
+const politicaPrivacidade = `# Política de Privacidade e Proteção de Dados da Plataforma Intranet
 
 Última atualização: 16 de maio de 2026
 
 1. Apresentação
 
-A ReDikma é uma plataforma corporativa de comunicação interna e engajamento desenvolvida para fortalecer a comunicação institucional, promover integração entre colaboradores e disponibilizar funcionalidades de interação social em ambiente corporativo seguro.
+A Intranet é uma plataforma corporativa de comunicação interna e engajamento desenvolvida para fortalecer a comunicação institucional, promover integração entre colaboradores e disponibilizar funcionalidades de interação social em ambiente corporativo seguro.
 
 Esta Política de Privacidade e Proteção de Dados descreve de forma clara e transparente como os dados pessoais dos usuários são coletados, utilizados, armazenados, compartilhados e protegidos, em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018).
 
@@ -14,13 +14,13 @@ Ao utilizar a plataforma, o usuário declara que leu e compreendeu esta Polític
 
 2. Quem é o Controlador dos Dados
 
-O controlador dos dados pessoais tratados na ReDikma é a própria empresa responsável pela disponibilização da plataforma aos seus colaboradores.
+O controlador dos dados pessoais tratados na Intranet é a própria empresa responsável pela disponibilização da plataforma aos seus colaboradores.
 
 A empresa é responsável por definir as finalidades e os meios de tratamento dos dados pessoais no âmbito da plataforma.
 
 3. Dados Pessoais Coletados
 
-A ReDikma poderá tratar os seguintes dados pessoais:
+A Intranet poderá tratar os seguintes dados pessoais:
 
 Dados cadastrais e funcionais:
 - Nome completo
@@ -60,7 +60,7 @@ Dados técnicos e de auditoria:
 
 4. Dados Sensíveis
 
-A ReDikma não tem como finalidade tratar dados pessoais sensíveis nos termos da LGPD.
+A Intranet não tem como finalidade tratar dados pessoais sensíveis nos termos da LGPD.
 
 O recurso de humor diário é opcional e utilizado exclusivamente para fins internos de acompanhamento de clima organizacional, sendo tratado com acesso restrito e observância dos princípios da necessidade e minimização de dados.
 
@@ -112,7 +112,7 @@ O compartilhamento será limitado ao mínimo necessário para cada finalidade.
 
 9. Armazenamento e Segurança
 
-A ReDikma adota medidas técnicas e administrativas para proteger os dados pessoais, incluindo:
+A Intranet adota medidas técnicas e administrativas para proteger os dados pessoais, incluindo:
 - Criptografia em trânsito via HTTPS/TLS.
 - Armazenamento seguro em banco de dados.
 - Senhas protegidas por hash criptográfico.
@@ -163,7 +163,7 @@ Solicitações relacionadas à privacidade e à proteção de dados poderão ser
 
 17. Aceite
 
-Ao utilizar a ReDikma e, quando aplicável, registrar seu aceite eletrônico, o usuário declara que leu, compreendeu e está ciente desta Política de Privacidade e Proteção de Dados.
+Ao utilizar a Intranet e, quando aplicável, registrar seu aceite eletrônico, o usuário declara que leu, compreendeu e está ciente desta Política de Privacidade e Proteção de Dados.
 `;
 
 export default function PoliticaPrivacidadePage() {

@@ -2,19 +2,19 @@
 
 import { toast } from "sonner";
 
-const termosDeUso = `# Termos de Uso da Plataforma ReDikma
+const termosDeUso = `# Termos de Uso da Plataforma Intranet
 
 Última atualização: 16 de maio de 2026
 
 1. Apresentação
 
-A ReDikma é uma plataforma corporativa de comunicação interna e engajamento destinada aos colaboradores da empresa. O sistema permite acesso a conteúdos institucionais, publicações automatizadas de recursos humanos, interações sociais entre colaboradores e funcionalidades complementares voltadas ao fortalecimento da cultura organizacional.
+A Intranet é uma plataforma corporativa de comunicação interna e engajamento destinada aos colaboradores da empresa. O sistema permite acesso a conteúdos institucionais, publicações automatizadas de recursos humanos, interações sociais entre colaboradores e funcionalidades complementares voltadas ao fortalecimento da cultura organizacional.
 
 Ao acessar e utilizar a plataforma, o colaborador declara que leu, compreendeu e concorda com estes Termos de Uso e com a Política de Privacidade.
 
 2. Finalidade da Plataforma
 
-A Redikma tem como objetivo centralizar comunicados institucionais, divulgar informações corporativas e ações de recursos humanos, promover integração e reconhecimento entre colaboradores, facilitar o acesso a conteúdos internos e disponibilizar recursos de interação social, como curtidas, comentários e reações.
+A Intranet tem como objetivo centralizar comunicados institucionais, divulgar informações corporativas e ações de recursos humanos, promover integração e reconhecimento entre colaboradores, facilitar o acesso a conteúdos internos e disponibilizar recursos de interação social, como curtidas, comentários e reações.
 
 A plataforma é de uso exclusivamente interno e corporativo.
 
@@ -36,7 +36,7 @@ O usuário é responsável por manter suas informações atualizadas e corretas.
 
 5. Funcionalidades da Plataforma
 
-A ReDikma poderá disponibilizar, entre outras funcionalidades:
+A Intranet poderá disponibilizar, entre outras funcionalidades:
 
 - Feed de notícias e comunicados institucionais;
 - Publicações automáticas de aniversários, tempo de empresa e promoções;
@@ -56,7 +56,7 @@ O usuário é integralmente responsável pelo conteúdo que publicar e pelas int
 
 7. Penalidades por Conduta Inadequada
 
-A ReDikma é um ambiente corporativo e deverá ser utilizada em conformidade com os princípios, valores, normas internas e políticas da empresa.
+A Intranet é um ambiente corporativo e deverá ser utilizada em conformidade com os princípios, valores, normas internas e políticas da empresa.
 
 Como o principal meio de manifestação do usuário ocorre por meio de comentários, qualquer utilização desse recurso para ofender colegas, superiores, subordinados ou terceiros, bem como para disseminar conteúdos inadequados ou incompatíveis com as normas da empresa, poderá resultar em medidas disciplinares dentro da própria plataforma.
 
@@ -66,7 +66,7 @@ O acúmulo de 3 (três) ocorrências poderá resultar em bloqueio temporário de
 
 Caso, após o desbloqueio, novas condutas inadequadas sejam registradas, o usuário poderá ser bloqueado por período de até 15 (quinze) dias.
 
-Persistindo o comportamento inadequado após as penalidades anteriores, a empresa poderá determinar o bloqueio definitivo da conta do usuário na ReDikma.
+Persistindo o comportamento inadequado após as penalidades anteriores, a empresa poderá determinar o bloqueio definitivo da conta do usuário na Intranet.
 
 As sanções aplicadas na plataforma não excluem a possibilidade de medidas disciplinares, administrativas ou legais no âmbito da empresa, de acordo com regulamentos internos e legislação aplicável.
 
@@ -128,7 +128,7 @@ Dúvidas relacionadas a estes Termos de Uso, à Política de Privacidade ou ao t
 
 19. Aceite
 
-Ao utilizar a plataforma, o usuário declara que leu, compreendeu e concorda integralmente com estes Termos de Uso e com a Política de Privacidade da Plataforma ReDikma.
+Ao utilizar a plataforma, o usuário declara que leu, compreendeu e concorda integralmente com estes Termos de Uso e com a Política de Privacidade da Plataforma Intranet.
 `;
 
 export default function TermosDeUsoPage() {

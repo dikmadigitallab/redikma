@@ -1,11 +1,13 @@
-# Checkpoints - Redikma
+# Checkpoints - Intranet
 
 ## [2026-05-19] Versão 0.9.98
+
 - Criação do projeto
 - Redesign completo da UI com paleta profissional
 - Implementação de responsividade mobile-first
 
 ## [2026-05-19] Galeria como padrão + Editor Mobile Profissional
+
 - **new-post page**: Agora abre galeria por padrão em vez de câmera. Câmera só é ativada quando usuário clica em "Usar câmera".
 - **photo-editor-mobile.tsx**: Redesign completo como editor profissional
   - Sistema de abas: Ajustes, Filtros, Cortar

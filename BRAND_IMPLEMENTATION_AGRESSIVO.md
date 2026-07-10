@@ -1,4 +1,4 @@
-# ReDikma - Implementação Agressiva de Branding Dikma
+# Intranet - Implementação Agressiva de Branding Dikma
 
 ## Status: ✅ COMPLETO E COMPILADO COM SUCESSO
 
@@ -7,23 +7,26 @@
 ## 🎨 Paleta de Cores - Aplicação Agressiva
 
 ### Cores Primárias
+
 - **Azul Royal Primário**: `#272662` - Usado em borders, backgrounds, headers e elementos principais
 - **Laranja Destaque**: `#F15A24` - Usado em botões de ação, hover states e CTAs
 - **Azul Secundário**: `#86B0DD` - Usado em gradientes e elementos secundários
 - **Creme Neutro**: `#F7ECDA` - Background alternativo e elementos neutros
 
 ### Variações de Opacidade (CSS Variables)
+
 ```css
---primary-10: rgba(39, 38, 98, 0.1)    /* backgrounds leves */
---primary-15: rgba(39, 38, 98, 0.15)   /* backgrounds médios */
---primary-20: rgba(39, 38, 98, 0.2)    /* backgrounds fortes */
---primary-30: rgba(39, 38, 98, 0.3)    /* backgrounds muito fortes */
---accent-10: rgba(241, 90, 36, 0.1)    /* accent leve */
---accent-15: rgba(241, 90, 36, 0.15)   /* accent médio */
---accent-20: rgba(241, 90, 36, 0.2)    /* accent forte */
+--primary-10: rgba(39, 38, 98, 0.1) /* backgrounds leves */
+  --primary-15: rgba(39, 38, 98, 0.15) /* backgrounds médios */
+  --primary-20: rgba(39, 38, 98, 0.2) /* backgrounds fortes */
+  --primary-30: rgba(39, 38, 98, 0.3) /* backgrounds muito fortes */
+  --accent-10: rgba(241, 90, 36, 0.1) /* accent leve */
+  --accent-15: rgba(241, 90, 36, 0.15) /* accent médio */
+  --accent-20: rgba(241, 90, 36, 0.2) /* accent forte */;
 ```
 
 ### Gradientes Criados
+
 - `--gradient-primary`: Azul Royal gradiente 135deg
 - `--gradient-primary-light`: Azul Royal → Azul Claro
 - `--gradient-accent`: Laranja gradiente 135deg
@@ -34,12 +37,14 @@
 ## 🔤 Tipografia - Red Hat Completa
 
 ### Fontes Implementadas
+
 - **Red Hat Display**: Pesos 300, 400, 500, 600, 700, 800, 900
   - Usada em: Headings, títulos, labels principais
 - **Red Hat Text**: Pesos 300, 400, 500, 600, 700
   - Usada em: Corpo do texto, inputs, labels secundárias
 
 ### Aplicação Global
+
 - Fonte padrão: `'Red Hat Display', 'Red Hat Text', sans-serif`
 - Inputs e textareas: `'Red Hat Text', sans-serif`
 - Todos os botões: `'Red Hat Display', 'Red Hat Text', sans-serif`
@@ -50,25 +55,27 @@
 ## 🎯 Componentes Atualizados com Cores Agressivas
 
 ### 1. **Sidebar** (`/components/sidebar.tsx`)
+
 - Border: `2px solid var(--primary)` ✅
-- Menu items: 
+- Menu items:
   - Hover: Background `var(--accent)`, texto branco
   - Ícones: Background `var(--primary-10)`, cor `var(--primary)`
   - Hover ícones: Background branco, cor `var(--accent)`
 - Card Logo: Halo decorativo com `var(--primary)`
-- Botão Logout: 
+- Botão Logout:
   - Background: `var(--accent)` com shadow
   - Texto: Branco
   - Hover: Scale 105% com shadow aumentada
 
 ### 2. **Feed Header** (`/components/feedHeader.tsx`)
+
 - Background: `var(--gradient-brand)` (gradiente Azul → Ciano → Laranja)
 - Border: `2px solid var(--accent)`
 - Logo: Border branco 2px
 - Título: Branco com drop-shadow
 - Subtítulo: Branco opacity-95 com font-semibold
 - Input busca: Border `2px solid var(--primary)`, focus `var(--accent)`
-- Notificação: 
+- Notificação:
   - Com unread: Background `var(--accent)`, texto branco, shadow
   - Sem unread: Cor `var(--primary)` hover
 - Dropdown menu:
@@ -77,12 +84,14 @@
   - Botão logout: Background `var(--accent)`, texto branco
 
 ### 3. **Card de Usuário** (`/components/cardUser.tsx`)
+
 - Border: `2px solid var(--primary)`
 - Hover: Border `var(--accent)`, shadow aumentada
 - Nome: Cor `var(--primary)`, font-bold
 - Halo: Background `var(--primary)`
 
 ### 4. **Posts Bar** (`/components/posts-bar.tsx`)
+
 - Card principal: Border `2px solid var(--primary)`, hover border `var(--accent)`
 - Campo fake input: Border `2px solid var(--primary)`, hover `var(--primary-10)`
 - Ícone imagem: Background `var(--primary-15)`, hover `var(--accent)` com texto branco
@@ -90,16 +99,18 @@
 - Botão "Publicar": Background `var(--accent)`, hover shadow + scale 105%
 
 ### 5. **Feed Posts** (`/components/feed.tsx`)
+
 - Card do post: Border `2px solid var(--primary)`, hover `var(--accent)`
 - Autor: Cor `var(--primary)`, font-bold
 - Campo comentário: Border `2px solid var(--primary)`, focus border `var(--accent)`
 - Botão enviar comentário: Background `var(--accent)`, texto branco, hover scale 110%
-- Botões likes: 
+- Botões likes:
   - Normal: Background `var(--primary-10)`
   - Com like: Background `var(--accent)`, scale 110%
 - Ícone comentário: Background `var(--primary-10)`, hover `var(--primary-20)`
 
 ### 6. **Modal de Postagem** (`/components/modal-postagem.tsx`)
+
 - Header: Background `var(--primary)`, border-bottom `2px solid var(--accent)`
 - Título: Branco, font-bold, Red Hat Display
 - Textarea: Border `2px solid var(--primary)`, focus shadow
@@ -109,6 +120,7 @@
 - Botão "Postar": Background `var(--accent)`, texto branco, hover shadow + scale 105%
 
 ### 7. **Admin Sidebar** (`/components/admin-sidebar.tsx`)
+
 - Border-top: `3px solid var(--primary)`
 - Items: Ícones cor `var(--primary)`, hover background `var(--primary-10)`
 
@@ -194,7 +206,7 @@ Aplicadas em TODOS os arquivos `.tsx`:
 
 ## 🚀 Resultado Final
 
-A aplicação ReDikma agora reflete completamente a identidade visual da Dikma com:
+A aplicação Intranet agora reflete completamente a identidade visual da Dikma com:
 
 - Azul Royal (#272662) como cor primária dominante
 - Laranja (#F15A24) para ações e chamadas de atenção

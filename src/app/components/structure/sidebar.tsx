@@ -48,36 +48,36 @@ export function Sidebar() {
 
     ...(isSystemAdmin
       ? [
-          {
-            icon: LayoutDashboard,
-            label: "Dashboard",
-            onClick: () => {
-              router.push("/admin/dashboard")
-            },
-            disabled: false,
+        {
+          icon: LayoutDashboard,
+          label: "Dashboard",
+          onClick: () => {
+            router.push("/admin/dashboard")
           },
-        ]
+          disabled: false,
+        },
+      ]
       : []),
 
     ...(isAdmin
       ? [
-          {
-            icon: UserPlus,
-            label: "Novo Usuário",
-            onClick: () => {
-              router.push("/admin/cadastro")
-            },
-            disabled: false,
+        {
+          icon: UserPlus,
+          label: "Novo Usuário",
+          onClick: () => {
+            router.push("/admin/cadastro")
           },
-          {
-            icon: Users,
-            label: "Todos os Usuários",
-            onClick: () => {
-              router.push("/admin/usuarios")
-            },
-            disabled: false,
+          disabled: false,
+        },
+        {
+          icon: Users,
+          label: "Todos os Usuários",
+          onClick: () => {
+            router.push("/admin/usuarios")
           },
-        ]
+          disabled: false,
+        },
+      ]
       : []),
 
     {
@@ -99,130 +99,127 @@ export function Sidebar() {
     },
   ]
 
-const sidebarContent = (
-  <div className="flex flex-col h-full py-4 md:py-6">
-    {/* Card usuário */}
-    <div className="px-4 md:px-6 mb-6">
-      <UserCard />
-    </div>
-
-    {/* Navegação */}
-    <nav className="flex-1 px-3 md:px-4">
-      <div className="px-2 mb-3">
-        <p
-          className="text-[10px] font-semibold uppercase tracking-[0.18em]"
-          style={{ color: "var(--gray)" }}
-        >
-          Menu
-        </p>
+  const sidebarContent = (
+    <div className="flex flex-col h-full py-4 md:py-6">
+      {/* Card usuário */}
+      <div className="px-4 md:px-6 mb-6">
+        <UserCard />
       </div>
 
-      <div
-        className="rounded-2xl border-2 shadow-md overflow-hidden"
-        style={{
-          backgroundColor: "var(--white)",
-          borderColor: "var(--primary)",
-        }}
-      >
-        {/* Barra topo */}
-        <div
-          className="h-1 w-full"
-          style={{
-            background:
-              "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
-          }}
-        />
+      {/* Navegação */}
+      <nav className="flex-1 px-3 md:px-4">
+        <div className="px-2 mb-3">
+          <p
+            className="text-[10px] font-semibold uppercase tracking-[0.18em]"
+            style={{ color: "var(--gray)" }}
+          >
+            Menu
+          </p>
+        </div>
 
-        <div className="p-2">
-          {menuItems.map((item) => (
-            <button
-              title={item.name}
-              key={item.label}
-              onClick={item.onClick}
-              disabled={item.disabled}
-              className={`group flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all duration-200 text-left font-semibold ${
-                item.disabled
-                  ? "opacity-40 cursor-not-allowed"
-                  : "cursor-pointer hover:bg-accent"
-              }`}
-              style={{
-                backgroundColor: "transparent",
-              }}
-            >
-              {/* Ícone */}
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${
-                  item.disabled
-                    ? ""
-                    : "group-hover:bg-white group-hover:text-accent"
-                }`}
+        <div
+          className="rounded-2xl border-2 shadow-md overflow-hidden"
+          style={{
+            backgroundColor: "var(--white)",
+            borderColor: "var(--primary)",
+          }}
+        >
+          {/* Barra topo */}
+          <div
+            className="h-1 w-full"
+            style={{
+              background:
+                "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
+            }}
+          />
+
+          <div className="p-2">
+            {menuItems.map((item) => (
+              <button
+                title={item.name}
+                key={item.label}
+                onClick={item.onClick}
+                disabled={item.disabled}
+                className={`group flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all duration-200 text-left font-semibold ${item.disabled
+                    ? "opacity-40 cursor-not-allowed"
+                    : "cursor-pointer hover:bg-accent"
+                  }`}
                 style={{
-                  backgroundColor: "var(--primary-10)",
-                  color: "var(--primary)",
+                  backgroundColor: "transparent",
                 }}
               >
-                <item.icon size={18} />
-              </div>
-
-              {/* Texto */}
-              <div className="flex flex-col items-start min-w-0">
-                <span
-                  className={`text-sm md:text-[80%] font-bold truncate transition-colors duration-200 ${
-                    item.disabled
-                      ? "text-primary"
-                      : "text-primary group-hover:text-black"
-                  }`}
+                {/* Ícone */}
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${item.disabled
+                      ? ""
+                      : "group-hover:bg-white group-hover:text-accent"
+                    }`}
+                  style={{
+                    backgroundColor: "var(--primary-10)",
+                    color: "var(--primary)",
+                  }}
                 >
-                  {item.label}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </nav>
+                  <item.icon size={18} />
+                </div>
 
-    {/* Logout */}
-    <div className="px-3 md:px-4 mt-6">
-      <div
-        className="rounded-2xl border-2 shadow-md p-2"
-        style={{
-          backgroundColor: "var(--accent)",
-          borderColor: "var(--accent)",
-        }}
-      >
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer font-bold"
+                {/* Texto */}
+                <div className="flex flex-col items-start min-w-0">
+                  <span
+                    className={`text-sm md:text-[80%] font-bold truncate transition-colors duration-200 ${item.disabled
+                        ? "text-primary"
+                        : "text-primary group-hover:text-black"
+                      }`}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* Logout */}
+      <div className="px-3 md:px-4 mt-6">
+        <div
+          className="rounded-2xl border-2 shadow-md p-2"
           style={{
             backgroundColor: "var(--accent)",
-            color: "white",
+            borderColor: "var(--accent)",
           }}
         >
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-3 md:px-4 py-3 rounded-xl transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer font-bold"
             style={{
-              backgroundColor: "rgba(255,255,255,0.25)",
+              backgroundColor: "var(--accent)",
               color: "white",
             }}
           >
-            <LogOut size={18} />
-          </div>
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.25)",
+                color: "white",
+              }}
+            >
+              <LogOut size={18} />
+            </div>
 
-          <div className="flex flex-col items-start">
-            <span className="text-sm md:text-[15px] font-bold text-white">
-              Sair
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-sm md:text-[15px] font-bold text-white">
+                Sair
+              </span>
 
-            <span className="text-[11px] text-white opacity-90">
-              Encerrar sessão
-            </span>
-          </div>
-        </button>
+              <span className="text-[11px] text-white opacity-90">
+                Encerrar sessão
+              </span>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
 
   return (
     <aside
@@ -267,8 +264,8 @@ const sidebarContent = (
               }}
             >
               <Image
-                src="/icons/redikma_logo.png"
-                alt="ReDikma"
+                src="/icons/Intranet_logo.png"
+                alt="Intranet"
                 width={36}
                 height={36}
                 className="object-contain"
@@ -282,14 +279,14 @@ const sidebarContent = (
               className="text-[100%] font-bold tracking-tight"
               style={{ color: "var(--primary)" }}
             >
-              ReDikma
+              Intranet
             </h1>
 
             <p
               className="text-[15%] font-semibold uppercase tracking-[0.18em] mt-0.5"
               style={{ color: "var(--gray)" }}
             >
-              Comunicação Interna 
+              Comunicação Interna
             </p>
           </div>
         </div>

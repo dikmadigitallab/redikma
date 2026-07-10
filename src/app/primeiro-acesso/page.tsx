@@ -78,14 +78,14 @@ export default function PrimeiroAcessoPage() {
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-sm overflow-hidden">
             <Image
-              src="/icons/redikma_logo.png"
-              alt="Logo Redikma"
+              src="/icons/Intranet_logo.png"
+              alt="Logo Intranet"
               width={36}
               height={36}
               className="object-contain"
             />
           </div>
-          <span className="font-bold text-lg text-neutral-900">ReDikma</span>
+          <span className="font-bold text-lg text-neutral-900">Intranet</span>
         </div>
       </header>
 
@@ -120,7 +120,7 @@ export default function PrimeiroAcessoPage() {
                   <p className="text-sm text-primary mt-0.5">
                     Declaro que li e concordo com os{" "}
                     <Link href="/legais/termos-de-uso" target="_blank" className="text-primary underline hover:no-underline">
-                      Termos de Uso da plataforma ReDikma
+                      Termos de Uso da plataforma Intranet
                     </Link>.
                   </p>
                 </div>

@@ -197,8 +197,8 @@ export function RightSidebar() {
     },
     {
       id: "20",
-      nome: "ReDikma",
-      username: "redikma",
+      nome: "Intranet",
+      username: "Intranet",
       visto: false,
       descricao:
         "Um espaço para fortalecer nossa conexão e manter viva a cultura que nos une todos os dias.",

@@ -6,7 +6,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route"
 import { Header } from "../components/structure/feedHeader"
 
 export const metadata: Metadata = {
-  title: "ReDikma - Comunicando Cultura",
+  title: "Intranet - Comunicando Cultura",
   description: "Plataforma de comunicação interna para engajamento e colaboração corporativa",
 }
 
@@ -44,7 +44,7 @@ export default async function RootLayout({
       <main className="md:ml-[18vw] pt-16 md:pt-0">
         <div className="w-full h-full">
           <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8">
-            <Header/>
+            <Header />
             {children}
           </div>
         </div>
