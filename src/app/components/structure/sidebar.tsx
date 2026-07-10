@@ -8,6 +8,8 @@ import {
   Users,
   Rss,
   LayoutDashboard,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { UserCard } from "./cardUser"
@@ -17,7 +19,7 @@ import Image from "next/image"
 
 export function Sidebar() {
   const router = useRouter()
-  const [, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const { data: session } = useSession()
 
   const isAdmin =
@@ -25,7 +27,6 @@ export function Sidebar() {
     session?.user?.role === "SYSTEM_ADM"
 
   const isSystemAdmin = session?.user?.role === "SYSTEM_ADM"
-
 
   async function handleLogout() {
     await signOut({ callbackUrl: "/login" })
@@ -45,7 +46,6 @@ export function Sidebar() {
       },
       disabled: false,
     },
-
     ...(isSystemAdmin
       ? [
         {
@@ -53,12 +53,12 @@ export function Sidebar() {
           label: "Dashboard",
           onClick: () => {
             router.push("/admin/dashboard")
+            setIsOpen(false)
           },
           disabled: false,
         },
       ]
       : []),
-
     ...(isAdmin
       ? [
         {
@@ -66,6 +66,7 @@ export function Sidebar() {
           label: "Novo Usuário",
           onClick: () => {
             router.push("/admin/cadastro")
+            setIsOpen(false)
           },
           disabled: false,
         },
@@ -74,12 +75,12 @@ export function Sidebar() {
           label: "Todos os Usuários",
           onClick: () => {
             router.push("/admin/usuarios")
+            setIsOpen(false)
           },
           disabled: false,
         },
       ]
       : []),
-
     {
       icon: Video,
       label: "Vídeos",
@@ -87,7 +88,6 @@ export function Sidebar() {
       disabled: true,
       name: "Em breve",
     },
-
     {
       icon: User,
       label: "Perfil",
@@ -100,7 +100,7 @@ export function Sidebar() {
   ]
 
   const sidebarContent = (
-    <div className="flex flex-col h-full py-4 md:py-6">
+    <div className="flex flex-col h-full py-4 lg:py-6">
       {/* Card usuário */}
       <div className="px-4 md:px-6 mb-6">
         <UserCard />
@@ -222,78 +222,112 @@ export function Sidebar() {
   )
 
   return (
-    <aside
-      className="hidden md:flex z-9999 flex-col w-[18vw] h-screen fixed left-0 top-0 overflow-y-auto shadow-xl"
-      style={{
-        backgroundColor: "var(--white)",
-        borderRight: "1px solid var(--border)",
-      }}
-    >
-      {/* Barra topo */}
-      <div
-        className="h-1.5 w-full shrink-0"
+    <>
+      {/* BOTÃO DA SETA: Totalmente oculto no celular (hidden), visível no tablet (md:flex), oculto no desktop (lg:hidden) */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="hidden md:flex lg:hidden fixed top-5 z-[10000] p-2 rounded-r-xl border-y-2 border-r-2 shadow-md transition-all duration-300"
         style={{
-          background:
-            "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
-        }}
-      />
-
-      {/* Header */}
-      <div
-        className="px-6 py-5 border-b shrink-0"
-        style={{
-          borderColor: "var(--border)",
-          backgroundColor: "rgba(255,255,255,0.98)",
+          left: isOpen ? "280px" : "0px",
+          backgroundColor: "var(--white)",
+          borderColor: "var(--primary)",
+          color: "var(--primary)",
         }}
       >
-        <div className="flex items-center gap-3">
-          {/* Logo */}
-          <div className="relative">
-            <div
-              className="absolute -inset-1 rounded-xl opacity-20 blur-sm"
-              style={{
-                backgroundColor: "var(--primary)",
-              }}
-            />
+        {isOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+      </button>
 
-            <div
-              className="relative w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm"
-              style={{
-                backgroundColor: "var(--white)",
-                borderColor: "var(--border)",
-              }}
-            >
-              <Image
-                src="/icons/Intranet_logo.png"
-                alt="Intranet"
-                width={36}
-                height={36}
-                className="object-contain"
+      {/* Fundo escurecido (Overlay): Só ativa e aparece na faixa do tablet */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-[9998] hidden md:block lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR */}
+      <aside
+        className={`fixed left-0 top-0 h-screen z-[9999] flex flex-col w-[280px] lg:w-[18vw] overflow-y-auto shadow-xl transition-transform duration-300 ease-in-out
+          /* No Celular: Completamente oculta */
+          -translate-x-full 
+          
+          /* No Tablet: Controlada pelo estado do botão (seta) */
+          md:${isOpen ? "translate-x-0" : "-translate-x-full"} 
+          
+          /* No Desktop: Sempre visível e fixa */
+          lg:translate-x-0
+        `}
+        style={{
+          backgroundColor: "var(--white)",
+          borderRight: "1px solid var(--border)",
+        }}
+      >
+        {/* Barra topo */}
+        <div
+          className="h-1.5 w-full shrink-0"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--primary) 0%, var(--secondary) 70%, var(--accent) 100%)",
+          }}
+        />
+
+        {/* Header */}
+        <div
+          className="px-6 py-5 border-b shrink-0"
+          style={{
+            borderColor: "var(--border)",
+            backgroundColor: "rgba(255,255,255,0.98)",
+          }}
+        >
+          <div className="flex items-center gap-3">
+            {/* Logo */}
+            <div className="relative">
+              <div
+                className="absolute -inset-1 rounded-xl opacity-20 blur-sm"
+                style={{
+                  backgroundColor: "var(--primary)",
+                }}
               />
+
+              <div
+                className="relative w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm"
+                style={{
+                  backgroundColor: "var(--white)",
+                  borderColor: "var(--border)",
+                }}
+              >
+                <Image
+                  src="/icons/Intranet_logo.png"
+                  alt="Intranet"
+                  width={36}
+                  height={36}
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Texto */}
+            <div className="min-w-0">
+              <h1
+                className="text-[100%] font-bold tracking-tight"
+                style={{ color: "var(--primary)" }}
+              >
+                Intranet
+              </h1>
+
+              <p
+                className="text-[15%] font-semibold uppercase tracking-[0.18em] mt-0.5"
+                style={{ color: "var(--gray)" }}
+              >
+                Comunicação Interna
+              </p>
             </div>
           </div>
-
-          {/* Texto */}
-          <div className="min-w-0">
-            <h1
-              className="text-[100%] font-bold tracking-tight"
-              style={{ color: "var(--primary)" }}
-            >
-              Intranet
-            </h1>
-
-            <p
-              className="text-[15%] font-semibold uppercase tracking-[0.18em] mt-0.5"
-              style={{ color: "var(--gray)" }}
-            >
-              Comunicação Interna
-            </p>
-          </div>
         </div>
-      </div>
 
-      {/* Conteúdo */}
-      <div className="flex-1 min-h-0">{sidebarContent}</div>
-    </aside>
+        {/* Conteúdo */}
+        <div className="flex-1 min-h-0">{sidebarContent}</div>
+      </aside>
+    </>
   )
 }
